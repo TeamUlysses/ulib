@@ -39,12 +39,12 @@ local function tool( ply, tr, toolmode )
 		end
 	end
 end
-hook.Add( "CanTool", "ULibPlayerToolCheck", tool, -10 )
+hook.Add( "CanTool", "ULibPlayerToolCheck", tool, hook.HIGH )
 
 local function noclip( ply )
 	if ply.NoNoclip then return false end
 end
-hook.Add( "PlayerNoClip", "ULibNoclipCheck", noclip, -10 )
+hook.Add( "PlayerNoClip", "ULibNoclipCheck", noclip, hook.HIGH )
 
 local function spawnblock( ply )
 	if ply.NoSpawning then return false end
@@ -63,5 +63,5 @@ local function vehicleblock( ply, ent )
 		return false
 	end
 end
-hook.Add( "CanPlayerEnterVehicle", "ULibVehicleBlock", vehicleblock, -10 )
-hook.Add( "CanDrive", "ULibVehicleDriveBlock", vehicleblock, -10 )
+hook.Add( "CanPlayerEnterVehicle", "ULibVehicleBlock", vehicleblock, hook.HIGH )
+hook.Add( "CanDrive", "ULibVehicleDriveBlock", vehicleblock, hook.HIGH )

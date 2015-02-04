@@ -880,7 +880,7 @@ function ucl.probe( ply )
 	hook.Call( ULib.HOOK_UCLCHANGED )
 	hook.Call( ULib.HOOK_UCLAUTH, _, ply )
 end
-hook.Add( "PlayerAuthed", "ULibAuth", ucl.probe, -4 ) -- Run slightly after garry-auth
+-- Note that this function is hooked into "PlayerAuthed", below.
 
 
 local function botCheck( ply )
@@ -889,28 +889,29 @@ local function botCheck( ply )
 		ucl.probe( ply )
 	end
 end
-hook.Add( "PlayerInitialSpawn", "ULibSendAuthToClients", botCheck, -20 )
+hook.Add( "PlayerInitialSpawn", "ULibSendAuthToClients", botCheck, hook.MONITOR_HIGH )
 
 local function sendAuthToClients( ply )
 	ULib.clientRPC( _, "authPlayerIfReady", ply, ply:UserID() ) -- Call on client
 end
-hook.Add( ULib.HOOK_UCLAUTH, "ULibSendAuthToClients", sendAuthToClients, 20 )
+hook.Add( ULib.HOOK_UCLAUTH, "ULibSendAuthToClients", sendAuthToClients, hook.MONITOR_LOW )
 
 local function sendUCLDataToClient( ply )
 	ULib.clientRPC( ply, "ULib.ucl.initClientUCL", ucl.authed, ucl.groups ) -- Send all UCL data (minus offline users) to all loaded users
 	ULib.clientRPC( ply, "hook.Call", ULib.HOOK_UCLCHANGED ) -- Call hook on client
 	ULib.clientRPC( ply, "authPlayerIfReady", ply, ply:UserID() ) -- Call on client
 end
-hook.Add( ULib.HOOK_LOCALPLAYERREADY, "ULibSendUCLDataToClient", sendUCLDataToClient, -20 )
+hook.Add( ULib.HOOK_LOCALPLAYERREADY, "ULibSendUCLDataToClient", sendUCLDataToClient, hook.MONITOR_HIGH )
 
 local function playerDisconnected( ply )
+	-- We want to perform these actions after everything else has processed through, but we need high priority hook to ensure we don't get sniped.
 	local uid = ply:UniqueID()
 	ULib.queueFunctionCall( function()
 		ucl.authed[ uid ] = nil
 		hook.Call( ULib.HOOK_UCLCHANGED )
 	end )
 end
-hook.Add( "PlayerDisconnected", "ULibUCLDisconnect", playerDisconnected, 20 ) -- Last thing we want to do
+hook.Add( "PlayerDisconnected", "ULibUCLDisconnect", playerDisconnected, hook.MONITOR_HIGH )
 
 local function UCLChanged()
 	ULib.clientRPC( _, "ULib.ucl.initClientUCL", ucl.authed, ucl.groups ) -- Send all UCL data (minus offline users) to all loaded users
@@ -930,7 +931,12 @@ hook.Add( "PlayerAuthed", "UTEST", function() print( "HERE HERE: Player Authed" 
 -- Move garry's auth function so it gets called sooner
 local playerAuth = hook.GetTable().PlayerInitialSpawn.PlayerAuthSpawn
 hook.Remove( "PlayerInitialSpawn", "PlayerAuthSpawn" ) -- Remove from original spot
-hook.Add( "PlayerAuthed", "GarryAuth", playerAuth, -5 ) -- Put here
+
+local function newPlayerAuth( ... )
+	playerAuth( ... ) -- Put here, slightly ahead of ucl.
+	ucl.probe( ... )
+end
+hook.Add( "PlayerAuthed", "ULibAuth", newPlayerAuth, hook.MONITOR_HIGH )
 
 local meta = FindMetaTable( "Player" )
 if not meta then return end

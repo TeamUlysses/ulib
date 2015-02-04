@@ -46,7 +46,7 @@ local function onEntCreated( ent )
 		needs_auth[ ent:UserID() ] = nil
 	end
 end
-hook.Add( "OnEntityCreated", "ULibLocalPlayerCheck", onEntCreated, -20 ) -- Flag server when we created LocalPlayer(), listen for player creations
+hook.Add( "OnEntityCreated", "ULibLocalPlayerCheck", onEntCreated, hook.MONITOR_HIGH ) -- Flag server when we created LocalPlayer(), listen for player creations
 
 -- We're trying to make sure that the player auths after the player object is created, this function is part of that check
 function authPlayerIfReady( ply, userid )

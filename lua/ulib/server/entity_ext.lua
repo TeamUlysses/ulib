@@ -119,7 +119,7 @@ local function tool( ply, tr, toolmode, second )
 		end
 	end
 end
-hook.Add( "CanTool", "ULibEntToolCheck", tool, -10 )
+hook.Add( "CanTool", "ULibEntToolCheck", tool, hook.HIGH )
 
 local function property( ply, propertymode, ent )
 	if ent.NoMoving then
@@ -134,13 +134,13 @@ local function property( ply, propertymode, ent )
 		end
 	end
 end
-hook.Add( "CanProperty", "ULibEntPropertyCheck", property, -19 )
+hook.Add( "CanProperty", "ULibEntPropertyCheck", property, hook.HIGH )
 
 local function physgun( ply, ent )
 	if ent.NoMoving then return false end
 end
-hook.Add( "PhysgunPickup", "ULibEntPhysCheck", physgun, -10 )
-hook.Add( "CanPlayerUnfreeze", "ULibEntUnfreezeCheck", physgun, -10 )
+hook.Add( "PhysgunPickup", "ULibEntPhysCheck", physgun, hook.HIGH )
+hook.Add( "CanPlayerUnfreeze", "ULibEntUnfreezeCheck", physgun, hook.HIGH )
 
 local function physgunReload( weapon, ply )
 	local trace = util.GetPlayerTrace( ply )
@@ -150,14 +150,14 @@ local function physgunReload( weapon, ply )
 	if not ent or not ent:IsValid() or ent:IsWorld() then return end -- Invalid or not interested
 	if ent.NoMoving then return false end
 end
-hook.Add( "OnPhysgunReload", "ULibEntPhysReloadCheck", physgunReload, -10 )
+hook.Add( "OnPhysgunReload", "ULibEntPhysReloadCheck", physgunReload, hook.HIGH )
 
 local function damageCheck( ent )
 	if ent.NoDeleting then
 		-- return false
 	end
 end
-hook.Add( "EntityTakeDamage", "ULibEntDamagedCheck", damageCheck, -20 )
+hook.Add( "EntityTakeDamage", "ULibEntDamagedCheck", damageCheck, hook.MONITOR_HIGH )
 
 -- This is just in case we have some horribly programmed addon that goes rampant in deleting things
 local function removedCheck( ent )
@@ -189,4 +189,4 @@ local function removedCheck( ent )
 		end )
 	end
 end
-hook.Add( "EntityRemoved", "ULibEntRemovedCheck", removedCheck, -20 )
+hook.Add( "EntityRemoved", "ULibEntRemovedCheck", removedCheck, hook.MONITOR_HIGH )

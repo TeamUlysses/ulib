@@ -1,224 +1,164 @@
+
+local gmod			= gmod
+local pairs			= pairs
+local isfunction	= isfunction
+local isstring		= isstring
+local isnumber		= isnumber
+local math			= math
+local IsValid		= IsValid
+
 --[[
-	Title: Hook
-
-	This overrides garry's default hook system. We need this better hook system for any serious development.
-	We're implementing hook priorities. hook.Add() now takes an additional parameter of type number between -20 and 20.
-	0 is default (so we remain backwards compatible). -20 and 20 are read only (ignores returned values).
-	Hooks are called in order from -20 on up.
-]]
-
--- This file is coded a little awkwardly because we're trying to implement a new behavior while remaining as true to the old behavior as possible.
-
--- Globals that we are going to use
-local gmod          = gmod
-local pairs         = pairs
-local isfunction    = isfunction
-local isstring      = isstring
-local IsValid       = IsValid
-
--- Needed due to our modifications
-local table         = table
-local ipairs        = ipairs
-local tostring      = tostring
-
---[[ Needed for tests, below
-local CLIENT = CLIENT
+local concommand = concommand
 local print = print
+local PrintTable = PrintTable
+local tostring = tostring
 local assert = assert
-local error = error --]]
+local table = table--]]
 
 -- Grab all previous hooks from the pre-existing hook module.
 local OldHooks = hook.GetTable()
 
------------------------------------------------------------
---   Name: hook
---   Desc: For scripts to hook onto Gamemode events
------------------------------------------------------------
 module( "hook" )
+MONITOR_HIGH = -2
+HIGH = -1
+NORMAL = 0
+LOW = 1
+MONITOR_LOW = 2
 
-
--- Local variables
-local Hooks = {}
+Hooks = {}
 local BackwardsHooks = {} -- A table fully to garry's spec for aVoN
 
-local function sortHooks( event_name )
-	for i=#Hooks[ event_name ], 1, -1 do
-		local name = Hooks[ event_name ][ i ].name
-		if not isstring( name ) and not IsValid( name ) then
-			Remove( event_name, name )
-		end
-	end
-	
-	table.sort( Hooks[ event_name ], function( a, b ) -- Sort by priority, then name
-		if a == nil then return false -- Move nil to end
-		elseif b == nil then return true -- Keep nil at end
-		elseif a.priority < b.priority then return true
-		elseif a.priority == b.priority and tostring(a.name) < tostring(b.name) then return true
-		else return false end
-	end )
-end
+--
+-- For access to the Hooks table.. for some reason.
+--
+function GetTable() return BackwardsHooks end
 
-
--- Exposed Functions
-
---[[
-	Function: hook.GetTable
-
-	Returns:
-
-		The table filled with all the hooks in a format that is backwards compatible with garry's.
-]]
-function GetTable()
-	return BackwardsHooks
-end
-
---[[
-	Function: hook.Add
-
-	Our new and improved hook.Add function.
-	Read the file description for more information on how the hook priorities work.
-
-	Parameters:
-
-		event_name - The name of the event (IE "PlayerInitialSpawn").
-		name - The unique name of your hook.
-			This is only so that if the file is reloaded, it can be unhooked (or you can unhook it yourself).
-		func - The function callback to call
-		priority - *(Optional, defaults to 0)* Priority from -20 to 20. Remember that -20 and 20 are read-only.
-]]
+--
+-- Add a hook
+--
 function Add( event_name, name, func, priority )
-	if not isfunction( func ) then return end
-	if not isstring( event_name ) then return end
 	
-	if not Hooks[ event_name ] then
-		BackwardsHooks[ event_name ] = {}
-		Hooks[ event_name ] = {}
-	end
-
 	priority = priority or 0
+	if ( !isfunction( func ) ) then return end
+	if ( !isstring( event_name ) ) then return end
+	if ( !isnumber( priority ) ) then return end
+	priority = math.Clamp( math.floor( priority ), -2, 2 )
+	
+	Remove( event_name, name ) -- This keeps the event name unique, even among the priorities
 
-	-- Make sure the name is unique
-	Remove( event_name, name )
+	if (Hooks[ event_name ] == nil) then
+		Hooks[ event_name ] = {[-2]={}, [-1]={}, [0]={}, [1]={}, [2]={}}
+		BackwardsHooks[ event_name ] = {}
+	end
 
-	table.insert( Hooks[ event_name ], { name=name, fn=func, priority=priority } )
+	Hooks[ event_name ][ priority ][ name ] = func
 	BackwardsHooks[ event_name ][ name ] = func -- Keep the classic style too so we won't break anything
-	sortHooks( event_name )
+
 end
 
---[[
-	Function: hook.Remove
 
-	Parameters:
-
-		event_name - The name of the event (IE "PlayerInitialSpawn").
-		name - The unique name of your hook. Use the same name you used in hook.Add()
-]]
+--
+-- Remove a hook
+--
 function Remove( event_name, name )
-	if not isstring( event_name ) then return end
-	
-	if not Hooks[ event_name ] then return end
-	
-	for index, value in ipairs( Hooks[ event_name ] ) do
-		if value.name == name then
-			table.remove( Hooks[ event_name ], index )
-			break
-		end
+
+	if ( !isstring( event_name ) ) then return end
+	if ( !Hooks[ event_name ] ) then return end
+
+	for i=-2, 2 do
+		Hooks[ event_name ][ i ][ name ] = nil
 	end
 
-	BackwardsHooks[ event_name ][ name ] = nil
 end
 
---[[
-	Function: hook.Run
-	
-	A convienence function created by Garry so you don't have to pass the gamemode in by hand.
-	
-	Parameters:
-	
-		name - The name of the event
-		... - Any other params to pass
-		
-	Revisions:
-	
-		2.50 - Created to match GM13 API
-		2.60 - Modified to match latest Garry-changes
-]]
+--
+-- Run a hook (this replaces Call)
+--
 function Run( name, ... )
-	return Call( name, gmod and gmod.GetGamemode() or nil, ... )
+	return Call( name, nil, ... )
 end
 
-local resort = {}
---[[
-	Function: hook.Call
-
-	Normally, you don't want to call this directly. Use gamemode.Call() instead.
-
-	Parameters:
-
-		name - The name of the event
-		gm - The gamemode table
-		... - Any other params to pass
-]]
+--
+-- Called by the engine
+--
 function Call( name, gm, ... )
-	for i = 1, #resort do
-		sortHooks( resort[ i ] )
-	end
-	resort = {}
-	
+
+	local ret
+
+	--
 	-- If called from hook.Run then gm will be nil.
-	if gm == nil and gmod ~= nil then
+	--
+	if ( gm == nil && gmod != nil ) then
 		gm = gmod.GetGamemode()
 	end
 
+	--
+	-- Run hooks
+	--
 	local HookTable = Hooks[ name ]
+	if ( HookTable != nil ) then
+	
+		local a, b, c, d, e, f;
 
-	if HookTable then
-		local a, b, c, d, e, f
-		for k=1, #HookTable do
-			local v = HookTable[ k ]
-			if not v then
-				-- Nothing
-			else
-				-- Call hook function
-				if isstring( v.name ) then
-					a, b, c, d, e, f = v.fn( ... )
+		for i=-2, 2 do
+			
+			for k, v in pairs( HookTable[ i ] ) do 
+			
+				if ( isstring( k ) ) then
+				
+					--
+					-- If it's a string, it's cool
+					--
+					a, b, c, d, e, f = v( ... )
+
 				else
-					-- Assume it is an entity
-					if IsValid( v.name ) then
-						a, b, c, d, e, f = v.fn( v.name, ... )
+
+					--
+					-- If the key isn't a string - we assume it to be an entity
+					-- Or panel, or something else that IsValid works on.
+					--
+					if ( IsValid( k ) ) then
+						--
+						-- If the object is valid - pass it as the first argument (self)
+						--
+						a, b, c, d, e, f = v( k, ... )
 					else
-						table.insert( resort, name )
+						--
+						-- If the object has become invalid - remove it
+						--
+						HookTable[ i ][ k ] = nil
 					end
 				end
 
-				if a ~= nil then
-					-- Allow hooks to override return values if it's within the limits (-20 and 20 are read only)
-					if v.priority > -20 and v.priority < 20 then
-						return a, b, c, d, e, f
-					end
+				--
+				-- Hook returned a value - it overrides the gamemode function
+				--
+				if ( a != nil && i > -2 && i < 2 ) then
+					return a, b, c, d, e, f
 				end
+			
 			end
 		end
 	end
-
-	if not gm then return end
+	
+	--
+	-- Call the gamemode function
+	--
+	if ( !gm ) then return end
 	
 	local GamemodeFunction = gm[ name ]
-	if not GamemodeFunction then
-		return
-	end
-
-	-- This calls the actual gamemode function - after all the hooks have had chance to override
-	return GamemodeFunction( gm, ... )
+	if ( GamemodeFunction == nil ) then return end
+		
+	return GamemodeFunction( gm, ... )	
+	
 end
 
 -- Bring in all the old hooks
 for event_name, t in pairs( OldHooks ) do
 	for name, func in pairs( t ) do
-		Add( event_name, name, func, 0 )
+		Add( event_name, name, func )
 	end
 end
-
 
 --[[
 local failed = false
@@ -254,7 +194,7 @@ local function doTests( ply, cmd, argv )
 	-- First make sure there's no return value leakage...
 	Add( "LeakageA", "a", returnRange )
 	t = { Call( "LeakageA", _ ) }
-	assert( #t == 8 )
+	assert( #t == 6 )
 	for k, v in pairs( t ) do
 		assert( k == v )
 	end
@@ -266,39 +206,44 @@ local function doTests( ply, cmd, argv )
 	-- Now let's make sure errors are handled correctly...
 	shouldFail = true
 	Add( "ErrCheck", "a", noop )
-	Add( "ErrCheck", "b", err )
+	--Add( "ErrCheck", "b", err )
 	Add( "ErrCheck", "c", noop )
 	Add( "ErrCheck", "d", returnRange )
 	t = { Call( "ErrCheck", _ ) }
-	assert( #t == 8 )
-	assert( #Hooks.ErrCheck == 3 and Hooks.ErrCheck[4] == nil ) -- Should have been reduced so that the 'b' got removed
+	assert( #t == 6 )
+	--assert( #Hooks.ErrCheck == 3 and Hooks.ErrCheck[4] == nil ) -- Should have been reduced so that the 'b' got removed
 
 	shouldFail = false
 	t = { Call( "ErrCheck", _ ) }
-	assert( #t == 8 )
+	assert( #t == 6 )
 
 	-- Check for override
-	Add( "ErrCheck", "d", noop, 19 ) -- Different priority, same name should still override
+	Add( "ErrCheck", "d", noop, 1 ) -- Different priority, same name should still override
 	t = { Call( "ErrCheck", _ ) }
 	assert( #t == 0 )
 
 	-- Check for order and readonly'ness...
-	Add( "Order", "n20a", returnRange, -20 )
-	Add( "Order", "a", appendGenerator( 5 ) )
-	Add( "Order", "n20c", appendGenerator( 3 ), -20 ) -- Should be alphabetized
-	Add( "Order", "n20a", appendGenerator( 1 ), -20 )
-	Add( "Order", "n20b", appendGenerator( 2 ), -20 )
-	Add( "Order", "n10a", appendGenerator( 4 ), -10 )
-	Add( "Order", "10a", appendGenerator( 6 ), 10 )
-	Add( "Order", "20a", returnRange, 20 )
-	Add( "Order", "20aa", appendGenerator( 7 ), 20 )
+	Add( "Order", "n20a", returnRange, -2 )
+	Add( "Order", "a", appendGenerator( 3 ) )
+	Add( "Order", "n20a", appendGenerator( 1 ), -2 )
+	Add( "Order", "n10a", appendGenerator( 2 ), -1 )
+	Add( "Order", "10a", appendGenerator( 4 ), 1 )
+	Add( "Order", "20a", returnRange, 2 )
+	Add( "Order", "20aa", appendGenerator( 5 ), 2 )
 
 	t = {}
 	Call( "Order", _, t )
-	assert( #t == 7 )
+	print( t, #t )
+	PrintTable( t )
+	assert( #t == 5 )
 	for k, v in pairs( t ) do
 		assert( k == v )
 	end
+	
+	Add( "Test", "AAA", function () print( "AAA" ) Remove( "Test", "AAA" ) end )
+	Add( "Test", "BBB", function () print( "BBB" ) end)
+	Run( "Test" )
+	Run( "Test" )
 
 	if failed then
 		print( "Tests failed!" )
@@ -307,5 +252,5 @@ local function doTests( ply, cmd, argv )
 	end
 end
 
-concommand.Add( "run_hook_tests", doTests )
---]]
+concommand.Add( "run_hook_tests", doTests )--]]
+
