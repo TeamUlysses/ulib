@@ -25,7 +25,7 @@ NORMAL = 0
 LOW = 1
 MONITOR_LOW = 2
 
-Hooks = {}
+local Hooks = {}
 local BackwardsHooks = {} -- A table fully to garry's spec for aVoN
 
 --
@@ -75,22 +75,13 @@ end
 -- Run a hook (this replaces Call)
 --
 function Run( name, ... )
-	return Call( name, nil, ... )
+	return Call( name, gmod and gmod.GetGamemode() or nil, ... )
 end
 
 --
 -- Called by the engine
 --
 function Call( name, gm, ... )
-
-	local ret
-
-	--
-	-- If called from hook.Run then gm will be nil.
-	--
-	if ( gm == nil && gmod != nil ) then
-		gm = gmod.GetGamemode()
-	end
 
 	--
 	-- Run hooks
