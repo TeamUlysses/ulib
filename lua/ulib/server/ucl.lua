@@ -889,19 +889,19 @@ local function botCheck( ply )
 		ucl.probe( ply )
 	end
 end
-hook.Add( "PlayerInitialSpawn", "ULibSendAuthToClients", botCheck, hook.MONITOR_HIGH )
+hook.Add( "PlayerInitialSpawn", "ULibSendAuthToClients", botCheck, MONITOR_HIGH )
 
 local function sendAuthToClients( ply )
 	ULib.clientRPC( _, "authPlayerIfReady", ply, ply:UserID() ) -- Call on client
 end
-hook.Add( ULib.HOOK_UCLAUTH, "ULibSendAuthToClients", sendAuthToClients, hook.MONITOR_LOW )
+hook.Add( ULib.HOOK_UCLAUTH, "ULibSendAuthToClients", sendAuthToClients, MONITOR_LOW )
 
 local function sendUCLDataToClient( ply )
 	ULib.clientRPC( ply, "ULib.ucl.initClientUCL", ucl.authed, ucl.groups ) -- Send all UCL data (minus offline users) to all loaded users
 	ULib.clientRPC( ply, "hook.Call", ULib.HOOK_UCLCHANGED ) -- Call hook on client
 	ULib.clientRPC( ply, "authPlayerIfReady", ply, ply:UserID() ) -- Call on client
 end
-hook.Add( ULib.HOOK_LOCALPLAYERREADY, "ULibSendUCLDataToClient", sendUCLDataToClient, hook.MONITOR_HIGH )
+hook.Add( ULib.HOOK_LOCALPLAYERREADY, "ULibSendUCLDataToClient", sendUCLDataToClient, MONITOR_HIGH )
 
 local function playerDisconnected( ply )
 	-- We want to perform these actions after everything else has processed through, but we need high priority hook to ensure we don't get sniped.
@@ -911,7 +911,7 @@ local function playerDisconnected( ply )
 		hook.Call( ULib.HOOK_UCLCHANGED )
 	end )
 end
-hook.Add( "PlayerDisconnected", "ULibUCLDisconnect", playerDisconnected, hook.MONITOR_HIGH )
+hook.Add( "PlayerDisconnected", "ULibUCLDisconnect", playerDisconnected, MONITOR_HIGH )
 
 local function UCLChanged()
 	ULib.clientRPC( _, "ULib.ucl.initClientUCL", ucl.authed, ucl.groups ) -- Send all UCL data (minus offline users) to all loaded users
@@ -936,7 +936,7 @@ local function newPlayerAuth( ... )
 	playerAuth( ... ) -- Put here, slightly ahead of ucl.
 	ucl.probe( ... )
 end
-hook.Add( "PlayerAuthed", "ULibAuth", newPlayerAuth, hook.MONITOR_HIGH )
+hook.Add( "PlayerAuthed", "ULibAuth", newPlayerAuth, MONITOR_HIGH )
 
 local meta = FindMetaTable( "Player" )
 if not meta then return end

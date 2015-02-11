@@ -15,15 +15,16 @@ local tostring = tostring
 local assert = assert
 local table = table--]]
 
+MONITOR_HIGH = -2
+HOOK_HIGH = -1
+HOOK_NORMAL = 0
+HOOK_LOW = 1
+MONITOR_LOW = 2
+
 -- Grab all previous hooks from the pre-existing hook module.
 local OldHooks = hook.GetTable()
 
 module( "hook" )
-MONITOR_HIGH = -2
-HIGH = -1
-NORMAL = 0
-LOW = 1
-MONITOR_LOW = 2
 
 local Hooks = {}
 local BackwardsHooks = {} -- A table fully to garry's spec for aVoN
@@ -42,7 +43,10 @@ function Add( event_name, name, func, priority )
 	if ( !isfunction( func ) ) then return end
 	if ( !isstring( event_name ) ) then return end
 	if ( !isnumber( priority ) ) then return end
-	priority = math.Clamp( math.floor( priority ), -2, 2 )
+	
+	priority = math.floor( priority )
+	if ( priority < -2 ) then priority = -2 end -- math.Clamp may not have been defined yet
+	if ( priority > 2 ) then priority = 2 end
 	
 	Remove( event_name, name ) -- This keeps the event name unique, even among the priorities
 
@@ -51,7 +55,7 @@ function Add( event_name, name, func, priority )
 		BackwardsHooks[ event_name ] = {}
 	end
 
-	Hooks[ event_name ][ priority ][ name ] = func
+	Hooks[ event_name ][ priority ][ name ] = { fn=func, isstring=isstring( event_name ) }
 	BackwardsHooks[ event_name ][ name ] = func -- Keep the classic style too so we won't break anything
 
 end
@@ -95,24 +99,24 @@ function Call( name, gm, ... )
 			
 			for k, v in pairs( HookTable[ i ] ) do 
 			
-				if ( isstring( k ) ) then
+				if ( v.isstring ) then
 				
 					--
 					-- If it's a string, it's cool
 					--
-					a, b, c, d, e, f = v( ... )
+					a, b, c, d, e, f = v.fn( ... )
 
 				else
 
 					--
 					-- If the key isn't a string - we assume it to be an entity
-					-- Or panel, or something else that IsValid works on.
+					-- Or panel, or something else that IsValid works on. 
 					--
 					if ( IsValid( k ) ) then
 						--
 						-- If the object is valid - pass it as the first argument (self)
 						--
-						a, b, c, d, e, f = v( k, ... )
+						a, b, c, d, e, f = v.fn( k, ... )
 					else
 						--
 						-- If the object has become invalid - remove it

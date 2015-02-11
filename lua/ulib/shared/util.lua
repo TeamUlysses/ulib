@@ -423,7 +423,7 @@ function ULib.namedQueueFunctionCall( queueName, fn, ... )
 
 	stacks[ queueName ] = stacks[ queueName ] or {}
 	table.insert( stacks[ queueName ], { fn=fn, n=select( "#", ... ), ... } )
-	hook.Add( "Think", "ULibQueueThink", onThink, hook.MONITOR_HIGH )
+	hook.Add( "Think", "ULibQueueThink", onThink, MONITOR_HIGH )
 end
 
 
