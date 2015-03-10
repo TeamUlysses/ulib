@@ -92,8 +92,6 @@ function Call( name, gm, ... )
 	--
 	local HookTable = Hooks[ name ]
 	if ( HookTable != nil ) then
-	
-		local a, b, c, d, e, f;
 
 		for i=-2, 2 do
 			
@@ -104,7 +102,10 @@ function Call( name, gm, ... )
 					--
 					-- If it's a string, it's cool
 					--
-					a, b, c, d, e, f = v.fn( ... )
+					local a, b, c, d, e, f = v.fn( ... )
+					if ( a != nil && i > -2 && i < 2 ) then
+						return a, b, c, d, e, f
+					end
 
 				else
 
@@ -116,7 +117,10 @@ function Call( name, gm, ... )
 						--
 						-- If the object is valid - pass it as the first argument (self)
 						--
-						a, b, c, d, e, f = v.fn( k, ... )
+						local a, b, c, d, e, f = v.fn( k, ... )
+						if ( a != nil && i > -2 && i < 2 ) then
+							return a, b, c, d, e, f
+						end
 					else
 						--
 						-- If the object has become invalid - remove it
@@ -124,14 +128,6 @@ function Call( name, gm, ... )
 						HookTable[ i ][ k ] = nil
 					end
 				end
-
-				--
-				-- Hook returned a value - it overrides the gamemode function
-				--
-				if ( a != nil && i > -2 && i < 2 ) then
-					return a, b, c, d, e, f
-				end
-			
 			end
 		end
 	end
