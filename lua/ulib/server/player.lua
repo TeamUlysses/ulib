@@ -265,7 +265,7 @@ local function doInvis()
 			if player:Alive() and player:GetActiveWeapon():IsValid() then
 				if player:GetActiveWeapon() ~= t.invis.wep then
 
-					if t.invis.wep and IsValid( t.invis.web ) then		-- If changed weapon, set the old weapon to be visible.
+					if t.invis.wep and IsValid( t.invis.wep ) then		-- If changed weapon, set the old weapon to be visible.
 						t.invis.wep:SetRenderMode( RENDERMODE_NORMAL )
 						t.invis.wep:Fire( "alpha", 255, 0 )
 						t.invis.wep:SetMaterial( "" )
