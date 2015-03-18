@@ -157,7 +157,7 @@ local function damageCheck( ent )
 		-- return false
 	end
 end
-hook.Add( "EntityTakeDamage", "ULibEntDamagedCheck", damageCheck, MONITOR_HIGH )
+hook.Add( "EntityTakeDamage", "ULibEntDamagedCheck", damageCheck, HOOK_MONITOR_HIGH )
 
 -- This is just in case we have some horribly programmed addon that goes rampant in deleting things
 local function removedCheck( ent )
@@ -189,4 +189,4 @@ local function removedCheck( ent )
 		end )
 	end
 end
-hook.Add( "EntityRemoved", "ULibEntRemovedCheck", removedCheck, MONITOR_HIGH )
+hook.Add( "EntityRemoved", "ULibEntRemovedCheck", removedCheck, HOOK_MONITOR_HIGH )

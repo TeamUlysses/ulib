@@ -15,11 +15,11 @@ local tostring = tostring
 local assert = assert
 local table = table--]]
 
-MONITOR_HIGH = -2
+HOOK_MONITOR_HIGH = -2
 HOOK_HIGH = -1
 HOOK_NORMAL = 0
 HOOK_LOW = 1
-MONITOR_LOW = 2
+HOOK_MONITOR_LOW = 2
 
 -- Grab all previous hooks from the pre-existing hook module.
 local OldHooks = hook.GetTable()
