@@ -38,16 +38,16 @@ function GetTable() return BackwardsHooks end
 -- Add a hook
 --
 function Add( event_name, name, func, priority )
-	
+
 	priority = priority or 0
 	if ( !isfunction( func ) ) then return end
 	if ( !isstring( event_name ) ) then return end
 	if ( !isnumber( priority ) ) then return end
-	
+
 	priority = math.floor( priority )
 	if ( priority < -2 ) then priority = -2 end -- math.Clamp may not have been defined yet
 	if ( priority > 2 ) then priority = 2 end
-	
+
 	Remove( event_name, name ) -- This keeps the event name unique, even among the priorities
 
 	if (Hooks[ event_name ] == nil) then
@@ -55,7 +55,7 @@ function Add( event_name, name, func, priority )
 		BackwardsHooks[ event_name ] = {}
 	end
 
-	Hooks[ event_name ][ priority ][ name ] = { fn=func, isstring=isstring( event_name ) }
+	Hooks[ event_name ][ priority ][ name ] = { fn=func, isstring=isstring( name ) }
 	BackwardsHooks[ event_name ][ name ] = func -- Keep the classic style too so we won't break anything
 
 end
@@ -94,11 +94,11 @@ function Call( name, gm, ... )
 	if ( HookTable != nil ) then
 
 		for i=-2, 2 do
-			
-			for k, v in pairs( HookTable[ i ] ) do 
-			
+
+			for k, v in pairs( HookTable[ i ] ) do
+
 				if ( v.isstring ) then
-				
+
 					--
 					-- If it's a string, it's cool
 					--
@@ -111,7 +111,7 @@ function Call( name, gm, ... )
 
 					--
 					-- If the key isn't a string - we assume it to be an entity
-					-- Or panel, or something else that IsValid works on. 
+					-- Or panel, or something else that IsValid works on.
 					--
 					if ( IsValid( k ) ) then
 						--
@@ -131,17 +131,17 @@ function Call( name, gm, ... )
 			end
 		end
 	end
-	
+
 	--
 	-- Call the gamemode function
 	--
 	if ( !gm ) then return end
-	
+
 	local GamemodeFunction = gm[ name ]
 	if ( GamemodeFunction == nil ) then return end
-		
-	return GamemodeFunction( gm, ... )	
-	
+
+	return GamemodeFunction( gm, ... )
+
 end
 
 -- Bring in all the old hooks
@@ -230,7 +230,7 @@ local function doTests( ply, cmd, argv )
 	for k, v in pairs( t ) do
 		assert( k == v )
 	end
-	
+
 	Add( "Test", "AAA", function () print( "AAA" ) Remove( "Test", "AAA" ) end )
 	Add( "Test", "BBB", function () print( "BBB" ) end)
 	Run( "Test" )
