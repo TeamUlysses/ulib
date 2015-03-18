@@ -1,6 +1,6 @@
 Title: ULib Readme
 
-*ULib v2.52 (released 03/09/15)*
+*ULib v2.60 (released 00/00/00)*
 
 ULib is a developer library for GMod 10 (<http://garrysmod.com/>).
 
@@ -44,6 +44,9 @@ After installing ULib correctly, scripts that take advantage of ULib will take c
 Rest easy!
 
 Group: Changelog
+v2.60 - *(00/00/00)*
+	* [CHANGE] Hook system. It's much faster (CPU-wise) and a little easier to use now (Many thanks for input from darkjacky and Divran).
+
 v2.52 - *(03/09/15)*
 	* [ADD] Admin parameter to ULib.unban for overriding purposes (Thanks for the idea, MStruntze).
 	* [ADD] A list of players is presented when a target string for getUser matches more than one player (Thanks, RhapsodySL).
