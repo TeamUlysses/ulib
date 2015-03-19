@@ -932,9 +932,10 @@ hook.Add( "PlayerAuthed", "UTEST", function() print( "HERE HERE: Player Authed" 
 local playerAuth = hook.GetTable().PlayerInitialSpawn.PlayerAuthSpawn
 hook.Remove( "PlayerInitialSpawn", "PlayerAuthSpawn" ) -- Remove from original spot
 
-local function newPlayerAuth( ... )
-	playerAuth( ... ) -- Put here, slightly ahead of ucl.
-	ucl.probe( ... )
+local function newPlayerAuth( ply, ... )
+	ucl.authed[ ply:UniqueID() ] = nil -- If the player ent is removed before disconnecting, we can have this hanging out there.
+	playerAuth( ply, ... ) -- Put here, slightly ahead of ucl.
+	ucl.probe( ply, ... )
 end
 hook.Add( "PlayerAuthed", "ULibAuth", newPlayerAuth, HOOK_MONITOR_HIGH )
 
