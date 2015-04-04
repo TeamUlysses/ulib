@@ -73,6 +73,8 @@ function Remove( event_name, name )
 		Hooks[ event_name ][ i ][ name ] = nil
 	end
 
+	BackwardsHooks[ event_name ][ name ] = nil
+
 end
 
 --
