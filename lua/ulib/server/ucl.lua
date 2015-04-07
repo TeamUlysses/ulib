@@ -207,7 +207,7 @@ local function reloadUsers()
 	if needsBackup then
 		Msg( "Users file was not formatted correctly. Attempting to fix and backing up original\n" )
 		if err then
-			Msg( "Error while reading groups file was: " .. err .. "\n" )
+			Msg( "Error while reading users file was: " .. err .. "\n" )
 		end
 		Msg( "Original file was backed up to " .. ULib.backupFile( ULib.UCL_USERS ) .. "\n" )
 		ucl.saveUsers()
