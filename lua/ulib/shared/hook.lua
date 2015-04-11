@@ -33,6 +33,7 @@ local BackwardsHooks = {} -- A table fully to garry's spec for aVoN
 -- For access to the Hooks table.. for some reason.
 --
 function GetTable() return BackwardsHooks end
+function GetULibTable() return Hooks end
 
 --
 -- Add a hook
