@@ -306,6 +306,14 @@ function ULib.isSandbox()
 end
 
 
+local function insertResult( files, result, relDir )
+	if not relDir then
+		table.insert( files, result )
+	else
+		table.insert( files, relDir .. "/" .. result )
+	end
+end
+
 --[[
 	Function: filesInDir
 
@@ -322,6 +330,7 @@ end
 		v2.10 - Initial (But dragged over from GM9 archive).
 		v2.40 - Fixed (was completely broken).
 		v2.50 - Now assumes paths relative to base folder.
+		v2.60 - Fix for Garry API-changes
 ]]
 function ULib.filesInDir( dir, recurse, root )
 	if not ULib.fileIsDir( dir ) then
@@ -335,17 +344,17 @@ function ULib.filesInDir( dir, recurse, root )
 	end
 	root = root or dir
 
-	local result = file.Find( dir .. "/*", "GAME" )
+	local resultFiles, resultFolders = file.Find( dir .. "/*", "GAME" )
 
-	for i=1, #result do
-		if ULib.fileIsDir( dir .. "/" .. result[ i ] ) and recurse then
-			files = table.Add( files, ULib.filesInDir( dir .. "/" .. result[ i ], recurse, root ) )
+	for i=1, #resultFiles do
+		insertResult( files, resultFiles[ i ], relDir )
+	end
+
+	for i=1, #resultFolders do
+		if recurse then
+			files = table.Add( files, ULib.filesInDir( dir .. "/" .. resultFolders[ i ], recurse, root ) )
 		else
-			if not relDir then
-				table.insert( files, result[ i ] )
-			else
-				table.insert( files, relDir .. "/" .. result[ i ] )
-			end
+			insertResult( files, resultFolders[ i ], relDir )
 		end
 	end
 
