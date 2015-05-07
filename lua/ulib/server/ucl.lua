@@ -550,6 +550,29 @@ function ucl.getUserRegisteredID( ply )
 end
 
 --[[
+	Function: ucl.getUserInfoFromID
+
+	Returns a table containing the name and group of a player in the UCL table of users if they exist.
+
+	Parameters:
+
+		id - The SteamID, IP, or UniqueID of the user you wish to check.
+]]
+
+function ucl.getUserInfoFromID( id )
+	
+	ULib.checkArg( 1, "ULib.ucl.addUser", "string", id )
+	id = id:upper() -- In case of steamid, needs to be upper case
+	
+	if ucl.users[ id ] then
+		return ucl.users[ id ]
+	else
+		return nil
+	end
+	
+end
+
+--[[
 	Function: ucl.addUser
 
 	Adds a user to the UCL. Automatically probes for the user, automatically saves.
