@@ -17,6 +17,7 @@ ULib is brought to you by..
 * Brett "Megiddo" Smith - Contact: <megiddo@ulyssesmod.net>
 * JamminR - Contact: <jamminr@ulyssesmod.net>
 * Stickly Man! - Contact: <sticklyman@ulyssesmod.net>
+* MrPresident - Contact: <mrpresident@ulyssesmod.net>
 
 Group: Requirements
 
@@ -45,6 +46,7 @@ Rest easy!
 
 Group: Changelog
 v2.60 - *(00/00/00)*
+	* [ADD] ULib.ucl.getUserInfoFromID for getting user info from an ID.
 	* [FIX] An assumption regarding player authentication that led to a player's group being reset to user sometimes.
 	* [FIX] Garry API change for ULib.findinDir (Thanks, ascentechit).
 	* [CHANGE] Hook system. It's much faster (CPU-wise) and a little easier to use now (Many thanks for input from darkjacky and Divran).
