@@ -560,16 +560,16 @@ end
 ]]
 
 function ucl.getUserInfoFromID( id )
-	
+
 	ULib.checkArg( 1, "ULib.ucl.addUser", "string", id )
 	id = id:upper() -- In case of steamid, needs to be upper case
-	
+
 	if ucl.users[ id ] then
 		return ucl.users[ id ]
 	else
 		return nil
 	end
-	
+
 end
 
 --[[
@@ -905,11 +905,18 @@ function ucl.probe( ply )
 end
 -- Note that this function is hooked into "PlayerAuthed", below.
 
-
-local function botCheck( ply )
-	if ply:IsBot() and not ucl.authed[ ply:UniqueID() ] then
+local function setupBot( ply )
+	if not ucl.authed[ ply:UniqueID() ] then
 		ply:SetUserGroup( ULib.ACCESS_ALL, true ) -- Give it a group!
 		ucl.probe( ply )
+	end
+end
+
+local function botCheck( ply )
+	if ply:IsBot() then
+		-- We have to call this twice because the uniqueID will change for NextBots
+		setupBot( ply )
+		ULib.queueFunctionCall( setupBot, ply )
 	end
 end
 hook.Add( "PlayerInitialSpawn", "ULibSendAuthToClients", botCheck, HOOK_MONITOR_HIGH )
