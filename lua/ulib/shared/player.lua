@@ -328,7 +328,7 @@ function ULib.getUser( target, enable_keywords, ply )
 		for i=2, #plyMatches do
 			str = str .. ", " .. plyMatches[ i ]:Nick()
 		end
-		
+
 		return false, "Found multiple targets: " .. str .. ". Please choose a better string for the target. (EG, the whole name)"
 	end
 
