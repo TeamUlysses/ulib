@@ -9,7 +9,7 @@
 
 	This table holds our say commands.
 ]]
-ULib.sayCmds = {}
+ULib.sayCmds = ULib.sayCmds or {}
 
 --[[
 	Function: sayCmdCheck

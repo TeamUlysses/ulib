@@ -151,7 +151,8 @@ function ULib.getAllReadyPlayers()
 end
 
 
-local repcvars = {} -- This is used for <ULib.replicatedWithWritableCvar> in order to keep track of valid cvars and access info.
+ULib.repcvars = ULib.repcvars or {} -- This is used for <ULib.replicatedWithWritableCvar> in order to keep track of valid cvars and access info.
+local repcvars = ULib.repcvars
 local repCvarServerChanged
 --[[
 	Function: replicatedWritableCvar

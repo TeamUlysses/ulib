@@ -21,6 +21,8 @@ HOOK_NORMAL = 0
 HOOK_LOW = 1
 HOOK_MONITOR_LOW = 2
 
+if hook.GetULibTable then return end	-- Prevent autorefresh reloading this file
+
 -- Grab all previous hooks from the pre-existing hook module.
 local OldHooks = hook.GetTable()
 
