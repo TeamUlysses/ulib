@@ -906,6 +906,8 @@ end
 -- Note that this function is hooked into "PlayerAuthed", below.
 
 local function setupBot( ply )
+	if not ply or not ply:IsValid() then return end
+
 	if not ucl.authed[ ply:UniqueID() ] then
 		ply:SetUserGroup( ULib.ACCESS_ALL, true ) -- Give it a group!
 		ucl.probe( ply )
