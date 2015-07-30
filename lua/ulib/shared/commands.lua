@@ -1306,7 +1306,7 @@ if SERVER then
 	end
 
 	local function hookRoute( ply, command, argv )
-		if table.Count(argv) > 0 then
+		if #argv > 0 then
 			concommand.Run( ply, table.remove( argv, 1 ), argv )
 		end
 	end
