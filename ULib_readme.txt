@@ -51,6 +51,7 @@ v2.60 - *(00/00/00)*
 	* [FIX] Garry API change for ULib.findinDir (Thanks, ascentechit).
 	* [FIX] Workaround for Garry's odd handling of bot UIDs (Thanks, BurgerLUA).
 	* [FIX] Improved how well ULib files handle being autorefreshed.
+	* [FIX] Exploitable console command could potentially cause errors and/or crashes.
 	* [CHANGE] Hook system. It's much faster (CPU-wise) and a little easier to use now (Many thanks for input from darkjacky and Divran).
 
 v2.52 - *(03/09/15)*
