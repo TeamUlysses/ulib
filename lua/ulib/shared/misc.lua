@@ -32,7 +32,7 @@ function ULib.explode( separator, str, limit )
 			table.insert( t, str:sub( curpos, newpos - 1 ) ) -- Save it in our table.
 			curpos = endpos + 1 -- save just after where we found it for searching next time.
 		else
-			if limit and table.getn( t ) > limit then
+			if limit and #t > limit then
 				return t -- Reached limit
 			end
 			table.insert( t, str:sub( curpos ) ) -- Save what's left in our array.
