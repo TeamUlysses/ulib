@@ -226,13 +226,15 @@ reloadUsers()
 		name - A string of the group name. (IE: superadmin)
 		allows - *(Optional, defaults to empty table)* The allowed access for the group.
 		inherit_from - *(Optional)* A string of a valid group to inherit from
+		from_CAMI - *(Optional)* An indicator for this group coming from CAMI.
 
 	Revisions:
 
 		v2.10 - acl is now an options parameter, added inherit_from.
 		v2.40 - Rewrite, changed parameter list around.
+		v2.60 - Added CAMI support and parameter.
 ]]
-function ucl.addGroup( name, allows, inherit_from )
+function ucl.addGroup( name, allows, inherit_from, from_CAMI )
 	ULib.checkArg( 1, "ULib.ucl.addGroup", "string", name )
 	ULib.checkArg( 2, "ULib.ucl.addGroup", {"nil","table"}, allows )
 	ULib.checkArg( 3, "ULib.ucl.addGroup", {"nil","string"}, inherit_from )
@@ -252,6 +254,11 @@ function ucl.addGroup( name, allows, inherit_from )
 	ucl.saveGroups()
 
 	hook.Call( ULib.HOOK_UCLCHANGED )
+
+	-- CAMI logic
+	if not from_CAMI and not ULib.findInTable( {"superadmin", "admin", "user"}, name ) then
+		CAMI.RegisterUsergroup( {Name=name, Inherits=inherit_from}, CAMI.ULX_TOKEN )
+	end
 end
 
 
@@ -344,6 +351,7 @@ end
 	Revisions:
 
 		v2.40 - Initial.
+		v2.60 - Added CAMI support.
 ]]
 function ucl.renameGroup( orig, new )
 	ULib.checkArg( 1, "ULib.ucl.renameGroup", "string", orig )
@@ -383,6 +391,14 @@ function ucl.renameGroup( orig, new )
 	ucl.saveGroups()
 
 	hook.Call( ULib.HOOK_UCLCHANGED )
+
+	-- CAMI logic
+	if not ULib.findInTable( {"superadmin", "admin", "user"}, orig ) then
+		CAMI.UnregisterUsergroup( orig, CAMI.ULX_TOKEN )
+	end
+	if not ULib.findInTable( {"superadmin", "admin", "user"}, new ) then
+		CAMI.RegisterUsergroup( {Name=new, Inherits=ucl.groups[ new ].inherit_from}, CAMI.ULX_TOKEN )
+	end
 end
 
 
@@ -399,6 +415,7 @@ end
 	Revisions:
 
 		v2.40 - Initial.
+		v2.60 - Added CAMI support.
 ]]
 function ucl.setGroupInheritance( group, inherit_from )
 	ULib.checkArg( 1, "ULib.ucl.renameGroup", "string", group )
@@ -438,6 +455,12 @@ function ucl.setGroupInheritance( group, inherit_from )
 	ucl.saveGroups()
 
 	hook.Call( ULib.HOOK_UCLCHANGED )
+
+	-- CAMI logic
+	if not ULib.findInTable( {"superadmin", "admin", "user"}, group ) then
+		CAMI.UnregisterUsergroup( group, CAMI.ULX_TOKEN )
+		CAMI.RegisterUsergroup( {Name=group, Inherits=inherit_from}, CAMI.ULX_TOKEN )
+	end
 end
 
 
@@ -478,13 +501,15 @@ end
 	Parameters:
 
 		name - A string of the group name. (IE: superadmin)
+		from_CAMI - *(Optional)* An indicator for this group coming from CAMI.
 
 	Revisions:
 
 		v2.10 - Initial.
 		v2.40 - Rewrite, removed write parameter.
+		v2.60 - Added CAMI support and parameter.
 ]]
-function ucl.removeGroup( name )
+function ucl.removeGroup( name, from_CAMI )
 	ULib.checkArg( 1, "ULib.ucl.removeGroup", "string", name )
 
 	if name == ULib.ACCESS_ALL then return error( "This group (" .. name .. ") cannot be removed!", 2 ) end
@@ -521,6 +546,11 @@ function ucl.removeGroup( name )
 	ucl.saveGroups()
 
 	hook.Call( ULib.HOOK_UCLCHANGED )
+
+	-- CAMI logic
+	if not from_CAMI and not ULib.findInTable( {"superadmin", "admin", "user"}, name ) then
+		CAMI.UnregisterUsergroup( name, CAMI.ULX_TOKEN )
+	end
 end
 
 --[[
@@ -534,7 +564,7 @@ end
 
 	Revisions:
 
-		2.41 - Initial.
+		v2.41 - Initial.
 ]]
 
 function ucl.getUserRegisteredID( ply )
@@ -582,14 +612,16 @@ end
 		id - The SteamID, IP, or UniqueID of the user you wish to add.
 		allows - *(Optional, defaults to empty table)* The list of access you wish to give this user.
 		denies - *(Optional, defaults to empty table)* The list of access you wish to explicitly deny this user.
-		group - *(Optional)* The sting of the group this user should belong to. Must be a valid group.
+		group - *(Optional)* The string of the group this user should belong to. Must be a valid group.
+		from_CAMI - *(Optional)* An indicator for this information coming from CAMI.
 
 	Revisions:
 
-		2.10 - No longer makes a group if it doesn't exist.
-		2.40 - Rewrite, changed the arguments all around.
+		v2.10 - No longer makes a group if it doesn't exist.
+		v2.40 - Rewrite, changed the arguments all around.
+		v2.60 - Added support for CAMI and parameter.
 ]]
-function ucl.addUser( id, allows, denies, group )
+function ucl.addUser( id, allows, denies, group, from_CAMI )
 	ULib.checkArg( 1, "ULib.ucl.addUser", "string", id )
 	ULib.checkArg( 2, "ULib.ucl.addUser", {"nil","table"}, allows )
 	ULib.checkArg( 3, "ULib.ucl.addUser", {"nil","table"}, denies )
@@ -614,6 +646,11 @@ function ucl.addUser( id, allows, denies, group )
 
 	local ply = ULib.getPlyByID( id )
 	if ply then
+		-- CAMI logic -- no way to pass disconnected group change.
+		if not from_CAMI then
+			CAMI.SignalUserGroupChanged( ply, ply:GetUserGroup(), group or "user", CAMI.ULX_TOKEN )
+		end
+
 		ucl.probe( ply )
 	else -- Otherwise this gets called twice
 		hook.Call( ULib.HOOK_UCLCHANGED )
@@ -751,12 +788,14 @@ end
 
 		id - The SteamID, IP, or UniqueID of the user you wish to remove. Must be a valid, existing ID.
 			The unique id of a connected user is always valid.
+		from_CAMI - *(Optional)* An indicator for this information coming from CAMI.
 
 	Revisions:
 
 		v2.40 - Rewrite, removed the write argument.
+		v2.60 - Added CAMI support and parameter.
 ]]
-function ucl.removeUser( id )
+function ucl.removeUser( id, from_CAMI )
 	ULib.checkArg( 1, "ULib.ucl.addUser", "string", id )
 	id = id:upper() -- In case of steamid, needs to be upper case
 
@@ -790,6 +829,11 @@ function ucl.removeUser( id )
 
 	local ply = ULib.getPlyByID( id )
 	if ply then
+		-- CAMI logic -- no way to pass disconnected group change.
+		if not from_CAMI then
+			CAMI.SignalUserGroupChanged( ply, ply:GetUserGroup(), ULib.ACCESS_ALL, CAMI.ULX_TOKEN )
+		end
+
 		ply:SetUserGroup( ULib.ACCESS_ALL, true )
 		ucl.probe( ply ) -- Reprobe
 	else -- Otherwise this is called twice

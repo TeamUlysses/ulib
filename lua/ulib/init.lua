@@ -43,6 +43,10 @@ if not ULib then
 	include( "server/player_ext.lua" )
 	Msg( "//  server/entity_ext.lua    //\n" )
 	include( "server/entity_ext.lua" )
+	Msg( "//  shared/cami_global.lua   //\n" )
+	include( "shared/cami_global.lua" )
+	Msg( "//  server/cami.lua    //\n" )
+	include( "server/cami.lua" )
 	Msg( "// Load Complete!            //\n" )
 	Msg( "///////////////////////////////\n" )
 

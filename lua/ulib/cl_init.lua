@@ -12,6 +12,7 @@ include( "ulib/client/cl_util.lua" )
 include( "ulib/client/draw.lua" )
 include( "ulib/shared/commands.lua" )
 include( "ulib/shared/sh_ucl.lua" )
+include( "ulib/shared/cami_global.lua" )
 
 Msg( string.format( "You are running ULib version %.2f.\n", ULib.VERSION ) )
 
