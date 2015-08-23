@@ -14,7 +14,9 @@
 CAMI.ULX_TOKEN = "ULX"
 
 local function onGroupRegistered( camiGroup, originToken )
+	-- Ignore if ULX is the source, or if we receive bad data from another addon
 	if originToken == CAMI.ULX_TOKEN then return end
+	if ULib.findInTable( {"superadmin", "admin", "user"}, camiGroup.Name ) then return end
 
 	if not ULib.ucl.groups[ camiGroup.Name ] then
 		ULib.ucl.addGroup( camiGroup.Name, nil, camiGroup.Inherits, true )
@@ -25,7 +27,9 @@ end
 hook.Add( "CAMI.OnUsergroupRegistered", "ULXCamiGroupRegistered", onGroupRegistered )
 
 local function onGroupRemoved( camiGroup, originToken )
+	-- Ignore if ULX is the source, or if we receive bad data from another addon
 	if originToken == CAMI.ULX_TOKEN then return end
+	if ULib.findInTable( {"superadmin", "admin", "user"}, camiGroup.Name ) then return end
 
 	ULib.ucl.removeGroup( camiGroup.Name, true )
 end
