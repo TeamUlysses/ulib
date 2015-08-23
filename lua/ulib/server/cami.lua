@@ -64,7 +64,7 @@ hook.Add( "CAMI.OnPrivilegeRegistered", "ULXCamiPrivilegeRegistered", onPrivileg
 
 local function playerHasAccess( actorPly, priv, callback, targetPly, extra )
 	local priv = priv:lower()
-	local result = actorPly:query(priv)
+	local result = ULib.ucl.query( actorPly, priv )
 	callback(result)
 end
 hook.Add( "CAMI.PlayerHasAccess", "ULXCamiPlayerHasAccess", playerHasAccess )
