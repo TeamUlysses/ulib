@@ -13,6 +13,7 @@ local dataFolder = "data"
 	Parameters:
 
 		f - The path to check, rooted at the garry's mod root directory.
+		noMount - *(Optional)* If true, will not look in mounted directories.
 
 	Returns:
 
@@ -21,8 +22,11 @@ local dataFolder = "data"
 	Revisions:
 
 		v2.51 - Initial revision (tired of Garry changing his API all the time).
+		v2.70 - Added noMount parameter to *only* look in mod directory.
 ]]
-function ULib.fileExists( f )
+function ULib.fileExists( f, noMount )
+	if noMount then return file.Exists( f, "MOD" ) end
+
 	local isDataFolder = f:lower():sub( 1, dataFolder:len() ) ~= dataFolder
 	fWoData = f:sub( dataFolder:len() + 2 ) -- +2 removes path seperator
 
@@ -37,6 +41,7 @@ end
 	Parameters:
 
 		f - The file to read, rooted at the garrysmod directory.
+		noMount - *(Optional)* If true, will not look in mounted directories.
 
 	Returns:
 
@@ -45,19 +50,31 @@ end
 	Revisions:
 
 		v2.51 - Initial revision (tired of Garry changing his API all the time).
+		v2.70 - Added noMount parameter to *only* look in mod directory.
 ]]
-function ULib.fileRead( f )
+function ULib.fileRead( f, noMount )
+	local existsWoMount = ULib.fileExists( f, true )
+
+	if noMount then
+		if not existsWoMount then
+			return nil
+		end
+
+		return file.Read( f, "MOD" )
+	end
+
 	local isDataFolder = f:lower():sub( 1, dataFolder:len() ) == dataFolder
 	fWoData = f:sub( dataFolder:len() + 2 ) -- +2 removes path seperator
 
-	if not ULib.fileExists( f ) then
+	if not existsWoMount and not ULib.fileExists( f ) then
 		return nil
 	end
 
 	if not isDataFolder then
 		return file.Read( f, "GAME" )
 	else
-		if file.Exists( fWoData, "DATA" ) then
+		-- We want to prefer any data files at the root, but allow for mounted directories
+		if existsWoMount then
 			return file.Read( fWoData, "DATA" )
 		else
 			return file.Read( f, "GAME" )
@@ -167,6 +184,7 @@ end
 	Parameters:
 
 		f - The file path to check, rooted at the garrysmod directory.
+		noMount - *(Optional)* If true, will not look in mounted directories.
 
 	Returns:
 
@@ -175,9 +193,14 @@ end
 	Revisions:
 
 		v2.51 - Initial revision (tired of Garry changing his API all the time).
+		v2.70 - Added noMount parameter to *only* look in mod directory.
 ]]
-function ULib.fileIsDir( f )
-	return file.IsDir( f, "GAME" )
+function ULib.fileIsDir( f, noMount )
+	if not noMount then
+		return file.IsDir( f, "GAME" )
+	else
+		return file.IsDir( f, "MOD" )
+	end
 end
 
 
@@ -190,20 +213,22 @@ end
 
 		f - The file, relative to the garrysmod folder.
 		queueName - The queue name to ULib.namedQueueFunctionCall to use.
+		noMount - *(Optional)* If true, will not look in mounted directories.
 
 	Revisions:
 
 		v2.40 - No longer strips comments, removed ability to execute on players.
 		v2.50 - Added option to conform to Garry's API changes and queueName to specify queue name to use.
 		v2.51 - Removed option parameter.
+		v2.70 - Added noMount parameter to *only* look in mod directory.
 ]]
-function ULib.execFile( f, queueName )
-	if not ULib.fileExists( f ) then
+function ULib.execFile( f, queueName, noMount )
+	if not ULib.fileExists( f, noMount ) then
 		ULib.error( "Called execFile with invalid file! " .. f )
 		return
 	end
 
-	ULib.execString( ULib.fileRead( f ), queueName )
+	ULib.execString( ULib.fileRead( f, noMount ), queueName )
 end
 
 
@@ -323,6 +348,7 @@ end
 
 		dir - The dir to look for files in.
 		recurse - *(Optional, defaults to false)* If true, searches directories recursively.
+		noMount - *(Optional)* If true, will not look in mounted directories.
 		root - *INTERNAL USE ONLY* This helps with recursive functions.
 
 	Revisions:
@@ -331,8 +357,9 @@ end
 		v2.40 - Fixed (was completely broken).
 		v2.50 - Now assumes paths relative to base folder.
 		v2.60 - Fix for Garry API-changes
+		v2.70 - Added noMount parameter to *only* look in mod directory.
 ]]
-function ULib.filesInDir( dir, recurse, root )
+function ULib.filesInDir( dir, recurse, noMount, root )
 	if not ULib.fileIsDir( dir ) then
 		return nil
 	end
@@ -344,7 +371,7 @@ function ULib.filesInDir( dir, recurse, root )
 	end
 	root = root or dir
 
-	local resultFiles, resultFolders = file.Find( dir .. "/*", "GAME" )
+	local resultFiles, resultFolders = file.Find( dir .. "/*", not noMount and "GAME" or "MOD" )
 
 	for i=1, #resultFiles do
 		insertResult( files, resultFiles[ i ], relDir )
@@ -352,7 +379,7 @@ function ULib.filesInDir( dir, recurse, root )
 
 	for i=1, #resultFolders do
 		if recurse then
-			files = table.Add( files, ULib.filesInDir( dir .. "/" .. resultFolders[ i ], recurse, root ) )
+			files = table.Add( files, ULib.filesInDir( dir .. "/" .. resultFolders[ i ], recurse, noMount, root ) )
 		else
 			insertResult( files, resultFolders[ i ], relDir )
 		end
