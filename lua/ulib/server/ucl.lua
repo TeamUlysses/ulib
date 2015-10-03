@@ -35,19 +35,34 @@ function ucl.saveUsers()
 end
 
 local function reloadGroups()
+	-- Try to read from the safest locations first
+	local noMount = true
+	local path = ULib.UCL_GROUPS
+	if not ULib.fileExists( path, noMount ) then
+		if ULib.fileExists( "addons/ulib/" .. path, noMount ) then
+			path = "addons/ulib/" .. path
+		else
+			Msg( "ULIB WARNING: groups.txt is missing and I can't find the default groups.txt file!!\n" )
+			if ULib.fileExists( path ) then
+				Msg( "ULIB WARNING: Reading groups.txt from a potentially unsafe location\n" )
+				noMount = false
+			end
+		end
+	end
+
 	local needsBackup = false
 	local err
-	ucl.groups, err = ULib.parseKeyValues( ULib.removeCommentHeader( ULib.fileRead( ULib.UCL_GROUPS, true ), "/" ) )
+	ucl.groups, err = ULib.parseKeyValues( ULib.removeCommentHeader( ULib.fileRead( path, noMount ) or "", "/" ) )
 
 	if not ucl.groups or not ucl.groups[ ULib.ACCESS_ALL ] then
 		needsBackup = true
 		-- Totally messed up! Clear it.
 		local f = "addons/ulib/" .. ULib.UCL_GROUPS
-		if not ULib.fileExists( f ) then
+		if not ULib.fileExists( f, true ) then
 			Msg( "ULIB PANIC: groups.txt is corrupted and I can't find the default groups.txt file!!\n" )
 		else
 			local err2
-			ucl.groups, err2 = ULib.parseKeyValues( ULib.removeCommentHeader( ULib.fileRead( f ), "/" ) )
+			ucl.groups, err2 = ULib.parseKeyValues( ULib.removeCommentHeader( ULib.fileRead( f, true ), "/" ) )
 			if not ucl.groups or not ucl.groups[ ULib.ACCESS_ALL ] then
 				Msg( "ULIB PANIC: default groups.txt is corrupt!\n" )
 				err = err2
@@ -123,20 +138,35 @@ end
 reloadGroups()
 
 local function reloadUsers()
+	-- Try to read from the safest locations first
+	local noMount = true
+	local path = ULib.UCL_USERS
+	if not ULib.fileExists( path, noMount ) then
+		if ULib.fileExists( "addons/ulib/" .. path, noMount ) then
+			path = "addons/ulib/" .. path
+		else
+			Msg( "ULIB WARNING: users.txt is missing and I can't find the default groups.txt file!!\n" )
+			if ULib.fileExists( path ) then
+				Msg( "ULIB WARNING: Reading users.txt from a potentially unsafe location\n" )
+				noMount = false
+			end
+		end
+	end
+
 	local needsBackup = false
 	local err
-	ucl.users, err = ULib.parseKeyValues( ULib.removeCommentHeader( ULib.fileRead( ULib.UCL_USERS, true ), "/" ) )
+	ucl.users, err = ULib.parseKeyValues( ULib.removeCommentHeader( ULib.fileRead( path, true ) or "", "/" ) )
 
 	-- Check to make sure it passes a basic validity test
 	if not ucl.users then
 		needsBackup = true
 		-- Totally messed up! Clear it.
 		local f = "addons/ulib/" .. ULib.UCL_USERS
-		if not ULib.fileExists( f ) then
+		if not ULib.fileExists( f, true ) then
 			Msg( "ULIB PANIC: users.txt is corrupted and I can't find the default users.txt file!!\n" )
 		else
 			local err2
-			ucl.users, err2 = ULib.parseKeyValues( ULib.removeCommentHeader( ULib.fileRead( f ), "/" ) )
+			ucl.users, err2 = ULib.parseKeyValues( ULib.removeCommentHeader( ULib.fileRead( f, true ), "/" ) )
 			if not ucl.users then
 				Msg( "ULIB PANIC: default users.txt is corrupt!\n" )
 				err = err2
