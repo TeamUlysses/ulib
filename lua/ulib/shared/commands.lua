@@ -867,7 +867,7 @@ local function translateCmdCallback( ply, commandName, argv )
 	local cmd = translatedCmds[ commandName:lower() ]
 	if not cmd then return error( "Invalid command!" ) end
 
-	local isOpposite = cmd.opposite == commandName
+	local isOpposite = string.lower( cmd.opposite or "" ) == string.lower( commandName )
 
 	local access, accessTag = ULib.ucl.query( ply, commandName )
 	if not access then
@@ -949,7 +949,7 @@ local function translateAutocompleteCallback( commandName, args )
 	local cmd = translatedCmds[ commandName:lower() ]
 	if not cmd then return error( "Invalid command!" ) end
 
-	local isOpposite = cmd.opposite == commandName
+	local isOpposite = string.lower( cmd.opposite or "" ) == string.lower( commandName )
 	local ply
 	if CLIENT then
 		ply = LocalPlayer()
