@@ -54,12 +54,6 @@ local function onUsersGroupChanged( ply, oldGroup, newGroup, originToken )
 end
 hook.Add( "CAMI.PlayerUsergroupChanged", "ULXCamiUsersGroupChanged", onUsersGroupChanged )
 
-for name, data in pairs(ULib.ucl.groups) do
-	if not ULib.findInTable( {"superadmin", "admin", "user"}, name ) then
-		CAMI.RegisterUsergroup( {Name=name, Inherits=(data.inherit_from or "user")}, CAMI.ULX_TOKEN )
-	end
-end
-
 local function onPrivilegeRegistered( camiPriv )
 	local priv = camiPriv.Name:lower()
 	ULib.ucl.registerAccess( priv, camiPriv.MinAccess, "A privilege from CAMI", "CAMI" )
@@ -84,3 +78,21 @@ local function steamIDHasAccess( steamid, priv, callback, targetPly, extra )
 end
 hook.Add( "CAMI.SteamIDHasAccess", "ULXCamiSteamidHasAccess", steamIDHasAccess )
 ]]
+
+-- Register anything already loaded
+for _, camiPriv in pairs(CAMI.GetPrivileges()) do
+	onPrivilegeRegistered( camiPriv )
+end
+
+for name, camiGroup in pairs(CAMI.GetUsergroups()) do
+	onGroupRegistered( camiGroup )
+end
+-- End register anything already loaded
+
+-- Register ULib things into CAMI
+for name, data in pairs(ULib.ucl.groups) do
+	if not ULib.findInTable( {"superadmin", "admin", "user"}, name ) then
+		CAMI.RegisterUsergroup( {Name=name, Inherits=(data.inherit_from or "user")}, CAMI.ULX_TOKEN )
+	end
+end
+-- End register ULib things into CAMI
