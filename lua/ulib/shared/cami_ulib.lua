@@ -1,17 +1,40 @@
 --[[
 	File: CAMI
 
-	Implements CAMI version "beta".
+	Implements CAMI version "20150902.1".
 
 	The CAMI API is designed by Falco "FPtje" Peijnenburg, but this source code
 	remains under the same licensing as the rest of ULib.
 
-	To update the across-addons shared CAMI logic, run the following in the
+	To update the shared FPtje CAMI logic, run the following in the
 	appropriate directory...
 	: wget https://raw.githubusercontent.com/glua/CAMI/master/sh_cami.lua -O cami_global.lua
 ]]
 
 CAMI.ULX_TOKEN = "ULX"
+
+local function playerHasAccess( actorPly, priv, callback, targetPly, extra )
+	local priv = priv:lower()
+	local result = ULib.ucl.query( actorPly, priv, true )
+	if result ~= nil then
+		callback(result)
+		return true
+	end
+end
+hook.Add( "CAMI.PlayerHasAccess", "ULXCamiPlayerHasAccess", playerHasAccess )
+
+-- Someday, implement this too.
+--[[
+local function steamIDHasAccess( steamid, priv, callback, targetPly, extra )
+	local priv = priv:lower()
+	callback(result)
+end
+hook.Add( "CAMI.SteamIDHasAccess", "ULXCamiSteamidHasAccess", steamIDHasAccess )
+]]
+
+-- Registering/deleting groups on client not necessary for ULib since we pass
+-- that data around from the server
+if CLIENT then return end
 
 local function onGroupRegistered( camiGroup, originToken )
 	-- Ignore if ULX is the source, or if we receive bad data from another addon
@@ -59,25 +82,6 @@ local function onPrivilegeRegistered( camiPriv )
 	ULib.ucl.registerAccess( priv, camiPriv.MinAccess, "A privilege from CAMI", "CAMI" )
 end
 hook.Add( "CAMI.OnPrivilegeRegistered", "ULXCamiPrivilegeRegistered", onPrivilegeRegistered )
-
-local function playerHasAccess( actorPly, priv, callback, targetPly, extra )
-	local priv = priv:lower()
-	local result = ULib.ucl.query( actorPly, priv, true )
-	if result ~= nil then
-		callback(result)
-		return true
-	end
-end
-hook.Add( "CAMI.PlayerHasAccess", "ULXCamiPlayerHasAccess", playerHasAccess )
-
--- Someday, implement this too.
---[[
-local function steamIDHasAccess( steamid, priv, callback, targetPly, extra )
-	local priv = priv:lower()
-	callback(result)
-end
-hook.Add( "CAMI.SteamIDHasAccess", "ULXCamiSteamidHasAccess", steamIDHasAccess )
-]]
 
 -- Register anything already loaded
 for _, camiPriv in pairs(CAMI.GetPrivileges()) do
