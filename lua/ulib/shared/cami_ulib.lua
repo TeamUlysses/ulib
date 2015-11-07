@@ -23,14 +23,18 @@ local function playerHasAccess( actorPly, priv, callback, targetPly, extra )
 end
 hook.Add( "CAMI.PlayerHasAccess", "ULXCamiPlayerHasAccess", playerHasAccess )
 
--- Someday, implement this too.
---[[
 local function steamIDHasAccess( steamid, priv, callback, targetPly, extra )
 	local priv = priv:lower()
-	callback(result)
+	steamid = steamid:upper()
+
+	if not ULib.isValidSteamID( steamid ) then return end
+
+	local connectedPly = ULib.getPlyByID( steamid )
+	if connectedPly then return playerHasAccess( connectedPly, priv, callback, targetPly, extra ) end
+
+	-- ULib currently doesn't support looking up permissions for users that aren't connected. Maybe in the future?
 end
 hook.Add( "CAMI.SteamIDHasAccess", "ULXCamiSteamidHasAccess", steamIDHasAccess )
-]]
 
 -- Registering/deleting groups on client not necessary for ULib since we pass
 -- that data around from the server
