@@ -1138,7 +1138,7 @@ end
 function cmds.TranslateCommand:setOpposite( cmd, args, say_cmd, hide_say, no_space_in_say )
 	ULib.checkArg( 1, "ULib.cmds.TranslateCommand:setOpposite", "string", cmd )
 	ULib.checkArg( 2, "ULib.cmds.TranslateCommand:setOpposite", "table", args )
-	ULib.checkArg( 3, "ULib.cmds.TranslateCommand:setOpposite", {"nil", "string"}, say_cmd )
+	ULib.checkArg( 3, "ULib.cmds.TranslateCommand:setOpposite", {"nil", "string", "table"}, say_cmd )
 	ULib.checkArg( 4, "ULib.cmds.TranslateCommand:setOpposite", {"nil", "boolean"}, hide_say )
 	ULib.checkArg( 5, "ULib.cmds.TranslateCommand:setOpposite", {"nil", "boolean"}, no_space_in_say )
 
