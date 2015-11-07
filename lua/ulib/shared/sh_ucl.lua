@@ -70,7 +70,7 @@ function ucl.query( ply, access, hide )
 	end
 
 	-- No specific instruction, assume they don't have access.
-	return false
+	return nil
 end
 
 

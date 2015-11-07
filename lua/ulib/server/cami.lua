@@ -6,7 +6,7 @@
 	The CAMI API is designed by Falco "FPtje" Peijnenburg, but this source code
 	remains under the same licensing as the rest of ULib.
 
-	To update the accross-addons shared CAMI logic, run the following in the
+	To update the across-addons shared CAMI logic, run the following in the
 	appropriate directory...
 	: wget https://raw.githubusercontent.com/glua/CAMI/master/sh_cami.lua -O cami_global.lua
 ]]
@@ -68,8 +68,11 @@ hook.Add( "CAMI.OnPrivilegeRegistered", "ULXCamiPrivilegeRegistered", onPrivileg
 
 local function playerHasAccess( actorPly, priv, callback, targetPly, extra )
 	local priv = priv:lower()
-	local result = ULib.ucl.query( actorPly, priv )
-	callback(result)
+	local result = ULib.ucl.query( actorPly, priv, true )
+	if result ~= nil then
+		callback(result)
+		return true
+	end
 end
 hook.Add( "CAMI.PlayerHasAccess", "ULXCamiPlayerHasAccess", playerHasAccess )
 
