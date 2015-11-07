@@ -41,7 +41,7 @@ Structures:
 ]]
 
 -- Version number in YearMonthDay format.
-local version = 20150823
+local version = 20150902.1
 
 if CAMI and CAMI.Version >= version then return end
 
@@ -53,7 +53,20 @@ usergroups
 	Contains the registered CAMI_USERGROUP usergroup structures.
 	Indexed by usergroup name.
 ]]
-local usergroups = CAMI.GetUsergroups and CAMI.GetUsergroups() or {}
+local usergroups = CAMI.GetUsergroups and CAMI.GetUsergroups() or {
+	user = {
+		Name = "user",
+		Inherits = "user"
+	},
+	admin = {
+		Name = "admin",
+		Inherits = "user"
+	},
+	superadmin = {
+		Name = "superadmin",
+		Inherits = "admin"
+	}
+}
 
 --[[
 privileges
@@ -88,24 +101,6 @@ function CAMI.RegisterUsergroup(usergroup, source)
 	hook.Call("CAMI.OnUsergroupRegistered", nil, usergroup, source)
 	return usergroup
 end
-
--- Default user usergroup
-CAMI.RegisterUsergroup{
-	Name = "user",
-	Inherits = "user"
-}
-
--- Default admin usergroup
-CAMI.RegisterUsergroup{
-	Name = "admin",
-	Inherits = "user"
-}
-
--- Default superadmin usergroup
-CAMI.RegisterUsergroup{
-	Name = "superadmin",
-	Inherits = "admin"
-}
 
 --[[
 CAMI.UnregisterUsergroup
@@ -188,7 +183,7 @@ function CAMI.UsergroupInherits(usergroupName1, usergroupName2)
 		usergroupName1 = usergroups[usergroupName1] and
 						 usergroups[usergroupName1].Inherits or
 						 usergroupName1
-	until usergroups[usergroupName1] and
+	until not usergroups[usergroupName1] or
 		  usergroups[usergroupName1].Inherits == usergroupName1
 
 	-- One can only be sure the usergroup inherits from user if the
@@ -359,9 +354,11 @@ local defaultAccessHandler = {["CAMI.PlayerHasAccess"] =
 
 		if not priv then return callback(fallback, "Fallback.") end
 
-		local usergroup = actorPly:GetUserGroup()
-		local inherits = CAMI.UsergroupInherits(usergroup, priv.MinAccess)
-		callback(inherits, "Fallback.")
+		callback(
+			priv.MinAccess == "user" or
+			priv.MinAccess == "admin" and actorPly:IsAdmin() or
+			priv.MinAccess == "superadmin" and actorPly:IsSuperAdmin()
+			, "Fallback.")
 	end,
 	["CAMI.SteamIDHasAccess"] =
 	function(_, _, _, callback)
