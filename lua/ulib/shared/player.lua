@@ -180,7 +180,7 @@ function ULib.getUsers( target, enable_keywords, ply )
 				if piece:sub( 1, 1 ) == "$" then
 					local player = ULib.getPlyByID( piece:sub( 2 ) )
 					if player then
-						table.insert( tmpTargets,  player )
+						table.insert( tmpTargets, player )
 					end
 				elseif piece == "*" then -- All!
 					table.Add( tmpTargets, players )
@@ -212,6 +212,11 @@ function ULib.getUsers( target, enable_keywords, ply )
 						if player:CheckGroup( group ) then
 							table.insert( tmpTargets, player )
 						end
+					end
+				else
+					local tblForHook = hook.Run( ULib.HOOK_GETUSERS_CUSTOM_KEYWORD, piece, ply )
+					if tblForHook then
+						table.Add( tmpTargets, tblForHook )
 					end
 				end
 
@@ -312,6 +317,9 @@ function ULib.getUser( target, enable_keywords, ply )
 			else
 				return player
 			end
+		else
+			local player = hook.Run( ULib.HOOK_GETUSER_CUSTOM_KEYWORD, target, ply )
+			if player then return player end
 		end
 	end
 
@@ -334,4 +342,3 @@ function ULib.getUser( target, enable_keywords, ply )
 
 	return plyMatches[ 1 ]
 end
-

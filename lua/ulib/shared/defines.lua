@@ -215,6 +215,45 @@ ULib.HOOK_POST_TRANSLATED_COMMAND = "ULibPostTranslatedCommand"
 ULib.HOOK_PLAYER_NAME_CHANGED = "ULibPlayerNameChanged"
 
 --[[
+	Hook: ULibGetUsersCustomKeyword
+
+	Called during ULib.getUsers when considering a target string for keywords.
+	This could be used to create a new, custom keyword for targetting users who
+	have been connected for less than five minutes, for example.
+	Return nil or a table of player objects to add to the target list.
+
+	Parameters passed to callback:
+
+		target - A string chunk of a possibly larger target list to operate on.
+		ply - The player doing the targetting, not always specified (can be nil).
+
+	Revisions:
+
+		v2.60 - Initial
+]]
+ULib.HOOK_GETUSERS_CUSTOM_KEYWORD = "ULibGetUsersCustomKeyword"
+
+--[[
+	Hook: ULibGetUserCustomKeyword
+
+	Called during ULib.getUser when considering a target string for keywords.
+	This could be used to create a new, custom keyword for always targetting a
+	specific connected steamid, for example. Or, to target the shortest connected
+	player.
+	Return nil or a player object.
+
+	Parameters passed to callback:
+
+		target - A string target.
+		ply - The player doing the targetting, not always specified (can be nil).
+
+	Revisions:
+
+		v2.60 - Initial
+]]
+ULib.HOOK_GETUSER_CUSTOM_KEYWORD = "ULibGetUserCustomKeyword"
+
+--[[
 	Section: UCL Helpers
 
 	These defines are server-only, to help with UCL.
