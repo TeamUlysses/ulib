@@ -66,7 +66,7 @@ local function onUsersGroupChanged( ply, oldGroup, newGroup, originToken )
 	if originToken == CAMI.ULX_TOKEN then return end
 
 	local id = ULib.ucl.getUserRegisteredID( ply )
-	if not id then id = target_ply:SteamID() end
+	if not id then id = ply:SteamID() end
 
 	if newGroup == ULib.ACCESS_ALL then
 		ULib.ucl.removeUser( id, true )
