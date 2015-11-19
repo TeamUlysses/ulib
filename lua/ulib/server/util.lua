@@ -151,6 +151,57 @@ function ULib.getAllReadyPlayers()
 end
 
 
+--[[
+	Function: getVersion
+
+	TODO
+]]
+function ULib.getVersion()
+	local versionStr
+	local build = nil
+	local usingWorkshop = false
+
+	-- Get workshop information, if available
+	local addons = engine.GetAddons()
+	for i=1, #addons do
+		-- Ideally we'd use the "wsid" from this table
+		-- But, as of 19 Nov 2015, that is broken, so we'll work around it
+		if addons[i].file:find(tostring(ULib.WORKSHOPID)) then
+			usingWorkshop = true
+		end
+	end
+
+	-- If we have good build data, set it in "build"
+	if ULib.fileExists( "ulib.build" ) then
+		local buildStr = ULib.fileRead( "ulib.build" )
+		local buildNum = tonumber(buildStr)
+		-- Make sure the time is something reasonable -- between the year 2014 and 2128
+		if buildNum and buildNum > 1400000000 and buildNum < 5000000000 then
+			build = buildNum
+		end
+	end
+
+	if ULib.RELEASE then
+		versionStr = string.format( "v%.02f", ULib.VERSION )
+	elseif usingWorkshop then
+		versionStr = string.format( "v%.02fw", ULib.VERSION )
+	elseif build then -- It's not release and it's not workshop
+		versionStr = string.format( "v%.02fd (%s)", ULib.VERSION, os.date( "%x", build ) )
+	else -- Not sure what this version is, but it's not a release
+		versionStr = string.format( "v%.02fd", ULib.VERSION )
+	end
+
+	return versionStr, ULib.VERSION, build, usingWorkshop
+end
+
+
+local function sendVersionData( ply )
+	local _, _, build, workshop = ULib.getVersion()
+	ULib.clientRPC( ply, "ULib.getVersionData", build, workshop )
+end
+hook.Add( "PlayerInitialSpawn", "ULibSendVersionData", sendVersionData )
+
+
 ULib.repcvars = ULib.repcvars or {} -- This is used for <ULib.replicatedWithWritableCvar> in order to keep track of valid cvars and access info.
 local repcvars = ULib.repcvars
 local repCvarServerChanged

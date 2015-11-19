@@ -6,8 +6,8 @@
 
 ULib = ULib or {}
 
-
-ULib.VERSION = 2.60
+ULib.RELEASE = false -- Don't access these two directlly, use ULib.getVersion()
+ULib.VERSION = 2.52
 
 ULib.ACCESS_ALL = "user"
 ULib.ACCESS_OPERATOR = "operator"
@@ -252,6 +252,8 @@ ULib.HOOK_GETUSERS_CUSTOM_KEYWORD = "ULibGetUsersCustomKeyword"
 		v2.60 - Initial
 ]]
 ULib.HOOK_GETUSER_CUSTOM_KEYWORD = "ULibGetUserCustomKeyword"
+
+ULib.WORKSHOPID = 557962238
 
 --[[
 	Section: UCL Helpers
