@@ -6,7 +6,7 @@
 if [ -a .commit ]
 	then
 	rm .commit
-	echo `date '+%s'` > version
-	git add version
+	echo `date '+%s'` > ulib.build
+	git add ulib.build
 	git commit --amend -C HEAD --no-verify
 fi

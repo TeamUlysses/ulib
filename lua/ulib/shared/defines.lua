@@ -264,7 +264,6 @@ ULib.UCL_USERS = "data/ulib/users.txt"
 ULib.UCL_GROUPS = "data/ulib/groups.txt"
 ULib.UCL_REGISTERED = "data/ulib/misc_registered.txt" -- Holds access strings that ULib has already registered
 ULib.BANS_FILE = "data/ulib/bans.txt"
-ULib.VERSION_FILE = "data/ulib/version.txt"
 
 ULib.DEFAULT_GRANT_ACCESS = { allow={}, deny={}, guest=true }
 
