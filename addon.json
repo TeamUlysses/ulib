@@ -6,7 +6,9 @@
 	[
 		"addon.txt",
 		".editorconfig",
-		".git*"
+		".git*",
+		"ulib.build",
+		"ULib_readme.txt"
 	],
 	"workshopid": 557962238
 }

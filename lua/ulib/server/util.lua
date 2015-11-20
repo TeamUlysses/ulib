@@ -202,6 +202,45 @@ end
 hook.Add( "PlayerInitialSpawn", "ULibSendVersionData", sendVersionData )
 
 
+ULib.updateAvailable = false
+local function ulibUpdateCheck( body, len, headers, httpCode )
+	if httpCode ~= 200 then
+		return
+	end
+
+	local currentBuild = tonumber(body)
+	if not currentBuild then return end
+
+	local _, _, myBuild = ULib.getVersion()
+	if myBuild < currentBuild then
+		ULib.updateAvailable = true
+		Msg( "[ULib] There is an update available\n" )
+	end
+end
+
+local function downloadForUlibUpdateCheck()
+	local _, _, myBuild, workshop = ULib.getVersion()
+	if not myBuild or workshop then
+		return
+	end
+
+	if ULib.RELEASE then
+		http.Fetch( "https://teamulysses.github.io/ulib/ulib.build", ulibUpdateCheck )
+	else
+		http.Fetch( "https://raw.githubusercontent.com/TeamUlysses/ulib/master/ulib.build", ulibUpdateCheck )
+	end
+end
+hook.Add( "Initialize", "ULibUpdateChecker", downloadForUlibUpdateCheck )
+
+local function advertiseNewVersion( ply )
+	if ply:IsAdmin() and ULib.updateAvailable and not ply.UlibUpdateAdvertised then
+		ULib.tsay( ply, "[ULib] There is an update available" )
+		ply.UlibUpdateAdvertised = true
+	end
+end
+hook.Add( ULib.HOOK_UCLAUTH, "ULibAdvertiseUpdate", advertiseNewVersion )
+
+
 ULib.repcvars = ULib.repcvars or {} -- This is used for <ULib.replicatedWithWritableCvar> in order to keep track of valid cvars and access info.
 local repcvars = ULib.repcvars
 local repCvarServerChanged
