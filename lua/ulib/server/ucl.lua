@@ -2,9 +2,83 @@
 	Title: UCL
 
 	ULib's Access Control List
+
+	Formatting Details:
+
+		Format of admin account in users.txt--
+		"<steamid|ip|unique id>"
+		{
+			"group" "superadmin"
+			"allow"
+			{
+				"ulx kick"
+				"ulx ban"
+			}
+			"deny"
+			{
+				"ulx cexec"
+			}
+		}
+
+		Example of a superadmin--
+		"STEAM_0:1:123456"
+		{
+			"group" "superadmin"
+			"allow"
+			{
+			}
+			"deny"
+			{
+			}
+		}
+
+		Format of group that gets the same allows as a superadmin in groups.txt--
+		"<group_name>"
+		{
+			"allow"
+			{
+				"ulx kick"
+				"ulx ban"
+			}
+			"inherit_from" "superadmin"
+		}
 ]]
 
 local ucl = ULib.ucl -- Make it easier for us to refer to
+
+local defaultGroupsText = -- To populate initially or when the user deletes it
+[["operator"
+{
+	"allow"
+	{
+	}
+	"can_target"    "!%admin"
+}
+
+"admin"
+{
+	"allow"
+	{
+	}
+	"inherit_from"	"operator"
+	"can_target"    "!%superadmin"
+}
+
+"superadmin"
+{
+	"allow"
+	{
+	}
+	"inherit_from"	"admin"
+}
+
+"user"
+{
+	"allow"
+	{
+	}
+}
+]]
 
 local accessStrings = ULib.parseKeyValues( ULib.fileRead( ULib.UCL_REGISTERED ) or "" ) or {}
 local accessCategories = {}
@@ -39,15 +113,12 @@ local function reloadGroups()
 	local noMount = true
 	local path = ULib.UCL_GROUPS
 	if not ULib.fileExists( path, noMount ) then
-		if ULib.fileExists( "addons/ulib/" .. path, noMount ) then
-			path = "addons/ulib/" .. path
-		else
-			Msg( "ULIB WARNING: groups.txt is missing and I can't find the default groups.txt file!!\n" )
-			if ULib.fileExists( path ) then
-				Msg( "ULIB WARNING: Reading groups.txt from a potentially unsafe location\n" )
-				noMount = false
-			end
+		ULib.fileWrite( path, defaultGroupsText )
+
+		if ULib.fileExists( ULib.UCL_REGISTERED ) then
+			ULib.fileDelete( ULib.UCL_REGISTERED ) -- Since we're regnerating we'll need to remove this
 		end
+		accessStrings = {}
 	end
 
 	local needsBackup = false
@@ -57,17 +128,9 @@ local function reloadGroups()
 	if not ucl.groups or not ucl.groups[ ULib.ACCESS_ALL ] then
 		needsBackup = true
 		-- Totally messed up! Clear it.
-		local f = "addons/ulib/" .. ULib.UCL_GROUPS
-		if not ULib.fileExists( f, true ) then
-			Msg( "ULIB PANIC: groups.txt is corrupted and I can't find the default groups.txt file!!\n" )
-		else
-			local err2
-			ucl.groups, err2 = ULib.parseKeyValues( ULib.removeCommentHeader( ULib.fileRead( f, true ), "/" ) )
-			if not ucl.groups or not ucl.groups[ ULib.ACCESS_ALL ] then
-				Msg( "ULIB PANIC: default groups.txt is corrupt!\n" )
-				err = err2
-			end
-		end
+		local err2
+		ucl.groups, err2 = ULib.parseKeyValues( ULib.removeCommentHeader( defaultGroupsText, "/" ) )
+
 		if ULib.fileExists( ULib.UCL_REGISTERED ) then
 			ULib.fileDelete( ULib.UCL_REGISTERED ) -- Since we're regnerating we'll need to remove this
 		end
@@ -142,15 +205,7 @@ local function reloadUsers()
 	local noMount = true
 	local path = ULib.UCL_USERS
 	if not ULib.fileExists( path, noMount ) then
-		if ULib.fileExists( "addons/ulib/" .. path, noMount ) then
-			path = "addons/ulib/" .. path
-		else
-			Msg( "ULIB WARNING: users.txt is missing and I can't find the default groups.txt file!!\n" )
-			if ULib.fileExists( path ) then
-				Msg( "ULIB WARNING: Reading users.txt from a potentially unsafe location\n" )
-				noMount = false
-			end
-		end
+		ULib.fileWrite( path, "" )
 	end
 
 	local needsBackup = false
@@ -161,21 +216,7 @@ local function reloadUsers()
 	if not ucl.users then
 		needsBackup = true
 		-- Totally messed up! Clear it.
-		local f = "addons/ulib/" .. ULib.UCL_USERS
-		if not ULib.fileExists( f, true ) then
-			Msg( "ULIB PANIC: users.txt is corrupted and I can't find the default users.txt file!!\n" )
-		else
-			local err2
-			ucl.users, err2 = ULib.parseKeyValues( ULib.removeCommentHeader( ULib.fileRead( f, true ), "/" ) )
-			if not ucl.users then
-				Msg( "ULIB PANIC: default users.txt is corrupt!\n" )
-				err = err2
-			end
-		end
-		if ULib.fileExists( ULib.UCL_REGISTERED ) then
-			ULib.fileDelete( ULib.UCL_REGISTERED ) -- Since we're regnerating we'll need to remove this
-		end
-		accessStrings = {}
+		ucl.users = {}
 
 	else
 		for id, userInfo in pairs( ucl.users ) do
