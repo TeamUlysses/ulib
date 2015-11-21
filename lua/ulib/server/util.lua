@@ -203,10 +203,21 @@ hook.Add( "PlayerInitialSpawn", "ULibSendVersionData", sendVersionData )
 
 
 ULib.updateAvailable = false
+local function advertiseNewVersion( ply )
+	if ply:IsAdmin() and ULib.updateAvailable and not ply.UlibUpdateAdvertised then
+		ULib.tsay( ply, "[ULib] There is an update available" )
+		ply.UlibUpdateAdvertised = true
+	end
+end
+hook.Add( ULib.HOOK_UCLAUTH, "ULibAdvertiseUpdate", advertiseNewVersion )
+
 local function ulibUpdateCheck( body, len, headers, httpCode )
 	if httpCode ~= 200 then
 		return
 	end
+
+	timer.Remove( "ULibUpdateChecker" )
+	hook.Remove( "Initialize", "ULibUpdateChecker" )
 
 	local currentBuild = tonumber(body)
 	if not currentBuild then return end
@@ -215,7 +226,17 @@ local function ulibUpdateCheck( body, len, headers, httpCode )
 	if myBuild < currentBuild then
 		ULib.updateAvailable = true
 		Msg( "[ULib] There is an update available\n" )
+
+		local players = player.GetAll()
+		for i=1, #players do
+			advertiseNewVersion( players[ i ] )
+		end
 	end
+end
+
+local function ulibUpdateErr()
+	timer.Remove( "ULibUpdateChecker" )
+	hook.Remove( "Initialize", "ULibUpdateChecker" )
 end
 
 local function downloadForUlibUpdateCheck()
@@ -225,20 +246,13 @@ local function downloadForUlibUpdateCheck()
 	end
 
 	if ULib.RELEASE then
-		http.Fetch( "https://teamulysses.github.io/ulib/ulib.build", ulibUpdateCheck )
+		http.Fetch( "https://teamulysses.github.io/ulib/ulib.build", ulibUpdateCheck, ulibUpdateErr )
 	else
-		http.Fetch( "https://raw.githubusercontent.com/TeamUlysses/ulib/master/ulib.build", ulibUpdateCheck )
+		http.Fetch( "https://raw.githubusercontent.com/TeamUlysses/ulib/master/ulib.build", ulibUpdateCheck, ulibUpdateErr )
 	end
 end
 hook.Add( "Initialize", "ULibUpdateChecker", downloadForUlibUpdateCheck )
-
-local function advertiseNewVersion( ply )
-	if ply:IsAdmin() and ULib.updateAvailable and not ply.UlibUpdateAdvertised then
-		ULib.tsay( ply, "[ULib] There is an update available" )
-		ply.UlibUpdateAdvertised = true
-	end
-end
-hook.Add( ULib.HOOK_UCLAUTH, "ULibAdvertiseUpdate", advertiseNewVersion )
+timer.Create( "ULibUpdateChecker", 9, 10, downloadForUlibUpdateCheck )
 
 
 ULib.repcvars = ULib.repcvars or {} -- This is used for <ULib.replicatedWithWritableCvar> in order to keep track of valid cvars and access info.
