@@ -6,7 +6,7 @@
 
 ULib = ULib or {}
 
-ULib.RELEASE = false -- Don't access these two directlly, use ULib.getVersion()
+ULib.RELEASE = false -- Don't access these two directly, use ULib.getVersion()
 ULib.VERSION = 2.52
 
 ULib.ACCESS_ALL = "user"
