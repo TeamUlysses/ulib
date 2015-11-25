@@ -48,7 +48,7 @@ local function onGroupRegistered( camiGroup, originToken )
 	if not ULib.ucl.groups[ camiGroup.Name ] then
 		ULib.ucl.addGroup( camiGroup.Name, nil, camiGroup.Inherits, true )
 	else
-		ULib.ucl.setGroupInheritance( camiGroup.Name, camiGroup.Inherits )
+		ULib.ucl.setGroupInheritance( camiGroup.Name, camiGroup.Inherits, true )
 	end
 end
 hook.Add( "CAMI.OnUsergroupRegistered", "ULXCamiGroupRegistered", onGroupRegistered )

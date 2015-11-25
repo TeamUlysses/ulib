@@ -482,13 +482,14 @@ end
 
 		group - A string of the group name. (IE: superadmin)
 		inherit_from - Either a string of the new inheritance group name or nil to remove inheritance. (IE: admin)
+		from_CAMI - *(Optional)* An indicator for this group coming from CAMI.
 
 	Revisions:
 
 		v2.40 - Initial.
-		v2.60 - Added CAMI support.
+		v2.60 - Added CAMI support and parameter.
 ]]
-function ucl.setGroupInheritance( group, inherit_from )
+function ucl.setGroupInheritance( group, inherit_from, from_CAMI )
 	ULib.checkArg( 1, "ULib.ucl.renameGroup", "string", group )
 	ULib.checkArg( 2, "ULib.ucl.renameGroup", {"nil","string"}, inherit_from )
 	if inherit_from then
@@ -528,7 +529,7 @@ function ucl.setGroupInheritance( group, inherit_from )
 	hook.Call( ULib.HOOK_UCLCHANGED )
 
 	-- CAMI logic
-	if not ULib.findInTable( {"superadmin", "admin", "user"}, group ) then
+	if not from_CAMI and not ULib.findInTable( {"superadmin", "admin", "user"}, group ) then
 		CAMI.UnregisterUsergroup( group, CAMI.ULX_TOKEN )
 		CAMI.RegisterUsergroup( {Name=group, Inherits=inherit_from}, CAMI.ULX_TOKEN )
 	end
