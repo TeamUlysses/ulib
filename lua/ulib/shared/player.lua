@@ -151,8 +151,13 @@ end
 
 		v2.40 - Rewrite, added more keywords, removed immunity.
 		v2.50 - Added "#" and '$' keywords, removed special exception for "%user" (replaced by "#user").
+		v2.60 - Returns false if target is an empty string.
 ]]
 function ULib.getUsers( target, enable_keywords, ply )
+	if target == "" then
+		return false, "No target specified!"
+	end
+
 	local players = player.GetAll()
 
 	-- First, do a full name match in case someone's trying to exploit our target system
@@ -281,8 +286,13 @@ end
 
 		v2.40 - Rewrite, added keywords, removed immunity.
 		v2.50 - Added "$" keyword.
+		v2.60 - Returns false if target is an empty string.
 ]]
 function ULib.getUser( target, enable_keywords, ply )
+	if target == "" then
+		return false, "No target specified!"
+	end
+
 	local players = player.GetAll()
 	target = target:lower()
 

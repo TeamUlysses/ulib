@@ -59,6 +59,7 @@ v2.60 - *(00/00/00)*
 	* [FIX] Exploitable console command could potentially cause errors and/or crashes.
 	* [FIX] Exploit involving file system mounting.
 	* [CHANGE] Hook system. It's much faster (CPU-wise) and a little easier to use now (Many thanks for input from darkjacky and Divran).
+	* [CHANGE] ULib.getUser(s) do not proceed if passed an empty string (Thanks, timmyws).
 
 v2.52 - *(03/09/15)*
 	* [ADD] Admin parameter to ULib.unban for overriding purposes (Thanks for the idea, MStruntze).
