@@ -492,9 +492,7 @@ end
 function ucl.setGroupInheritance( group, inherit_from, from_CAMI )
 	ULib.checkArg( 1, "ULib.ucl.renameGroup", "string", group )
 	ULib.checkArg( 2, "ULib.ucl.renameGroup", {"nil","string"}, inherit_from )
-	if inherit_from then
-		if inherit_from == ULib.ACCESS_ALL then inherit_from = nil end -- Implicitly inherited
-	end
+	inherit_from = inherit_from or "user"
 
 	if group == ULib.ACCESS_ALL then return error( "This group (" .. group .. ") cannot have its inheritance changed!", 2 ) end
 	if not ucl.groups[ group ] then return error( "Group does not exist (" .. group .. ")", 2 ) end
