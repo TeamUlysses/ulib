@@ -85,6 +85,16 @@ local accessCategories = {}
 ULib.ucl.accessStrings = accessStrings
 ULib.ucl.accessCategories = accessCategories
 
+if not ULib.fileExists( ULib.UCL_GROUPS, true ) then
+	ULib.fileWrite( ULib.UCL_GROUPS, defaultGroupsText )
+
+	if ULib.fileExists( ULib.UCL_REGISTERED ) then
+		ULib.fileDelete( ULib.UCL_REGISTERED ) -- Since we're regnerating we'll need to remove this
+	end
+	table.Empty( accessStrings )
+	table.Empty( accessCategories )
+end
+
 -- Helper function to save access string registration to misc_registered.txt
 local function saveAccessStringRegistration()
 	ULib.fileWrite( ULib.UCL_REGISTERED, ULib.makeKeyValues( accessStrings ) )
@@ -118,7 +128,8 @@ local function reloadGroups()
 		if ULib.fileExists( ULib.UCL_REGISTERED ) then
 			ULib.fileDelete( ULib.UCL_REGISTERED ) -- Since we're regnerating we'll need to remove this
 		end
-		accessStrings = {}
+		table.Empty( accessStrings )
+		table.Empty( accessCategories )
 	end
 
 	local needsBackup = false
@@ -134,7 +145,8 @@ local function reloadGroups()
 		if ULib.fileExists( ULib.UCL_REGISTERED ) then
 			ULib.fileDelete( ULib.UCL_REGISTERED ) -- Since we're regnerating we'll need to remove this
 		end
-		accessStrings = {}
+		table.Empty( accessStrings )
+		table.Empty( accessCategories )
 
 	else
 		-- Check to make sure it passes a basic validity test
