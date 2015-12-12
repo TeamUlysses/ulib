@@ -80,6 +80,31 @@ function ULib.slap( ent, damage, power, nosound )
 	ent:SetHealth( newHp )
 end
 
+-- ULib ban message
+local banMsg =
+[[===========YOU ARE BANNED===========
+Reason: %s
+Time Left: %s]]
+local function checkBan( steamid64, ip, password, clpassword, name )
+	local steamid = util.SteamIDFrom64( steamid64 )
+	local banData = ULib.bans[ steamid ]
+	if banData and (banData.reason ~= "" or banData.unban > 0) then
+		local reason = "(None given)"
+		if banData.reason and #banData.reason > 0 then
+			reason = banData.reason
+		end
+
+		local unbanStr = "(Permaban)"
+		local unban = tonumber( banData.unban )
+		if unban and unban > 0 then
+			unbanStr = ULib.secondsToStringTime( unban - os.time() )
+		end
+		Msg(string.format("%s(%s) was kicked by ULib for being banned\n", name, steamid))
+		return false, banMsg:format( reason, unbanStr )
+	end
+end
+hook.Add( "CheckPassword", "ULibBanCheck", checkBan )
+
 --[[
 	Function: kick
 

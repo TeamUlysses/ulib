@@ -709,6 +709,65 @@ end
 
 
 --[[
+	Function: secondsToStringTime
+
+	Converts a number of seconds to a string describing the time span.
+
+	Parameters:
+
+		secs - The number of seconds.
+
+	Returns:
+
+		A string representing the length of the spawn.
+
+	Revisions:
+
+		v2.60 - Initial
+]]
+function ULib.secondsToStringTime( secs )
+	local str = ""
+
+	local secsInYear = 60 * 60 * 24 * 365
+	if secs > secsInYear then
+		local years = math.floor( secs / secsInYear )
+		secs = secs % secsInYear
+		str = string.format( "%s%i year(s) ", str, years )
+	end
+
+	local secsInWeek = 60 * 60 * 24 * 7
+	if secs > secsInWeek then
+		local weeks = math.floor( secs / secsInWeek )
+		secs = secs % secsInWeek
+		str = string.format( "%s%i week(s) ", str, weeks )
+	end
+
+	local secsInDay = 60 * 60 * 24
+	if secs > secsInDay then
+		local days = math.floor( secs / secsInDay )
+		secs = secs % secsInDay
+		str = string.format( "%s%i day(s) ", str, days )
+	end
+
+	local secsInHour = 60 * 60
+	if secs > secsInHour then
+		local hours = math.floor( secs / secsInHour )
+		secs = secs % secsInHour
+		str = string.format( "%s%i day(s) ", str, hours )
+	end
+
+	local secsInMinute = 60
+	if secs > 0 then
+		local minutes = math.ceil( secs / secsInMinute )
+		if minutes >= 60 then minutes = 59 end
+		str = string.format( "%s%i minute(s) ", str, minutes )
+	end
+
+	return str:Trim()
+end
+
+
+--[[
 	Section: Inheritance
 ]]
 
