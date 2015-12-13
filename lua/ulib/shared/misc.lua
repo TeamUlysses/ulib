@@ -645,9 +645,9 @@ end
 
 
 --[[
-	Function: stringTimeToSeconds
+	Function: stringTimeToMinutes
 
-	Converts a string containing time information to seconds.
+	Converts a string containing time information to minutes.
 
 	Parameters:
 
@@ -661,8 +661,9 @@ end
 
 		v2.41 - Initial
 		v2.43 - Added year parameter
+		v2.60 - Renamed function from "stringTimeToSeconds" to "stringTimeToMinutes", because I am dumb
 ]]
-function ULib.stringTimeToSeconds( str )
+function ULib.stringTimeToMinutes( str )
 	if str == nil or type( str ) == "number" then
 		return str
 	end
@@ -706,12 +707,14 @@ function ULib.stringTimeToSeconds( str )
 
 	return minutes + num
 end
+ULib.stringTimeToSeconds = ULib.stringTimeToMinutes -- Remove in the future
 
 
 --[[
 	Function: secondsToStringTime
 
 	Converts a number of seconds to a string describing the time span.
+	Note that it rounds up to the minute level (ten seconds will be one minute).
 
 	Parameters:
 
@@ -732,35 +735,35 @@ function ULib.secondsToStringTime( secs )
 	if secs > secsInYear then
 		local years = math.floor( secs / secsInYear )
 		secs = secs % secsInYear
-		str = string.format( "%s%i year(s) ", str, years )
+		str = string.format( "%s%i year%s ", str, years, (years > 1 and "s" or "") )
 	end
 
 	local secsInWeek = 60 * 60 * 24 * 7
 	if secs > secsInWeek then
 		local weeks = math.floor( secs / secsInWeek )
 		secs = secs % secsInWeek
-		str = string.format( "%s%i week(s) ", str, weeks )
+		str = string.format( "%s%i week%s ", str, weeks, (weeks > 1 and "s" or "") )
 	end
 
 	local secsInDay = 60 * 60 * 24
 	if secs > secsInDay then
 		local days = math.floor( secs / secsInDay )
 		secs = secs % secsInDay
-		str = string.format( "%s%i day(s) ", str, days )
+		str = string.format( "%s%i day%s ", str, days, (days > 1 and "s" or "") )
 	end
 
 	local secsInHour = 60 * 60
 	if secs > secsInHour then
 		local hours = math.floor( secs / secsInHour )
 		secs = secs % secsInHour
-		str = string.format( "%s%i day(s) ", str, hours )
+		str = string.format( "%s%i hour%s ", str, hours, (hours > 1 and "s" or "") )
 	end
 
 	local secsInMinute = 60
 	if secs > 0 then
 		local minutes = math.ceil( secs / secsInMinute )
 		if minutes >= 60 then minutes = 59 end
-		str = string.format( "%s%i minute(s) ", str, minutes )
+		str = string.format( "%s%i minute%s ", str, minutes, (minutes > 1 and "s" or "") )
 	end
 
 	return str:Trim()

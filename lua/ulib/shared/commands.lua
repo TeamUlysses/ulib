@@ -186,16 +186,16 @@ function cmds.NumArg:processRestrictions( cmdRestrictions, plyRestrictions )
 			self.min = tonumber( self.min )
 			self.max = tonumber( self.max )
 		else
-			self.min = ULib.stringTimeToSeconds( self.min )
-			self.max = ULib.stringTimeToSeconds( self.max )
+			self.min = ULib.stringTimeToMinutes( self.min )
+			self.max = ULib.stringTimeToMinutes( self.max )
 		end
 	end
 
 	if allowTimeString and not self.timeStringsParsed then
 		self.timeStringsParsed = true
-		cmdRestrictions.min = ULib.stringTimeToSeconds( cmdRestrictions.min )
-		cmdRestrictions.max = ULib.stringTimeToSeconds( cmdRestrictions.max )
-		cmdRestrictions.default = ULib.stringTimeToSeconds( cmdRestrictions.default )
+		cmdRestrictions.min = ULib.stringTimeToMinutes( cmdRestrictions.min )
+		cmdRestrictions.max = ULib.stringTimeToMinutes( cmdRestrictions.max )
+		cmdRestrictions.default = ULib.stringTimeToMinutes( cmdRestrictions.default )
 	end
 
 	if cmdRestrictions.min and (not self.min or self.min < cmdRestrictions.min) then
@@ -229,7 +229,7 @@ function cmds.NumArg:parseAndValidate( ply, arg, cmdInfo, plyRestrictions )
 	if not allowTimeString then
 		num = tonumber( arg )
 	else
-		num = ULib.stringTimeToSeconds( arg )
+		num = ULib.stringTimeToMinutes( arg )
 	end
 
 	local typeString
