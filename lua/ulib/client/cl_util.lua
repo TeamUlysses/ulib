@@ -24,35 +24,6 @@ end
 net.Receive( "URPC", ULibRPC )
 
 
-function ULib.getVersionData( build, workshop )
-	ULib.build = build
-	ULib.usingWorkshop = workshop
-end
-
-
---[[
-	Function: getVersion
-
-	TODO
-]]
-function ULib.getVersion()
-	local versionStr
-	local build = ULib.build
-	local usingWorkshop = ULib.usingWorkshop
-
-	if ULib.RELEASE then
-		versionStr = string.format( "v%.02f", ULib.VERSION )
-	elseif usingWorkshop then
-		versionStr = string.format( "v%.02fw", ULib.VERSION )
-	elseif build then -- It's not release and it's not workshop
-		versionStr = string.format( "v%.02fd (%s)", ULib.VERSION, os.date( "%x", build ) )
-	else -- Not sure what this version is, but it's not a release
-		versionStr = string.format( "v%.02fd", ULib.VERSION )
-	end
-
-	return versionStr, ULib.VERSION, build, usingWorkshop
-end
-
 --[[
 	Function: umsgRcv
 

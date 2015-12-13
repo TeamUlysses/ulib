@@ -50,7 +50,7 @@ v2.60 - *(00/00/00)*
 	* [ADD] CAMI support.
 	* [ADD] "noMount" parameter to file-related APIs.
 	* [ADD] ULibGetUser(s)CustomKeyword hooks (Thanks, LuaTenshi).
-	* [ADD] ULib.getVersion().
+	* [ADD] Dynamic and consistent versioning for ULib plugins with automatic update checking.
 	* [FIX] The usual random slew of Garry-breakages (Thanks, Fuzzik).
 	* [FIX] An assumption regarding player authentication that led to a player's group being reset to user sometimes.
 	* [FIX] Garry API change for ULib.findinDir (Thanks, ascentechit).

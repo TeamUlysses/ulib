@@ -43,6 +43,8 @@ if not ULib then
 	include( "server/player_ext.lua" )
 	Msg( "//  server/entity_ext.lua    //\n" )
 	include( "server/entity_ext.lua" )
+	Msg( "//  shared/plugin.lua        //\n" )
+	include( "ulib/shared/plugin.lua" )
 	Msg( "//  shared/cami_global.lua   //\n" )
 	include( "shared/cami_global.lua" )
 	Msg( "//  shared/cami_ulib.lua     //\n" )
