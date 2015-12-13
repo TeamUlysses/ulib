@@ -268,13 +268,6 @@ ULib.UCL_REGISTERED = "data/ulib/misc_registered.txt" -- Holds access strings th
 ULib.BANS_FILE = "data/ulib/bans.txt"
 
 ULib.DEFAULT_GRANT_ACCESS = { allow={}, deny={}, guest=true }
-
-hook.Add( "Initialize", "ULibCheckFileInit", function()
-	if ULib.fileExists( ULib.UCL_REGISTERED ) and ULib.fileExists( "addons/ulib/data/" .. ULib.UCL_GROUPS ) and ULib.fileRead( ULib.UCL_GROUPS ) == ULib.fileRead( "addons/ulib/data/" .. ULib.UCL_GROUPS ) then
-	  -- File has been reset, delete registered
-		ULib.fileDelete( ULib.UCL_REGISTERED )
-	end
-end)
 end
 
 --[[
