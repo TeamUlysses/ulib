@@ -69,7 +69,10 @@ local function onUsersGroupChanged( ply, oldGroup, newGroup, originToken )
 	if not id then id = ply:SteamID() end
 
 	if newGroup == ULib.ACCESS_ALL then
-		ULib.ucl.removeUser( id, true )
+		-- If they are becoming a regular user, and they had access, then remove them
+		if ULib.ucl.users[ id ] then
+			ULib.ucl.removeUser( id, true )
+		end
 	else
 		if not ULib.ucl.groups[ newGroup ] then -- Just in case we were never notified of this group
 			local camiGroup = CAMI.GetUsergroup(usergroupName)
