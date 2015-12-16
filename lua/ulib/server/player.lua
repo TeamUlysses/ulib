@@ -80,31 +80,61 @@ function ULib.slap( ent, damage, power, nosound )
 	ent:SetHealth( newHp )
 end
 
--- ULib ban message
-local banJoinMsg = [[
-===========YOU ARE BANNED===========
-Reason: %s
-Time Left: %s]]
+-- ULib default ban message
+ULib.BanMessage = [[
+-------===== [ BANNED ] =====-------
+
+---= Reason =---
+{{REASON}}
+
+---= Time Left =---
+{{TIME_LEFT}} ]]
+
+local function getBanMessage( steamid )
+	local banData = ULib.bans[ steamid ]
+	if not banData then return end
+
+	local replacements = {
+		BANNED_BY = "(Unknown)",
+		BAN_START = "(Unknown)",
+		REASON = "(None given)",
+		TIME_LEFT = "(Permaban)",
+		STEAMID = steamid:gsub("%D", ""),
+		STEAMID64 = util.SteamIDTo64( steamid ),
+	}
+
+	if banData.admin and banData.admin ~= "" then
+		replacements.BANNED_BY = banData.admin
+	end
+
+	local time = tonumber( banData.time )
+	if time and time > 0 then
+		replacements.BAN_START = os.date( "%c", time )
+	end
+
+	if banData.reason and banData.reason ~= "" then
+		replacements.REASON = banData.reason
+	end
+
+	local unban = tonumber( banData.unban )
+	if unban and unban > 0 then
+		replacements.TIME_LEFT = ULib.secondsToStringTime( unban - os.time() )
+	end
+
+	return ULib.BanMessage:gsub( "{{([%w_]+)}}", replacements )
+end
+
 local function checkBan( steamid64, ip, password, clpassword, name )
 	local steamid = util.SteamIDFrom64( steamid64 )
 	local banData = ULib.bans[ steamid ]
 	if not banData then return end -- Not banned
 
-	local reason = nil
-	if banData.reason and banData.reason ~= "" then
-		reason = banData.reason
-	end
+	-- Nothing useful to show them, go to default message
+	if not banData.admin and not banData.reason and not banData.unban and not banData.time then return end
 
-	local unbanStr = nil
-	local unban = tonumber( banData.unban )
-	if unban and unban > 0 then
-		unbanStr = ULib.secondsToStringTime( unban - os.time() )
-	end
-
-	if reason or unbanStr then -- Only give this message if we have something useful to display
-		Msg(string.format("%s (%s)<%s> was kicked by ULib because they are on the ban list\n", name, steamid, ip))
-		return false, banJoinMsg:format( reason or "(None given)", unbanStr or "(Permaban)" )
-	end
+	local message = getBanMessage( steamid )
+	Msg(string.format("%s (%s)<%s> was kicked by ULib because they are on the ban list\n", name, steamid, ip))
+	return false, message
 end
 hook.Add( "CheckPassword", "ULibBanCheck", checkBan, HOOK_LOW )
 -- Low priority to allow servers to easily have another ban message addon
@@ -176,13 +206,6 @@ end
 ULib.kickban = ULib.ban
 
 
--- Yes, the first newline is intentional
-local banMsg = [[
-
-========YOU HAVE BEEN BANNED========
-Reason: %s
-Length: %s]]
-
 --[[
 	Function: addBan
 
@@ -204,6 +227,37 @@ Length: %s]]
 function ULib.addBan( steamid, time, reason, name, admin )
 	if reason == "" then reason = nil end
 
+	local admin_name
+	if admin then
+		admin_name = "(Console)"
+		if admin:IsValid() then
+			admin_name = string.format( "%s(%s)", admin:Name(), admin:SteamID() )
+		end
+	end
+
+	local t = {}
+	local timeNow = os.time()
+	if ULib.bans[ steamid ] then
+		t = ULib.bans[ steamid ]
+		t.modified_admin = admin_name
+		t.modified_time = timeNow
+	else
+		t.admin = admin_name
+	end
+	t.time = t.time or timeNow
+	if time > 0 then
+		t.unban = ( ( time * 60 ) + timeNow )
+	else
+		t.unban = 0
+	end
+	if reason then
+		t.reason = reason
+	end
+	if name then
+		t.name = name
+	end
+	ULib.bans[ steamid ] = t
+
 	local strTime = time ~= 0 and ULib.secondsToStringTime( time*60 )
 	local shortReason = "Banned for " .. (strTime or "eternity")
 	if reason then
@@ -211,8 +265,8 @@ function ULib.addBan( steamid, time, reason, name, admin )
 	end
 
 	local longReason = shortReason
-	if reason or strTime then
-		longReason = banMsg:format( reason or "(None given)", strTime or "(Permaban)")
+	if reason or strTime or admin then -- If we have something useful to show
+		longReason = "\n" .. getBanMessage( steamid ) .. "\n" -- Newlines because we are forced to show "Disconnect: <msg>."
 	end
 
 	local ply = player.GetBySteamID( steamid )
@@ -228,35 +282,6 @@ function ULib.addBan( steamid, time, reason, name, admin )
 	game.ConsoleCommand( string.format( "banid %f %s kick\n", time, steamid ) )
 	game.ConsoleCommand( "writeid\n" )
 
-	local admin_name
-	if admin then
-		admin_name = "(Console)"
-		if admin:IsValid() then
-			admin_name = string.format( "%s(%s)", admin:Name(), admin:SteamID() )
-		end
-	end
-
-	local t = {}
-	if ULib.bans[ steamid ] then
-		t = ULib.bans[ steamid ]
-		t.modified_admin = admin_name
-		t.modified_time = os.time()
-	else
-		t.admin = admin_name
-	end
-	t.time = t.time or os.time()
-	if time > 0 then
-		t.unban = ( ( time * 60 ) + os.time() )
-	else
-		t.unban = 0
-	end
-	if reason then
-		t.reason = reason
-	end
-	if name then
-		t.name = name
-	end
-	ULib.bans[ steamid ] = t
 	ULib.fileWrite( ULib.BANS_FILE, ULib.makeKeyValues( ULib.bans ) )
 end
 
