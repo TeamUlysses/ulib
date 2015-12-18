@@ -58,6 +58,7 @@ v2.60 - *(00/00/00)*
 	* [FIX] Improved how well ULib files handle being autorefreshed.
 	* [FIX] Exploitable console command could potentially cause errors and/or crashes.
 	* [FIX] Exploit involving file system mounting.
+	* [FIX] Minor exploit that redirects unspecified playerArgs to a player with a specific name instead of the calling player. (Thanks Repe!)
 	* [CHANGE] Hook system. It's much faster (CPU-wise) and a little easier to use now (Many thanks for input from darkjacky and Divran).
 	* [CHANGE] ULib.getUser(s) do not proceed if passed an empty string (Thanks, timmyws).
 	* [CHANGE] Renamed function from "stringTimeToSeconds" to "stringTimeToMinutes", because I am dumb. An alias function will be available for a short time.
