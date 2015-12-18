@@ -511,7 +511,7 @@ function cmds.PlayerArg:parseAndValidate( ply, arg, cmdInfo, plyRestrictions )
 	self:processRestrictions( ply, cmdInfo, plyRestrictions )
 
 	if not arg and table.HasValue( cmdInfo, cmds.optional ) then
-		arg = cmdInfo.default or "^" -- Set it, needs to go through our process
+		arg = cmdInfo.default or "$" .. ULib.getUniqueIDForPlayer( ply ) -- Set it, needs to go through our process
 	end
 
 	local target, err_msg1 = ULib.getUser( arg, true, ply )
