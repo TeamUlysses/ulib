@@ -93,7 +93,16 @@ ULib.registerPlugin{
 --[[
 	Function: pluginVersionStr
 
-	TODO
+	Returns a human-readable version string for plugins in a consistent format.
+	The string tells users if they're using a development build (with build number/date), workshop, or release version.
+
+	Parameters:
+
+		name - The string of the plugin name you are querying about.
+
+	Returns:
+
+		A string of the version information for the specified plugin.
 ]]
 function ULib.pluginVersionStr( name )
 	local dat = ULib.plugins[ name ]
@@ -134,7 +143,13 @@ end
 --[[
 	Function: updateCheck
 
-	TODO
+	Check for updates for a named plugin at a given URL (usually you will want to
+	use the URL specified in registerPlugin). Note that this is an asynchronous check.
+
+	Parameters:
+
+		name - The name of the plugin.
+		url - The URL to check.
 ]]
 function ULib.updateCheck( name, url )
 	local plugin = ULib.plugins[ name ]
