@@ -4,39 +4,62 @@
 	Some useful functions for ULib plugins to use for doing plugin-type things.
 ]]
 
+
+--[[
+	Table: plugins
+
+	Holds plugin data for plugins that have registered themselves with ULib.
+
+	Fields:
+
+		Name - A string of the name of the plugin.
+		Version - A string or number of the version of the plugin.
+		IsReleaseVersion - An optional boolean specifying if this is a release (non-beta) version
+		Author - An optional string of the author of the plugin.
+		URL - An optional string of the URL for the plugin.
+		WorkshopID - An optional number specifying the workshopid for the plugin.
+		BuildNumLocal - An optional number specifying the build number for this plugin.
+		BuildHidden - An optional boolean; if true, the build is not shown in the version string.
+		BuildNumRemoteURL - An optional string specifying the URL to visit to retrieve the latest published build number for the plugin.
+		BuildNumRemoteReceivedCallback - An optional function to callback when the latest published build number is received.
+
+		WorkshopMounted - A generated boolean which is true only if WorkshopID was specified and that ID is currently mounted.
+		BuildNumRemote - A generated number of the retrieved latest published build number.
+]]
 ULib.plugins = {} -- Any registered plugins go here
 
 
 --[[
 	Function: registerPlugin
 
-	TODO
+	Parameters:
+
+		pluginData - A table of plugin data in the format documented in <plugins>, above.
 ]]
-function ULib.registerPlugin( name, pluginData )
+function ULib.registerPlugin( pluginData )
+	local name = pluginData.Name
 	if not ULib.plugins[ name ] then
 		ULib.plugins[ name ] = pluginData
 	else
 		table.Merge( ULib.plugins[ name ], pluginData )
 		pluginData = ULib.plugins[ name ]
 	end
-	--ULib.plugins[ name ] = { version=version, isRelease=isRelease, author=author,
-	-- url=url, workshopid=workshopid, build=build, hideBuild=hideBuild, buildURL=buildURL, buildCallback=buildCallback }
 
-	if pluginData.workshopid then
+	if pluginData.WorkshopID then
 		-- Get workshop information, if available
 		local addons = engine.GetAddons()
 		for i=1, #addons do
 			local addon = addons[i]
 			-- Ideally we'd use the "wsid" from this table
 			-- But, as of 19 Nov 2015, that is broken, so we'll work around it
-			if addon.mounted and addon.file:find(tostring(pluginData.workshopid)) then
-				ULib.plugins[ name ].usingWorkshop = true
+			if addon.mounted and addon.file:find(tostring(pluginData.WorkshopID)) then
+				pluginData.WorkshopMounted = true
 			end
 		end
 	end
 
 	if SERVER then
-		ULib.clientRPC( nil, "ULib.registerPlugin", name, pluginData )
+		ULib.clientRPC( nil, "ULib.registerPlugin", pluginData )
 	end
 end
 
@@ -44,24 +67,27 @@ end
 if SERVER then
 	local function sendRegisteredPlugins( ply )
 		for name, pluginData in pairs (ULib.plugins) do
-			ULib.clientRPC( ply, "ULib.registerPlugin", name, pluginData )
+			ULib.clientRPC( ply, "ULib.registerPlugin", pluginData )
 		end
 	end
 	hook.Add( "PlayerInitialSpawn", "ULibSendRegisteredPlugins", sendRegisteredPlugins )
 end
 
-
-local ulibDat = {
-	version       = string.format( "%.2f", ULib.VERSION ),
-	isRelease     = ULib.RELEASE,
-	author        = "Team Ulysses",
-	url           = "http://ulyssesmod.net",
-	workshopid    = 557962238,
-	build         = tonumber(ULib.fileRead( "ulib.build" )),
-	buildURL      = ULib.RELEASE and "https://teamulysses.github.io/ulib/ulib.build" or "https://raw.githubusercontent.com/TeamUlysses/ulib/master/ulib.build",
-	--buildCallback = nil
+local ulibBuildNumURL = ULib.RELEASE and "https://teamulysses.github.io/ulib/ulib.build" or "https://raw.githubusercontent.com/TeamUlysses/ulib/master/ulib.build"
+ULib.registerPlugin{
+	Name          = "ULib",
+	Version       = string.format( "%.2f", ULib.VERSION ),
+	IsReleaseVersion = ULib.RELEASE,
+	Author        = "Team Ulysses",
+	URL           = "http://ulyssesmod.net",
+	WorkshopID    = 557962238,
+	--WorkshopMounted = true,
+	BuildNumLocal = tonumber(ULib.fileRead( "ulib.build" )),
+	--BuildHidden = true,
+	BuildNumRemoteURL = ulibBuildNumURL,
+	--BuildNumRemote = 123,
+	--BuildNumRemoteReceivedCallback = nil,
 }
-ULib.registerPlugin( "ULib", ulibDat )
 
 
 --[[
@@ -73,21 +99,21 @@ function ULib.pluginVersionStr( name )
 	local dat = ULib.plugins[ name ]
 	if not dat then return nil end
 
-	if dat.isRelease then
-		return string.format( "v%s", dat.version )
+	if dat.IsRelease then
+		return string.format( "v%s", dat.Version )
 
-	elseif dat.usingWorkshop then
-		return string.format( "v%sw", dat.version )
+	elseif dat.WorkshopMounted then
+		return string.format( "v%sw", dat.Version )
 
-	elseif dat.build and not dat.hideBuild then -- It's not release and it's not workshop
-		local build = dat.build
+	elseif dat.BuildNumLocal and not dat.BuildHidden then -- It's not release and it's not workshop
+		local build = dat.BuildNumLocal
 		if build > 1400000000 and build < 5000000000 then -- Probably a date -- between 2014 and 2128
 			build = os.date( "%x", build )
 		end
-		return string.format( "v%sd (%s)", dat.version, build )
+		return string.format( "v%sd (%s)", dat.Version, build )
 
 	else -- Not sure what this version is, but it's not a release
-		return string.format( "v%sd", dat.version )
+		return string.format( "v%sd", dat.Version )
 	end
 end
 
@@ -96,9 +122,9 @@ local function receiverFor( plugin )
 		local buildOnline = tonumber( body )
 		if not buildOnline then return end
 
-		plugin.buildOnline = buildOnline
-		if plugin.buildCallback then
-			plugin.buildCallback( plugin.build, buildOnline )
+		plugin.BuildNumRemote = buildOnline
+		if plugin.BuildNumRemoteReceivedCallback then
+			plugin.BuildNumRemoteReceivedCallback( plugin.BuildNumLocal, buildOnline )
 		end
 	end
 	return receiver
@@ -113,7 +139,7 @@ end
 function ULib.updateCheck( name, url )
 	local plugin = ULib.plugins[ name ]
 	if not plugin then return nil end
-	if plugin.buildOnline then return nil end
+	if plugin.BuildNumRemote then return nil end
 
 	http.Fetch( url, receiverFor( plugin ) )
 	return true
@@ -129,8 +155,8 @@ local function httpCheck( body, len, headers, httpCode )
 
 	-- Okay, the HTTP library is functional and we can reach out. Let's check for updates.
 	for name, plugin in pairs (ULib.plugins) do
-		if plugin.buildURL then
-			ULib.updateCheck( name, plugin.buildURL )
+		if plugin.BuildNumRemoteURL then
+			ULib.updateCheck( name, plugin.BuildNumRemoteURL )
 		end
 	end
 end
