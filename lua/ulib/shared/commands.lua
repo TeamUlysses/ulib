@@ -484,7 +484,8 @@ function cmds.PlayerArg:processRestrictions( ply, cmdRestrictions, plyRestrictio
 	end
 
 	if ply:IsValid() and not ignore_can_target and not table.HasValue( cmdRestrictions, cmds.ignoreCanTarget ) and ULib.ucl.getGroupCanTarget( ply:GetUserGroup() ) then -- can_target restriction
-		local restricted = ULib.getUsers( ULib.ucl.getGroupCanTarget( ply:GetUserGroup() ) .. ",^", true, ply ) -- Allow self on top of restrictions
+		local selfTarget = "$" .. ULib.getUniqueIDForPlayer( ply )
+		local restricted = ULib.getUsers( ULib.ucl.getGroupCanTarget( ply:GetUserGroup() ) .. "," .. selfTarget, true, ply ) -- Allow self on top of restrictions
 		if not restricted or not self.restrictedTargets then -- Easy, just set it
 			self.restrictedTargets = restricted
 
