@@ -442,6 +442,16 @@ function ULib.toBool( x )
 end
 
 
+local function navigateUpTo(currentPointer, tableCrumbs)
+	for i=1, #tableCrumbs-1 do
+		local nextTableName = tableCrumbs[i]
+		currentPointer = currentPointer[ nextTableName ]
+		if type(currentPointer) ~= "table" then return false end -- Not found
+	end
+	return true, currentPointer
+end
+
+
 --[[
 	Function: findVar
 
@@ -449,26 +459,72 @@ end
 
 	Parameters:
 
-		var - The variable you wish to find
+		varLocation - The string location of the variable you wish to find or set (E.G., "ULib.myTable.MyVariable").
+		rootTable - The optional root table to search. Defaults to _G, the global environment.
 
 	Returns:
 
-		The variable or nil
+	Two values as follows...
+
+		Status - A boolean indicating whether or not it was found.
+		Value - The value of the variable.
 
 	Revisions:
 
 		v2.40 - Removed dependency on gmod functions.
+		v2.60 - Now returns two values to indicate success and value.
+		        Added second parameter for root table and added better handling for nil values.
 ]]
-function ULib.findVar( var )
-	if not var then error( "Nil param passed to ULib.findVar", 2 ) end
-	local loc = ULib.explode( "%.", var )
-	local x = _G
-	for _, v in ipairs( loc ) do
-		x = x[ v ]
-		if not x then return end
-	end
+function ULib.findVar( varLocation, rootTable )
+	ULib.checkArg( 1, "ULib.findVar", "string", varLocation )
+	ULib.checkArg( 2, "ULib.findVar", {"table", "nil"}, rootTable )
+	rootTable = rootTable or _G
 
-	return x
+	local tableCrumbs = ULib.explode( "%.", varLocation )
+	local success, lastTable = navigateUpTo(rootTable, tableCrumbs)
+	if not success then return false end
+
+	local lastCrumb = tableCrumbs[#tableCrumbs]
+	return true, lastTable[lastCrumb]
+end
+
+
+--[[
+	Function: setVar
+
+	Given a string, find and set a var starting from the global namespace. This will correctly parse tables. IE, "ULib.serialize".
+
+	Parameters:
+
+		varLocation - The string location of the variable you wish to find or set (E.G., "ULib.myTable.MyVariable").
+		varValue - The value to set it to.
+		rootTable - The optional root table to search. Defaults to _G, the global environment.
+
+	Returns:
+
+	Two values as follows...
+
+		Status - A boolean indicating whether or not it was found and set.
+		Value - The PREVIOUS value of the variable.
+
+	Revisions:
+
+		v2.60 - Initial.
+]]
+function ULib.setVar( varLocation, varValue, rootTable )
+	ULib.checkArg( 1, "ULib.setVar", "string", varLocation )
+	ULib.checkArg( 3, "ULib.setVar", {"table", "nil"}, rootTable )
+	rootTable = rootTable or _G
+
+	local tableCrumbs = ULib.explode( "%.", varLocation )
+	local success, lastTable = navigateUpTo(rootTable, tableCrumbs)
+	if not success then return false end
+
+	local lastCrumb = tableCrumbs[#tableCrumbs]
+	local prevVal = lastTable[lastCrumb]
+	lastTable[lastCrumb] = varValue
+
+	return true, prevVal
 end
 
 

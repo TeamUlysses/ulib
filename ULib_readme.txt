@@ -51,6 +51,7 @@ v2.60 - *(00/00/00)*
 	* [ADD] "noMount" parameter to file-related APIs.
 	* [ADD] ULibGetUser(s)CustomKeyword hooks (Thanks, LuaTenshi).
 	* [ADD] Dynamic and consistent versioning for ULib plugins with automatic update checking.
+	* [ADD] ULib.setVar, a compliment to ULib.findVar.
 	* [FIX] The usual random slew of Garry-breakages (Thanks, Fuzzik).
 	* [FIX] An assumption regarding player authentication that led to a player's group being reset to user sometimes.
 	* [FIX] Garry API change for ULib.findinDir (Thanks, ascentechit).
@@ -62,6 +63,7 @@ v2.60 - *(00/00/00)*
 	* [CHANGE] Hook system. It's much faster (CPU-wise) and a little easier to use now (Many thanks for input from darkjacky and Divran).
 	* [CHANGE] ULib.getUser(s) do not proceed if passed an empty string (Thanks, timmyws).
 	* [CHANGE] Renamed function from "stringTimeToSeconds" to "stringTimeToMinutes", because I am dumb. An alias function will be available for a short time.
+	* [CHANGE] Massively improved the utility of ULib.findVar and restructured the return values.
 
 v2.52 - *(03/09/15)*
 	* [ADD] Admin parameter to ULib.unban for overriding purposes (Thanks for the idea, MStruntze).
