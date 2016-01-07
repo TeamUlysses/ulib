@@ -47,8 +47,10 @@ local function onGroupRegistered( camiGroup, originToken )
 
 	if not ULib.ucl.groups[ camiGroup.Name ] then
 		ULib.ucl.addGroup( camiGroup.Name, nil, camiGroup.Inherits, true )
-	else
-		ULib.ucl.setGroupInheritance( camiGroup.Name, camiGroup.Inherits, true )
+	--else
+		--ULib.ucl.setGroupInheritance( camiGroup.Name, camiGroup.Inherits, true )
+		-- We used to set inheritance according to what CAMI passed to us, but DarkRP/FAdmin
+		-- passes us bad data by design, so we have to ignore this for sanity
 	end
 end
 hook.Add( "CAMI.OnUsergroupRegistered", "ULXCamiGroupRegistered", onGroupRegistered )
