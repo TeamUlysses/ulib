@@ -90,7 +90,7 @@ ULib.BanMessage = [[
 ---= Time Left =---
 {{TIME_LEFT}} ]]
 
-local function getBanMessage( steamid )
+function ULib.getBanMessage( steamid )
 	local banData = ULib.bans[ steamid ]
 	if not banData then return end
 
@@ -132,7 +132,7 @@ local function checkBan( steamid64, ip, password, clpassword, name )
 	-- Nothing useful to show them, go to default message
 	if not banData.admin and not banData.reason and not banData.unban and not banData.time then return end
 
-	local message = getBanMessage( steamid )
+	local message = ULib.getBanMessage( steamid )
 	Msg(string.format("%s (%s)<%s> was kicked by ULib because they are on the ban list\n", name, steamid, ip))
 	return false, message
 end
@@ -266,7 +266,7 @@ function ULib.addBan( steamid, time, reason, name, admin )
 
 	local longReason = shortReason
 	if reason or strTime or admin then -- If we have something useful to show
-		longReason = "\n" .. getBanMessage( steamid ) .. "\n" -- Newlines because we are forced to show "Disconnect: <msg>."
+		longReason = "\n" .. ULib.getBanMessage( steamid ) .. "\n" -- Newlines because we are forced to show "Disconnect: <msg>."
 	end
 
 	local ply = player.GetBySteamID( steamid )
