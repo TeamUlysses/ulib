@@ -21,8 +21,11 @@ To install ULib, simply extract the files from the downloaded archive to your ga
 When you've done this, you should have a file structure like this:
 
 `<garrysmod>/addons/ulib/lua/ULib/init.lua`
+
 `<garrysmod>/addons/ulib/lua/ULib/server/util.lua`
+
 `<garrysmod>/addons/ulib/lua/autorun/ulib_init.lua`
+
 `<garrysmod>/addons/ulib/data/ULib/users.txt`
 
 Please note that installation is the same on dedicated servers.
