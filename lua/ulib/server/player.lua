@@ -458,7 +458,7 @@ function ULib.refreshBans()
 	-- We're queueing this because it will split the load out for VERY large ban files
 	ULib.queueFunctionCall( function() ULib.fileWrite( ULib.BANS_FILE, ULib.makeKeyValues( ULib.bans ) ) end )
 end
-ULib.pcallError( ULib.refreshBans )
+hook.Add( "Initialize", "ULibLoadBans", ULib.refreshBans, HOOK_MONITOR_HIGH )
 
 
 --[[
