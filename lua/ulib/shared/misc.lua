@@ -451,6 +451,15 @@ local function navigateUpTo(currentPointer, tableCrumbs)
 	return true, currentPointer
 end
 
+local function getCrumbsTable( varLocation )
+	local tableCrumbs = ULib.explode( "[%.%[]", varLocation )
+	for i=1, #tableCrumbs do
+		local newCrumb, replaced = string.gsub( tableCrumbs[i], "]$", "" )
+		if replaced > 0 then tableCrumbs[i] = tonumber( newCrumb ) end
+	end
+	return tableCrumbs
+end
+
 
 --[[
 	Function: findVar
@@ -480,7 +489,7 @@ function ULib.findVar( varLocation, rootTable )
 	ULib.checkArg( 2, "ULib.findVar", {"table", "nil"}, rootTable )
 	rootTable = rootTable or _G
 
-	local tableCrumbs = ULib.explode( "%.", varLocation )
+	local tableCrumbs = getCrumbsTable( varLocation )
 	local success, lastTable = navigateUpTo(rootTable, tableCrumbs)
 	if not success then return false end
 
@@ -516,7 +525,7 @@ function ULib.setVar( varLocation, varValue, rootTable )
 	ULib.checkArg( 3, "ULib.setVar", {"table", "nil"}, rootTable )
 	rootTable = rootTable or _G
 
-	local tableCrumbs = ULib.explode( "%.", varLocation )
+	local tableCrumbs = getCrumbsTable( varLocation )
 	local success, lastTable = navigateUpTo(rootTable, tableCrumbs)
 	if not success then return false end
 
