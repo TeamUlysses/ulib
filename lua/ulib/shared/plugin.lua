@@ -14,7 +14,7 @@
 
 		Name - A string of the name of the plugin.
 		Version - A string or number of the version of the plugin.
-		IsReleaseVersion - An optional boolean specifying if this is a release (non-beta) version
+		IsRelease - An optional boolean specifying if this is a release (non-beta) version
 		Author - An optional string of the author of the plugin.
 		URL - An optional string of the URL for the plugin.
 		WorkshopID - An optional number specifying the workshopid for the plugin.
@@ -77,7 +77,7 @@ local ulibBuildNumURL = ULib.RELEASE and "https://teamulysses.github.io/ulib/uli
 ULib.registerPlugin{
 	Name          = "ULib",
 	Version       = string.format( "%.2f", ULib.VERSION ),
-	IsReleaseVersion = ULib.RELEASE,
+	IsRelease     = ULib.RELEASE,
 	Author        = "Team Ulysses",
 	URL           = "http://ulyssesmod.net",
 	WorkshopID    = 557962238,
