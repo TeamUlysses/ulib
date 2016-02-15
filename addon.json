@@ -8,7 +8,8 @@
 		".editorconfig",
 		".git*",
 		"ulib.build",
-		"ULib_readme.txt",
+		"README.md",
+		"CHANGELOG.md",
 		"lua/ulib/modules/what_is_this.txt"
 	],
 	"workshopid": 557962238

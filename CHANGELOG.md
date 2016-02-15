@@ -1,5 +1,6 @@
 # ULib Changelog
-## v2.60 - *(00/00/00)*
+
+## v2.60 - *(02/15/16)*
 * [ADD] ULib.ucl.getUserInfoFromID for getting user info from an ID.
 * [ADD] CAMI support.
 * [ADD] "noMount" parameter to file-related APIs.
