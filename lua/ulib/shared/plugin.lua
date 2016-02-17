@@ -108,11 +108,11 @@ function ULib.pluginVersionStr( name )
 	local dat = ULib.plugins[ name ]
 	if not dat then return nil end
 
-	if dat.IsRelease then
-		return string.format( "v%s", dat.Version )
-
-	elseif dat.WorkshopMounted then
+	if dat.WorkshopMounted then
 		return string.format( "v%sw", dat.Version )
+
+	elseif dat.IsRelease then
+		return string.format( "v%s", dat.Version )
 
 	elseif dat.BuildNumLocal and not dat.BuildHidden then -- It's not release and it's not workshop
 		local build = dat.BuildNumLocal
