@@ -6,7 +6,7 @@
 
 ULib = ULib or {}
 
-ULib.RELEASE = true -- Don't access these two directly, use ULib.pluginVersionStr("ULib")
+ULib.RELEASE = false -- Don't access these two directly, use ULib.pluginVersionStr("ULib")
 ULib.VERSION = 2.60
 ULib.AUTOMATIC_UPDATE_CHECKS = true
 
