@@ -33,6 +33,8 @@ function meta:DisallowVehicles( bool )
 end
 
 local function tool( ply, tr, toolmode )
+	if not ply or not ply:IsValid() then return end
+
 	if ply.NoSpawning then
 		if not table.HasValue( ULib.spawnWhitelist, toolmode ) then
 			return false
@@ -42,11 +44,13 @@ end
 hook.Add( "CanTool", "ULibPlayerToolCheck", tool, HOOK_HIGH )
 
 local function noclip( ply )
+	if not ply or not ply:IsValid() then return end
 	if ply.NoNoclip then return false end
 end
 hook.Add( "PlayerNoClip", "ULibNoclipCheck", noclip, HOOK_HIGH )
 
 local function spawnblock( ply )
+	if not ply or not ply:IsValid() then return end
 	if ply.NoSpawning then return false end
 end
 hook.Add( "PlayerSpawnObject", "ULibSpawnBlock", spawnblock )
@@ -59,6 +63,7 @@ hook.Add( "PlayerSpawnSENT", "ULibSpawnBlock", spawnblock )
 hook.Add( "PlayerGiveSWEP", "ULibSpawnBlock", spawnblock )
 
 local function vehicleblock( ply, ent )
+	if not ply or not ply:IsValid() then return end
 	if ply.NoVehicles then
 		return false
 	end
