@@ -276,8 +276,8 @@ end
 	Function: Player:CheckGroup
 
 	This function is similar to IsUserGroup(), but this one checks the UCL group chain as well.
-	For example, if a user is in group "owner" which inherits from "superadmin", this function
-	will return true if you check the user against "superadmin", where IsUserGroup() wouldn't.
+	For example, if a user is in group "superadmin" which inherits from "admin", this function
+	will return true if you check the user against "admin", where IsUserGroup() wouldn't.
 
 	Parameters:
 
