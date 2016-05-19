@@ -65,6 +65,7 @@ end
 hook.Add( "CAMI.OnUsergroupUnregistered", "ULXCamiGroupRemoved", onGroupRemoved )
 
 local function onUsersGroupChanged( ply, oldGroup, newGroup, originToken )
+	if not ply or not ply:IsValid() then return end -- Seems like we get called after a player disconnects sometimes
 	if originToken == CAMI.ULX_TOKEN then return end
 
 	local id = ULib.ucl.getUserRegisteredID( ply )
