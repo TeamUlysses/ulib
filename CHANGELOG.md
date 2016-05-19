@@ -2,6 +2,7 @@
 
 ## v2.61 - *(00/00/00)*
 * [FIX] NPCs loading from saves (Thanks, GamingStudios1029).
+* [FIX] Many issues with secondsToStringTime (Thanks, fruitwasp).
 
 ## v2.60 - *(02/15/16)*
 * [ADD] ULib.ucl.getUserInfoFromID for getting user info from an ID.

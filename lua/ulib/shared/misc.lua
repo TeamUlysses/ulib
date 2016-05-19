@@ -787,7 +787,7 @@ ULib.stringTimeToSeconds = ULib.stringTimeToMinutes -- Remove in the future
 
 	Returns:
 
-		A string representing the length of the spawn.
+		A string representing the length of the span.
 
 	Revisions:
 
@@ -795,40 +795,38 @@ ULib.stringTimeToSeconds = ULib.stringTimeToMinutes -- Remove in the future
 ]]
 function ULib.secondsToStringTime( secs )
 	local str = ""
+	local mins = math.ceil(secs / 60)
 
-	local secsInYear = 60 * 60 * 24 * 365
-	if secs > secsInYear then
-		local years = math.floor( secs / secsInYear )
-		secs = secs % secsInYear
+	local minsInYear = 60 * 24 * 365
+	if mins >= minsInYear then
+		local years = math.floor( mins / minsInYear )
+		mins = mins % minsInYear
 		str = string.format( "%s%i year%s ", str, years, (years > 1 and "s" or "") )
 	end
 
-	local secsInWeek = 60 * 60 * 24 * 7
-	if secs > secsInWeek then
-		local weeks = math.floor( secs / secsInWeek )
-		secs = secs % secsInWeek
+	local minsInWeek = 60 * 24 * 7
+	if mins >= minsInWeek then
+		local weeks = math.floor( mins / minsInWeek )
+		mins = mins % minsInWeek
 		str = string.format( "%s%i week%s ", str, weeks, (weeks > 1 and "s" or "") )
 	end
 
-	local secsInDay = 60 * 60 * 24
-	if secs > secsInDay then
-		local days = math.floor( secs / secsInDay )
-		secs = secs % secsInDay
+	local minsInDay = 60 * 24
+	if mins >= minsInDay then
+		local days = math.floor( mins / minsInDay )
+		mins = mins % minsInDay
 		str = string.format( "%s%i day%s ", str, days, (days > 1 and "s" or "") )
 	end
 
-	local secsInHour = 60 * 60
-	if secs > secsInHour then
-		local hours = math.floor( secs / secsInHour )
-		secs = secs % secsInHour
+	local minsInHour = 60
+	if mins >= minsInHour then
+		local hours = math.floor( mins / minsInHour )
+		mins = mins % minsInHour
 		str = string.format( "%s%i hour%s ", str, hours, (hours > 1 and "s" or "") )
 	end
 
-	local secsInMinute = 60
-	if secs > 0 then
-		local minutes = math.ceil( secs / secsInMinute )
-		if minutes >= 60 then minutes = 59 end
-		str = string.format( "%s%i minute%s ", str, minutes, (minutes > 1 and "s" or "") )
+	if mins > 0 then
+		str = string.format( "%s%i minute%s ", str, mins, (mins > 1 and "s" or "") )
 	end
 
 	return str:Trim()
