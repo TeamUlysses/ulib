@@ -1,6 +1,6 @@
 # ULib Changelog
 
-## v2.61 - *(00/00/00)*
+## v2.61 - *(05/22/16)*
 * [FIX] NPCs loading from saves (Thanks, GamingStudios1029).
 * [FIX] Many issues with secondsToStringTime (Thanks, fruitwasp).
 
