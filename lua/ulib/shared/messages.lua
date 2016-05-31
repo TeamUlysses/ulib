@@ -193,7 +193,7 @@ end
 
 		ply - The player to print to, set to nil to send to everyone. (Ignores this param if called on client)
 		msg - The message to print.
-		color - *(Optional)* The amount of red to use for the text.
+		color - *(Optional, defaults to 255, 255, 255, 255)* The color of the text.
 		duration - *(Optional)* The amount of time to show the text.
 		fade - *(Optional, defaults to 0.5)* The length of fade time
 
@@ -204,7 +204,7 @@ end
 ]]
 function ULib.csay( ply, msg, color, duration, fade )
 	if CLIENT then
-		ULib.csayDraw( msg, color, duration )
+		ULib.csayDraw( msg, color, duration, fade )
 		Msg( msg .. "\n" )
 		return
 	end
