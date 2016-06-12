@@ -720,21 +720,24 @@ function ucl.addUser( id, allows, denies, group, from_CAMI )
 	for k, v in ipairs( allows ) do allows[ k ] = v end
 	for k, v in ipairs( denies ) do denies[ k ] = v end
 
-	local name
+	local name, oldgroup
 	if ucl.users[ id ] and ucl.users[ id ].name then name = ucl.users[ id ].name end -- Preserve name
+	if ucl.users[ id ] and ucl.users[ id ].group then oldgroup = ucl.users[ id ].group end
 	ucl.users[ id ] = { allow=allows, deny=denies, group=group, name=name }
 
 	ucl.saveUsers()
 
 	local ply = ULib.getPlyByID( id )
 	if ply then
-		-- CAMI logic -- no way to pass disconnected group change.
 		if not from_CAMI then
-			CAMI.SignalUserGroupChanged( ply, ply:GetUserGroup(), group or "user", CAMI.ULX_TOKEN )
+			CAMI.SignalUserGroupChanged( ply, oldgroup, group or "user", CAMI.ULX_TOKEN )
 		end
 
 		ucl.probe( ply )
 	else -- Otherwise this gets called twice
+		if not from_CAMI then
+			CAMI.SignalSteamIDUserGroupChanged( id, oldgroup, group or "user", CAMI.ULX_TOKEN )
+		end
 		hook.Call( ULib.HOOK_UCLCHANGED )
 	end
 end
@@ -911,7 +914,6 @@ function ucl.removeUser( id, from_CAMI )
 
 	local ply = ULib.getPlyByID( id )
 	if ply then
-		-- CAMI logic -- no way to pass disconnected group change.
 		if not from_CAMI then
 			CAMI.SignalUserGroupChanged( ply, ply:GetUserGroup(), ULib.ACCESS_ALL, CAMI.ULX_TOKEN )
 		end
@@ -919,6 +921,9 @@ function ucl.removeUser( id, from_CAMI )
 		ply:SetUserGroup( ULib.ACCESS_ALL, true )
 		ucl.probe( ply ) -- Reprobe
 	else -- Otherwise this is called twice
+		if not from_CAMI then
+			CAMI.SignalSteamIDUserGroupChanged( id, userInfo.group, ULib.ACCESS_ALL, CAMI.ULX_TOKEN )
+		end
 		hook.Call( ULib.HOOK_UCLCHANGED )
 	end
 end
