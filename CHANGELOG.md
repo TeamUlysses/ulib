@@ -1,5 +1,8 @@
 # ULib Changelog
 
+## v2.62 - *(00/00/00)*
+* [ADD] Enhancements from CAMI.
+
 ## v2.61 - *(05/22/16)*
 * [FIX] NPCs loading from saves (Thanks, GamingStudios1029).
 * [FIX] Many issues with secondsToStringTime (Thanks, fruitwasp).
