@@ -978,7 +978,7 @@ end
 
 -- Return the super class object of the instance
 function root_class:superClass()
-	base_class = getmetatable( self ).base_class
+	local base_class = getmetatable( self ).base_class
 	return base_class ~= root_class and base_class or nil -- Nil if root class
 end
 

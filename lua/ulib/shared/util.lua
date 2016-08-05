@@ -28,7 +28,7 @@ function ULib.fileExists( f, noMount )
 	if noMount then return file.Exists( f, "MOD" ) end
 
 	local isDataFolder = f:lower():sub( 1, dataFolder:len() ) ~= dataFolder
-	fWoData = f:sub( dataFolder:len() + 2 ) -- +2 removes path seperator
+	local fWoData = f:sub( dataFolder:len() + 2 ) -- +2 removes path seperator
 
 	return file.Exists( f, "GAME" ) or (isDataFolder and file.Exists( fWoData, "DATA" ))
 end
@@ -64,7 +64,7 @@ function ULib.fileRead( f, noMount )
 	end
 
 	local isDataFolder = f:lower():sub( 1, dataFolder:len() ) == dataFolder
-	fWoData = f:sub( dataFolder:len() + 2 ) -- +2 removes path seperator
+	local fWoData = f:sub( dataFolder:len() + 2 ) -- +2 removes path seperator
 
 	if not existsWoMount and not ULib.fileExists( f ) then
 		return nil
@@ -98,7 +98,7 @@ end
 ]]
 function ULib.fileWrite( f, content )
 	local isDataFolder = f:lower():sub( 1, dataFolder:len() ) == dataFolder
-	fWoData = f:sub( dataFolder:len() + 2 ) -- +2 removes path seperator
+	local fWoData = f:sub( dataFolder:len() + 2 ) -- +2 removes path seperator
 
 	if not isDataFolder then return nil end
 
@@ -122,7 +122,7 @@ end
 ]]
 function ULib.fileAppend( f, content )
 	local isDataFolder = f:lower():sub( 1, dataFolder:len() ) == dataFolder
-	fWoData = f:sub( dataFolder:len() + 2 ) -- +2 removes path seperator
+	local fWoData = f:sub( dataFolder:len() + 2 ) -- +2 removes path seperator
 
 	if not isDataFolder then return nil end
 
@@ -145,7 +145,7 @@ end
 ]]
 function ULib.fileCreateDir( f )
 	local isDataFolder = f:lower():sub( 1, dataFolder:len() ) == dataFolder
-	fWoData = f:sub( dataFolder:len() + 2 ) -- +2 removes path seperator
+	local fWoData = f:sub( dataFolder:len() + 2 ) -- +2 removes path seperator
 
 	if not isDataFolder then return nil end
 
@@ -168,7 +168,7 @@ end
 ]]
 function ULib.fileDelete( f )
 	local isDataFolder = f:lower():sub( 1, dataFolder:len() ) == dataFolder
-	fWoData = f:sub( dataFolder:len() + 2 ) -- +2 removes path seperator
+	local fWoData = f:sub( dataFolder:len() + 2 ) -- +2 removes path seperator
 
 	if not isDataFolder then return nil end
 

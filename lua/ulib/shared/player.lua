@@ -298,7 +298,7 @@ function ULib.getUser( target, enable_keywords, ply )
 
 	local plyMatches = {}
 	if enable_keywords and target:sub( 1, 1 ) == "$" then
-		possibleId = target:sub( 2 )
+		local possibleId = target:sub( 2 )
 		table.insert( plyMatches, ULib.getPlyByID( possibleId ) )
 	end
 

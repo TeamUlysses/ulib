@@ -170,6 +170,7 @@ function cmds.NumArg:processRestrictions( cmdRestrictions, plyRestrictions )
 	-- First, reset
 	self.min = nil
 	self.max = nil
+	local dummy
 
 	local allowTimeString = table.HasValue( cmdRestrictions, cmds.allowTimeString )
 

@@ -230,7 +230,7 @@ local function clientChangeCvar( ply, command, argv )
 	end
 
 	sv_cvar = sv_cvar:lower()
-	cvar_obj = repcvars[ sv_cvar ].cvar_obj
+	local cvar_obj = repcvars[ sv_cvar ].cvar_obj
 	local oldvalue = cvar_obj:GetString()
 	if oldvalue == newvalue then return end -- Agreement
 
