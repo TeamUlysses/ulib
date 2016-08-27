@@ -14,7 +14,7 @@
 
 	Parameters:
 
-		filter - The Player object, table of Player objects for who you want to send this to, nil sends to everyone.
+		plys - The Player object, table of Player objects for who you want to send this to, nil sends to everyone.
 		fn - A string of the function to run on the client. Does *not* need to be in the global namespace, "myTable.myFunction" works too.
 		... - *Optional* The parameters to pass to the function.
 
@@ -29,6 +29,59 @@ function ULib.clientRPC( plys, fn, ... )
 	net.Start( "URPC" )
 	net.WriteString( fn )
 	net.WriteTable( {...} )
+	if plys then
+		net.Send( plys )
+	else
+		net.Broadcast()
+	end
+end
+
+
+--[[
+	Function: clientCompressedRPC
+
+	Just like <clientRPC()>, but all arguents are expected to be nils, strings, or simple tables (which will be converted to a string).
+	Arguments will be copressed and then decompressed on the client.
+
+	Parameters:
+
+		plys - The Player object, table of Player objects for who you want to send this to, nil sends to everyone.
+		fn - A string of the function to run on the client. Does *not* need to be in the global namespace, "myTable.myFunction" works too.
+		... - *Optional* The parameters to pass to the function.
+
+	Revisions:
+
+		v2.62 - Initial.
+]]
+function ULib.clientCompressedRPC( plys, fn, ... )
+	ULib.checkArg( 1, "ULib.clientRPC", {"nil","Player","table"}, plys )
+	ULib.checkArg( 2, "ULib.clientRPC", {"string"}, fn )
+
+	net.Start( "URPCC" )
+	net.WriteString( fn )
+
+	local argv = {...}
+	local argn = select( "#", ... ) -- This makes sure we get nil values
+
+	net.WriteInt(argn, 8)
+
+	for i=1, argn do
+		local arg = argv[i]
+		local payload = arg
+
+		net.WriteString(type(payload))
+
+		if type(payload) == "table" then
+			payload = util.TableToJSON(payload)
+		end
+
+		if type(payload) == "string" then
+			payload = util.Compress(payload)
+			net.WriteUInt(#payload, 32)
+			net.WriteData(payload, #payload)
+		end
+	end
+
 	if plys then
 		net.Send( plys )
 	else

@@ -1060,7 +1060,7 @@ end
 hook.Add( ULib.HOOK_UCLAUTH, "ULibSendAuthToClients", sendAuthToClients, HOOK_MONITOR_LOW )
 
 local function sendUCLDataToClient( ply )
-	ULib.clientRPC( ply, "ULib.ucl.initClientUCL", ucl.authed, ucl.groups ) -- Send all UCL data (minus offline users) to all loaded users
+	ULib.clientCompressedRPC( ply, "ULib.ucl.initClientUCL", ucl.authed, ucl.groups ) -- Send all UCL data (minus offline users) to all loaded users
 	ULib.clientRPC( ply, "hook.Call", ULib.HOOK_UCLCHANGED ) -- Call hook on client
 	ULib.clientRPC( ply, "authPlayerIfReady", ply, ply:UserID() ) -- Call on client
 end
@@ -1077,7 +1077,7 @@ end
 hook.Add( "PlayerDisconnected", "ULibUCLDisconnect", playerDisconnected, HOOK_MONITOR_HIGH )
 
 local function UCLChanged()
-	ULib.clientRPC( _, "ULib.ucl.initClientUCL", ucl.authed, ucl.groups ) -- Send all UCL data (minus offline users) to all loaded users
+	ULib.clientCompressedRPC( _, "ULib.ucl.initClientUCL", ucl.authed, ucl.groups ) -- Send all UCL data (minus offline users) to all loaded users
 	ULib.clientRPC( _, "hook.Call", ULib.HOOK_UCLCHANGED ) -- Call hook on client
 end
 hook.Add( ULib.HOOK_UCLCHANGED, "ULibSendUCLToClients", UCLChanged )
