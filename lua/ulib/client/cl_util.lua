@@ -24,43 +24,6 @@ end
 net.Receive( "URPC", ULibRPC )
 
 
-local function ULibCompressedRPC()
-	local fn_string = net.ReadString()
-	local argn = net.ReadUInt(8)
-	local argv = {}
-
-	for i=1, argn do
-		local typ = net.ReadString()
-		local arg = nil
-		if typ == "string" or typ == "table" then
-			local bytes = net.ReadUInt(32)
-			arg = util.Decompress( net.ReadData( bytes ) )
-		end
-
-		if typ == "table" then
-			arg = util.JSONToTable( arg )
-		end
-
-		argv[i] = arg
-	end
-
-	local success, fn = ULib.findVar( fn_string )
-	if not success or type( fn ) ~= "function" then return error( "Received bad RPC, invalid function (" .. tostring( fn_string ) .. ")!" ) end
-
-	-- Since the table length operator can't always be trusted if there are holes in it, find the length by ourself
-	local max = 0
-	for k, v in pairs( argv ) do
-		local n = tonumber( k )
-		if n and n > max then
-			max = n
-		end
-	end
-	
-	fn( unpack( argv, 1, max ) )
-end
-net.Receive( "URPCC", ULibCompressedRPC )
-
-
 --[[
 	Function: umsgRcv
 

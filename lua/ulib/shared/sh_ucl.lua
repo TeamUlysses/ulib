@@ -175,11 +175,6 @@ end
 -- Client init stuff
 if CLIENT then
 	function ucl.initClientUCL( authed, groups )
-		for k, v in pairs(authed) do
-			authed[k] = nil
-			authed[tostring(k)] = v
-		end
-
 		ucl.authed = authed
 		ucl.groups = groups
 	end

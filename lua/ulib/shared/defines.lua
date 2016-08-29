@@ -276,5 +276,4 @@ end
 ]]
 if SERVER then
 	util.AddNetworkString( "URPC" )
-	util.AddNetworkString( "URPCC" )
 end
