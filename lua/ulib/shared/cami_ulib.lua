@@ -16,10 +16,12 @@ CAMI.ULX_TOKEN = "ULX"
 local function playerHasAccess( actorPly, priv, callback, targetPly, extra )
 	local priv = priv:lower()
 	local result = ULib.ucl.query( actorPly, priv, true )
-	if result ~= nil then
-		callback(result)
-		return true
-	end
+	-- CAMI does not support floating access like ULX -- meaning that in ULX the
+	-- access does not have to be tied to a group, but CAMI requires an access to
+	-- be tied to a group. To work around this, ULX cannot defer an access
+	-- decision, but has to give an authoritative answer to each query.
+	callback(not not result) -- double not converts a nil to a false
+	return true
 end
 hook.Add( "CAMI.PlayerHasAccess", "ULXCamiPlayerHasAccess", playerHasAccess )
 

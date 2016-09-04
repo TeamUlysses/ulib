@@ -1,7 +1,7 @@
 # ULib Changelog
 
 ## v2.62 - *(00/00/00)*
-* [ADD] Enhancements from CAMI.
+* [ADD] Enhancements from and to CAMI.
 
 ## v2.61 - *(05/22/16)*
 * [FIX] NPCs loading from saves (Thanks, GamingStudios1029).
