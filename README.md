@@ -1,6 +1,6 @@
 # ULib
 
-ULib is a developer library for GMod 10 (http://garrysmod.com/).
+ULib is a developer library for GMod 13 (http://garrysmod.com/).
 
 ULib provides such features as universal physics, user access lists, and much, much more!
 
