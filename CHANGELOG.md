@@ -2,6 +2,7 @@
 
 ## v2.62 - *(00/00/00)*
 * [ADD] Enhancements from and to CAMI.
+* [FIX] Registers ULib-created CAMI groups on client side properly now (thanks, Roboderpy).
 
 ## v2.61 - *(05/22/16)*
 * [FIX] NPCs loading from saves (Thanks, GamingStudios1029).

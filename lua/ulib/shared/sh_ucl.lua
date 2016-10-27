@@ -177,6 +177,12 @@ if CLIENT then
 	function ucl.initClientUCL( authed, groups )
 		ucl.authed = authed
 		ucl.groups = groups
+		for name, data in pairs( groups ) do
+			if not ULib.findInTable( {"superadmin", "admin", "user"}, name ) then
+				inherit_from = data.inherit_from or "user"
+				CAMI.RegisterUsergroup( {Name=name, Inherits=inherit_from}, CAMI.ULX_TOKEN )
+			end
+		end
 	end
 end
 
