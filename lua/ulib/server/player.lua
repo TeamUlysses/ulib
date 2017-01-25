@@ -158,7 +158,7 @@ hook.Add( "CheckPassword", "ULibBanCheck", checkBan, HOOK_LOW )
 function ULib.kick( ply, reason, calling_ply )
 	local nick = calling_ply and calling_ply:IsValid() and
 		(string.format( "%s(%s)", calling_ply:Nick(), calling_ply:SteamID() ) or "Console")
-
+	local steamid = ply:SteamID()
 	if reason and nick then
 		ply:Kick( string.format( "Kicked by %s - %s", nick, reason ) )
 	elseif nick then
@@ -166,6 +166,7 @@ function ULib.kick( ply, reason, calling_ply )
 	else
 		ply:Kick( reason or "[ULX] Kicked from server" )
 	end
+	hook.Call( ULib.HOOK_USER_KICKED, _, steamid, reason or "[ULX] Kicked from server", calling_ply or "Console" )
 end
 
 

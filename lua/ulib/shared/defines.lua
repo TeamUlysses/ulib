@@ -255,6 +255,25 @@ ULib.HOOK_GETUSERS_CUSTOM_KEYWORD = "ULibGetUsersCustomKeyword"
 ULib.HOOK_GETUSER_CUSTOM_KEYWORD = "ULibGetUserCustomKeyword"
 
 --[[
+	Hook: ULibPlayerKicked
+
+	Called during ULib.kick.
+	This alerts you to the player being kicked.
+	Return nil or a player object.
+
+	Parameters passed to callback:
+
+		steamid - SteamID of the kicked player.
+		reason - Kick reason. Can be nil.
+		caller - Whomever did the kick. Can be nil.
+
+	Revisions:
+
+		v2.ANDRE_DO_UPDATE - Initial
+]]
+ULib.HOOK_USER_KICKED = "ULibPlayerKicked"
+
+--[[
 	Section: UCL Helpers
 
 	These defines are server-only, to help with UCL.
