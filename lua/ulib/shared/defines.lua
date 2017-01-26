@@ -259,7 +259,6 @@ ULib.HOOK_GETUSER_CUSTOM_KEYWORD = "ULibGetUserCustomKeyword"
 
 	Called during ULib.kick.
 	This alerts you to the player being kicked.
-	Return nil or a player object.
 
 	Parameters passed to callback:
 
@@ -272,6 +271,23 @@ ULib.HOOK_GETUSER_CUSTOM_KEYWORD = "ULibGetUserCustomKeyword"
 		v2.ANDRE_DO_UPDATE - Initial
 ]]
 ULib.HOOK_USER_KICKED = "ULibPlayerKicked"
+
+--[[
+	Hook: ULibPlayerKicked
+
+	Called during ULib.addBan.
+	This alerts you to the player being banned.
+
+	Parameters passed to callback:
+
+		steamid - SteamID of the banned player.
+		ban_data - The data about the ban, exactly like it would be stored in ULib.bans.
+
+	Revisions:
+
+		v2.ANDRE_DO_UPDATE - Initial
+]]
+ULib.HOOK_USER_BANNED = "ULibPlayerBanned"
 
 --[[
 	Section: UCL Helpers
