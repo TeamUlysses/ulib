@@ -314,6 +314,8 @@ function ULib.unban( steamid, admin )
 	--ULib banlist
 	ULib.bans[ steamid ] = nil
 	ULib.fileWrite( ULib.BANS_FILE, ULib.makeKeyValues( ULib.bans ) )
+	hook.Call( ULib.HOOK_USER_UNBANNED, _, steamid, admin or "Console" )
+
 end
 
 local function doInvis()

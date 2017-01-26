@@ -273,7 +273,7 @@ ULib.HOOK_GETUSER_CUSTOM_KEYWORD = "ULibGetUserCustomKeyword"
 ULib.HOOK_USER_KICKED = "ULibPlayerKicked"
 
 --[[
-	Hook: ULibPlayerKicked
+	Hook: ULibPlayerBanned
 
 	Called during ULib.addBan.
 	This alerts you to the player being banned.
@@ -288,6 +288,23 @@ ULib.HOOK_USER_KICKED = "ULibPlayerKicked"
 		v2.ANDRE_DO_UPDATE - Initial
 ]]
 ULib.HOOK_USER_BANNED = "ULibPlayerBanned"
+
+--[[
+	Hook: ULibPlayerUnBanned
+
+	Called during ULib.unban.
+	This alerts you to the player being banned.
+
+	Parameters passed to callback:
+
+		steamid - SteamID of the unbanned player.
+		admin - If passed, it will be the unbaning admin, else it will show as console..
+
+	Revisions:
+
+		v2.ANDRE_DO_UPDATE - Initial
+]]
+ULib.HOOK_USER_UNBANNED = "ULibPlayerUnBanned"
 
 --[[
 	Section: UCL Helpers
