@@ -336,7 +336,7 @@ function ucl.addGroup( name, allows, inherit_from, from_CAMI )
 	ucl.groups[ name ] = { allow=allows, inherit_from=inherit_from }
 	ucl.saveGroups()
 
-	hook.Call( ULib.HOOK_UCLCHANGED )
+	hook.Call( ULib.HOOK_GROUP_CREATED, _, name, ucl.groups[ name ] )
 
 	-- CAMI logic
 	if not from_CAMI and not ULib.findInTable( {"superadmin", "admin", "user"}, name ) then
