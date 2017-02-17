@@ -566,12 +566,12 @@ function ucl.setGroupCanTarget( group, can_target )
 	if not ucl.groups[ group ] then return error( "Group does not exist (" .. group .. ")", 2 ) end
 
 	if ucl.groups[ group ].can_target == can_target then return end -- Nothing to change
-
+	local old = ucl.groups[ group ].can_target
 	ucl.groups[ group ].can_target = can_target
 
-	ucl.saveGroups()
+	hook.Call( ULib.HOOK_GROUP_CANTARGET_CHANGE, _, group, can_target, old )
 
-	hook.Call( ULib.HOOK_UCLCHANGED )
+	ucl.saveGroups()
 end
 
 

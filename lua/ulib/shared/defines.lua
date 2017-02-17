@@ -327,7 +327,7 @@ ULib.HOOK_GROUP_CREATED = "ULibGroupCreated"
 	Hook: ULibGroupRemoved
 
 	Called during ULib.ucl.removeGroup.
-	This alerts you to the group being created.
+	This alerts you to the group being removed.
 
 	Parameters passed to callback:
 
@@ -344,7 +344,7 @@ ULib.HOOK_GROUP_REMOVED = "ULibGroupRemoved"
 	Hook: ULibGroupAccessChanged
 
 	Called during ULib.ucl.groupAllow.
-	This alerts you to the group being created.
+	This alerts you to the group access being changed.
 
 	Parameters passed to callback:
 
@@ -361,8 +361,8 @@ ULib.HOOK_GROUP_ACCESS_CHANGE = "ULibGroupAccessChanged"
 --[[
 	Hook: ULibGroupRenamed
 
-	Called during ULib.ucl.groupAllow.
-	This alerts you to the group being created.
+	Called during ULib.ucl.renameGroup.
+	This alerts you to the group being renamed.
 
 	Parameters passed to callback:
 
@@ -378,8 +378,8 @@ ULib.HOOK_GROUP_RENAMED = "ULibGroupRenamed"
 --[[
 	Hook: ULibGroupInheritanceChanged
 
-	Called during ULib.ucl.groupAllow.
-	This alerts you to the group being created.
+	Called during ULib.ucl.setGroupInheritance.
+	This alerts you to the group Inheritance being changed.
 
 	Parameters passed to callback:
 
@@ -392,6 +392,24 @@ ULib.HOOK_GROUP_RENAMED = "ULibGroupRenamed"
 		v2.ANDRE_DO_UPDATE - Initial
 ]]
 ULib.HOOK_GROUP_INHERIT_CHANGE = "ULibGroupInheritanceChanged"
+
+--[[
+	Hook: ULibGroupCanTargetChanged
+
+	Called during ULib.ucl.setGroupCanTarget.
+	This alerts you to the group CanTarget being changed.
+
+	Parameters passed to callback:
+
+		group_name - Group Name
+		new_target - New CanTarget
+		old_target - Old CanTarget
+
+	Revisions:
+
+		v2.ANDRE_DO_UPDATE - Initial
+]]
+ULib.HOOK_GROUP_CANTARGET_CHANGE = "ULibGroupCanTargetChanged"
 
 --[[
 	Section: UCL Helpers
