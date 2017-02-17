@@ -473,7 +473,7 @@ function ucl.renameGroup( orig, new )
 	ucl.saveUsers()
 	ucl.saveGroups()
 
-	hook.Call( ULib.HOOK_UCLCHANGED )
+	hook.Call( ULib.HOOK_GROUP_RENAMED, _, orig, new )
 
 	-- CAMI logic
 	if not ULib.findInTable( {"superadmin", "admin", "user"}, orig ) then

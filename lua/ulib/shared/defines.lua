@@ -359,6 +359,23 @@ ULib.HOOK_GROUP_REMOVED = "ULibGroupRemoved"
 ULib.HOOK_GROUP_ACCESS_CHANGE = "ULibGroupAccessChanged"
 
 --[[
+	Hook: renameGroup
+
+	Called during ULib.ucl.groupAllow.
+	This alerts you to the group being created.
+
+	Parameters passed to callback:
+
+		old_name - Old Group Name
+		new_name - New Group Name
+
+	Revisions:
+
+		v2.ANDRE_DO_UPDATE - Initial
+]]
+ULib.HOOK_GROUP_RENAMED = "ULibGroupRenamed"
+
+--[[
 	Section: UCL Helpers
 
 	These defines are server-only, to help with UCL.
