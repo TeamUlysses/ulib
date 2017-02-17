@@ -431,10 +431,10 @@ ULib.HOOK_GROUP_CANTARGET_CHANGE = "ULibGroupCanTargetChanged"
 ULib.HOOK_USER_GROUP_CHANGE = "ULibUserGroupChange"
 
 --[[
-	Hook: ULibUserGroupChange
+	Hook: ULibUserAccessChange
 
 	Called during ULib.ucl.userAllow.
-	This alerts you to the user's group being changed.
+	This alerts you to the user's acess being changed.
 
 	Parameters passed to callback:
 
@@ -447,6 +447,22 @@ ULib.HOOK_USER_GROUP_CHANGE = "ULibUserGroupChange"
 		v2.ANDRE_DO_UPDATE - Initial
 ]]
 ULib.HOOK_USER_ACCESS_CHANGE = "ULibUserAccessChange"
+
+--[[
+	Hook: ULibUserRemoved
+
+	Called during ULib.ucl.removeUser.
+	This alerts you to the user's group being removed.
+
+	Parameters passed to callback:
+
+	id - Steamid of the user.
+	user_info - Old User Info(group, allows, denys, etc) as stored in ULib.ucl.users[id] before the change
+	Revisions:
+
+		v2.ANDRE_DO_UPDATE - Initial
+]]
+ULib.HOOK_USER_REMOVED = "ULibUserRemoved"
 
 --[[
 	Section: UCL Helpers

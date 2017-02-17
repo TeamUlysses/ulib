@@ -914,6 +914,7 @@ function ucl.removeUser( id, from_CAMI )
 
 	if changed then -- If the user is only added to the default garry file, then nothing changed
 		ucl.saveUsers()
+		hook.Call( ULib.HOOK_USER_REMOVED, _, id, userInfo )
 	end
 
 	local ply = ULib.getPlyByID( id )
