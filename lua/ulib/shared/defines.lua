@@ -359,7 +359,7 @@ ULib.HOOK_GROUP_REMOVED = "ULibGroupRemoved"
 ULib.HOOK_GROUP_ACCESS_CHANGE = "ULibGroupAccessChanged"
 
 --[[
-	Hook: renameGroup
+	Hook: ULibGroupRenamed
 
 	Called during ULib.ucl.groupAllow.
 	This alerts you to the group being created.
@@ -374,6 +374,24 @@ ULib.HOOK_GROUP_ACCESS_CHANGE = "ULibGroupAccessChanged"
 		v2.ANDRE_DO_UPDATE - Initial
 ]]
 ULib.HOOK_GROUP_RENAMED = "ULibGroupRenamed"
+
+--[[
+	Hook: ULibGroupInheritanceChanged
+
+	Called during ULib.ucl.groupAllow.
+	This alerts you to the group being created.
+
+	Parameters passed to callback:
+
+		group_name - Group Name
+		new_inherit - New Inheritance
+		old_inherit - Old Inheritance
+
+	Revisions:
+
+		v2.ANDRE_DO_UPDATE - Initial
+]]
+ULib.HOOK_GROUP_INHERIT_CHANGE = "ULibGroupInheritanceChanged"
 
 --[[
 	Section: UCL Helpers

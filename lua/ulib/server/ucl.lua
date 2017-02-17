@@ -536,7 +536,7 @@ function ucl.setGroupInheritance( group, inherit_from, from_CAMI )
 
 	ucl.saveGroups()
 
-	hook.Call( ULib.HOOK_UCLCHANGED )
+	hook.Call( ULib.HOOK_GROUP_INHERIT_CHANGE, _, group, inherit_from, old_inherit )
 
 	-- CAMI logic
 	if not from_CAMI and not ULib.findInTable( {"superadmin", "admin", "user"}, group ) then
