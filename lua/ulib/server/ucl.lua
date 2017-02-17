@@ -337,6 +337,7 @@ function ucl.addGroup( name, allows, inherit_from, from_CAMI )
 	ucl.saveGroups()
 
 	hook.Call( ULib.HOOK_GROUP_CREATED, _, name, ucl.groups[ name ] )
+	hook.Call( ULib.HOOK_UCLCHANGED )
 
 	-- CAMI logic
 	if not from_CAMI and not ULib.findInTable( {"superadmin", "admin", "user"}, name ) then
@@ -415,6 +416,7 @@ function ucl.groupAllow( name, access, revoke )
 		ucl.saveGroups()
 
 		hook.Call( ULib.HOOK_GROUP_ACCESS_CHANGE, _, name, access, revoke or false )
+		hook.Call( ULib.HOOK_UCLCHANGED )
 	end
 
 	return changed
@@ -474,6 +476,7 @@ function ucl.renameGroup( orig, new )
 	ucl.saveGroups()
 
 	hook.Call( ULib.HOOK_GROUP_RENAMED, _, orig, new )
+	hook.Call( ULib.HOOK_UCLCHANGED )
 
 	-- CAMI logic
 	if not ULib.findInTable( {"superadmin", "admin", "user"}, orig ) then
@@ -537,6 +540,7 @@ function ucl.setGroupInheritance( group, inherit_from, from_CAMI )
 	ucl.saveGroups()
 
 	hook.Call( ULib.HOOK_GROUP_INHERIT_CHANGE, _, group, inherit_from, old_inherit )
+	hook.Call( ULib.HOOK_UCLCHANGED )
 
 	-- CAMI logic
 	if not from_CAMI and not ULib.findInTable( {"superadmin", "admin", "user"}, group ) then
@@ -572,6 +576,8 @@ function ucl.setGroupCanTarget( group, can_target )
 	hook.Call( ULib.HOOK_GROUP_CANTARGET_CHANGE, _, group, can_target, old )
 
 	ucl.saveGroups()
+
+	hook.Call( ULib.HOOK_UCLCHANGED )
 end
 
 
@@ -628,6 +634,7 @@ function ucl.removeGroup( name, from_CAMI )
 	ucl.saveGroups()
 
 	hook.Call( ULib.HOOK_GROUP_REMOVED, _, name, oldgroup )
+	hook.Call( ULib.HOOK_UCLCHANGED )
 
 	-- CAMI logic
 	if not from_CAMI and not ULib.findInTable( {"superadmin", "admin", "user"}, name ) then
@@ -740,7 +747,6 @@ function ucl.addUser( id, allows, denies, group, from_CAMI )
 			CAMI.SignalSteamIDUserGroupChanged( id, oldgroup, group or "user", CAMI.ULX_TOKEN )
 		end
 		hook.Call( ULib.HOOK_UCLCHANGED )
-		--Player Offline
 		hook.Call( ULib.HOOK_USER_GROUP_CHANGE, _, id, allows, denies, group, oldgroup )
 	end
 end
@@ -862,6 +868,7 @@ function ucl.userAllow( id, access, revoke, deny )
 		ucl.saveUsers()
 
 		hook.Call( ULib.HOOK_USER_ACCESS_CHANGE, _, id, access, revoke or false, deny or false )
+		hook.Call( ULib.HOOK_UCLCHANGED )
 	end
 
 	return changed
