@@ -414,7 +414,7 @@ function ucl.groupAllow( name, access, revoke )
 
 		ucl.saveGroups()
 
-		hook.Call( ULib.HOOK_UCLCHANGED )
+		hook.Call( ULib.HOOK_GROUP_ACCESS_CHANGE, _, name, access, revoke )
 	end
 
 	return changed

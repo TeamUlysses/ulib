@@ -309,7 +309,7 @@ ULib.HOOK_USER_UNBANNED = "ULibPlayerUnBanned"
 --[[
 	Hook: ULibGroupCreated
 
-	Called during ULib.ucl.ucl.addGroup.
+	Called during ULib.ucl.addGroup.
 	This alerts you to the group being created.
 
 	Parameters passed to callback:
@@ -326,7 +326,7 @@ ULib.HOOK_GROUP_CREATED = "ULibGroupCreated"
 --[[
 	Hook: ULibGroupRemoved
 
-	Called during ULib.ucl.ucl.removeGroup.
+	Called during ULib.ucl.removeGroup.
 	This alerts you to the group being created.
 
 	Parameters passed to callback:
@@ -339,6 +339,24 @@ ULib.HOOK_GROUP_CREATED = "ULibGroupCreated"
 		v2.ANDRE_DO_UPDATE - Initial
 ]]
 ULib.HOOK_GROUP_REMOVED = "ULibGroupRemoved"
+
+--[[
+	Hook: ULibGroupAccessChanged
+
+	Called during ULib.ucl.groupAllow.
+	This alerts you to the group being created.
+
+	Parameters passed to callback:
+
+		group_name - Group Name
+		access - Acess being changed
+		revoke - Are we adding(false) or revoking(true)
+
+	Revisions:
+
+		v2.ANDRE_DO_UPDATE - Initial
+]]
+ULib.HOOK_GROUP_ACCESS_CHANGE = "ULibGroupAccessChanged"
 
 --[[
 	Section: UCL Helpers
