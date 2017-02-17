@@ -616,7 +616,7 @@ function ucl.removeGroup( name, from_CAMI )
 			end
 		end
 	end
-
+	local oldgroup = table.Copy( ucl.groups[ name ] )
 	ucl.groups[ name ] = nil
 	for _, groupInfo in pairs( ucl.groups ) do
 		if groupInfo.inherit_from == name then
@@ -627,7 +627,7 @@ function ucl.removeGroup( name, from_CAMI )
 	ucl.saveUsers()
 	ucl.saveGroups()
 
-	hook.Call( ULib.HOOK_UCLCHANGED )
+	hook.Call( ULib.HOOK_GROUP_REMOVED, _, name, oldgroup )
 
 	-- CAMI logic
 	if not from_CAMI and not ULib.findInTable( {"superadmin", "admin", "user"}, name ) then

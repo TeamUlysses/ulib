@@ -307,10 +307,10 @@ ULib.HOOK_USER_BANNED = "ULibPlayerBanned"
 ULib.HOOK_USER_UNBANNED = "ULibPlayerUnBanned"
 
 --[[
-	Hook: ULibPlayerUnBanned
+	Hook: ULibGroupCreated
 
-	Called during ULib.unban.
-	This alerts you to the player being banned.
+	Called during ULib.ucl.ucl.addGroup.
+	This alerts you to the group being created.
 
 	Parameters passed to callback:
 
@@ -322,6 +322,23 @@ ULib.HOOK_USER_UNBANNED = "ULibPlayerUnBanned"
 		v2.ANDRE_DO_UPDATE - Initial
 ]]
 ULib.HOOK_GROUP_CREATED = "ULibGroupCreated"
+
+--[[
+	Hook: ULibGroupRemoved
+
+	Called during ULib.ucl.ucl.removeGroup.
+	This alerts you to the group being created.
+
+	Parameters passed to callback:
+
+		group_name - Group Name
+		group_data - Group table as it is store in ULib.ucl.groups[ name ].
+
+	Revisions:
+
+		v2.ANDRE_DO_UPDATE - Initial
+]]
+ULib.HOOK_GROUP_REMOVED = "ULibGroupRemoved"
 
 --[[
 	Section: UCL Helpers
