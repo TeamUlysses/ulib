@@ -414,7 +414,7 @@ function ucl.groupAllow( name, access, revoke )
 
 		ucl.saveGroups()
 
-		hook.Call( ULib.HOOK_GROUP_ACCESS_CHANGE, _, name, access, revoke )
+		hook.Call( ULib.HOOK_GROUP_ACCESS_CHANGE, _, name, access, revoke or false )
 	end
 
 	return changed
@@ -853,6 +853,7 @@ function ucl.userAllow( id, access, revoke, deny )
 	end
 
 	if changed then
+		print("Tester")
 		local ply = ULib.getPlyByID( id )
 		if ply then
 			ULib.queueFunctionCall( hook.Call, ULib.HOOK_UCLAUTH, _, ply ) -- Inform the masses
@@ -860,7 +861,7 @@ function ucl.userAllow( id, access, revoke, deny )
 
 		ucl.saveUsers()
 
-		hook.Call( ULib.HOOK_UCLCHANGED )
+		hook.Call( ULib.HOOK_USER_ACCESS_CHANGE, _, id, access, revoke or false, deny or false )
 	end
 
 	return changed

@@ -431,6 +431,24 @@ ULib.HOOK_GROUP_CANTARGET_CHANGE = "ULibGroupCanTargetChanged"
 ULib.HOOK_USER_GROUP_CHANGE = "ULibUserGroupChange"
 
 --[[
+	Hook: ULibUserGroupChange
+
+	Called during ULib.ucl.userAllow.
+	This alerts you to the user's group being changed.
+
+	Parameters passed to callback:
+
+	id - Steamid of the user.
+	access - Acess being changed
+	revoke - Are we adding(false) or revoking(true)
+	deny - Are we denying(true) or allowing(false)
+	Revisions:
+
+		v2.ANDRE_DO_UPDATE - Initial
+]]
+ULib.HOOK_USER_ACCESS_CHANGE = "ULibUserAccessChange"
+
+--[[
 	Section: UCL Helpers
 
 	These defines are server-only, to help with UCL.
