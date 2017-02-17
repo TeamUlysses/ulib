@@ -733,12 +733,15 @@ function ucl.addUser( id, allows, denies, group, from_CAMI )
 			CAMI.SignalUserGroupChanged( ply, oldgroup, group or "user", CAMI.ULX_TOKEN )
 		end
 
+		hook.Call( ULib.HOOK_USER_GROUP_CHANGE, _, id, allows, denies, group, oldgroup )
 		ucl.probe( ply )
 	else -- Otherwise this gets called twice
 		if not from_CAMI then
 			CAMI.SignalSteamIDUserGroupChanged( id, oldgroup, group or "user", CAMI.ULX_TOKEN )
 		end
 		hook.Call( ULib.HOOK_UCLCHANGED )
+		--Player Offline
+		hook.Call( ULib.HOOK_USER_GROUP_CHANGE, _, id, allows, denies, group, oldgroup )
 	end
 end
 

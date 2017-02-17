@@ -412,6 +412,25 @@ ULib.HOOK_GROUP_INHERIT_CHANGE = "ULibGroupInheritanceChanged"
 ULib.HOOK_GROUP_CANTARGET_CHANGE = "ULibGroupCanTargetChanged"
 
 --[[
+	Hook: ULibUserGroupChange
+
+	Called during ULib.ucl.addUser.
+	This alerts you to the user's group being changed.
+
+	Parameters passed to callback:
+
+		id - Steamid of the user.
+		allows - Allows Table
+		denies - Denies Table
+		new_group - New Group
+		old_group - Old Group
+	Revisions:
+
+		v2.ANDRE_DO_UPDATE - Initial
+]]
+ULib.HOOK_USER_GROUP_CHANGE = "ULibUserGroupChange"
+
+--[[
 	Section: UCL Helpers
 
 	These defines are server-only, to help with UCL.
