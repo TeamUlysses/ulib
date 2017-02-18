@@ -268,7 +268,7 @@ ULib.HOOK_GETUSER_CUSTOM_KEYWORD = "ULibGetUserCustomKeyword"
 
 	Revisions:
 
-		v2.ANDRE_DO_UPDATE - Initial
+		v2.61 - Initial
 ]]
 ULib.HOOK_USER_KICKED = "ULibPlayerKicked"
 
@@ -285,7 +285,7 @@ ULib.HOOK_USER_KICKED = "ULibPlayerKicked"
 
 	Revisions:
 
-		v2.ANDRE_DO_UPDATE - Initial
+		v2.61 - Initial
 ]]
 ULib.HOOK_USER_BANNED = "ULibPlayerBanned"
 
@@ -302,7 +302,7 @@ ULib.HOOK_USER_BANNED = "ULibPlayerBanned"
 
 	Revisions:
 
-		v2.ANDRE_DO_UPDATE - Initial
+		v2.61 - Initial
 ]]
 ULib.HOOK_USER_UNBANNED = "ULibPlayerUnBanned"
 
@@ -319,7 +319,7 @@ ULib.HOOK_USER_UNBANNED = "ULibPlayerUnBanned"
 
 	Revisions:
 
-		v2.ANDRE_DO_UPDATE - Initial
+		v2.61 - Initial
 ]]
 ULib.HOOK_GROUP_CREATED = "ULibGroupCreated"
 
@@ -336,7 +336,7 @@ ULib.HOOK_GROUP_CREATED = "ULibGroupCreated"
 
 	Revisions:
 
-		v2.ANDRE_DO_UPDATE - Initial
+		v2.61 - Initial
 ]]
 ULib.HOOK_GROUP_REMOVED = "ULibGroupRemoved"
 
@@ -354,7 +354,7 @@ ULib.HOOK_GROUP_REMOVED = "ULibGroupRemoved"
 
 	Revisions:
 
-		v2.ANDRE_DO_UPDATE - Initial
+		v2.61 - Initial
 ]]
 ULib.HOOK_GROUP_ACCESS_CHANGE = "ULibGroupAccessChanged"
 
@@ -371,7 +371,7 @@ ULib.HOOK_GROUP_ACCESS_CHANGE = "ULibGroupAccessChanged"
 
 	Revisions:
 
-		v2.ANDRE_DO_UPDATE - Initial
+		v2.61 - Initial
 ]]
 ULib.HOOK_GROUP_RENAMED = "ULibGroupRenamed"
 
@@ -389,7 +389,7 @@ ULib.HOOK_GROUP_RENAMED = "ULibGroupRenamed"
 
 	Revisions:
 
-		v2.ANDRE_DO_UPDATE - Initial
+		v2.61 - Initial
 ]]
 ULib.HOOK_GROUP_INHERIT_CHANGE = "ULibGroupInheritanceChanged"
 
@@ -407,7 +407,7 @@ ULib.HOOK_GROUP_INHERIT_CHANGE = "ULibGroupInheritanceChanged"
 
 	Revisions:
 
-		v2.ANDRE_DO_UPDATE - Initial
+		v2.61 - Initial
 ]]
 ULib.HOOK_GROUP_CANTARGET_CHANGE = "ULibGroupCanTargetChanged"
 
@@ -426,7 +426,7 @@ ULib.HOOK_GROUP_CANTARGET_CHANGE = "ULibGroupCanTargetChanged"
 		old_group - Old Group
 	Revisions:
 
-		v2.ANDRE_DO_UPDATE - Initial
+		v2.61 - Initial
 ]]
 ULib.HOOK_USER_GROUP_CHANGE = "ULibUserGroupChange"
 
@@ -444,7 +444,7 @@ ULib.HOOK_USER_GROUP_CHANGE = "ULibUserGroupChange"
 	deny - Are we denying(true) or allowing(false)
 	Revisions:
 
-		v2.ANDRE_DO_UPDATE - Initial
+		v2.61 - Initial
 ]]
 ULib.HOOK_USER_ACCESS_CHANGE = "ULibUserAccessChange"
 
@@ -460,7 +460,7 @@ ULib.HOOK_USER_ACCESS_CHANGE = "ULibUserAccessChange"
 	user_info - Old User Info(group, allows, denys, etc) as stored in ULib.ucl.users[id] before the change
 	Revisions:
 
-		v2.ANDRE_DO_UPDATE - Initial
+		v2.61 - Initial
 ]]
 ULib.HOOK_USER_REMOVED = "ULibUserRemoved"
 
