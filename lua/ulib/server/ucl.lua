@@ -859,7 +859,6 @@ function ucl.userAllow( id, access, revoke, deny )
 	end
 
 	if changed then
-		print("Tester")
 		local ply = ULib.getPlyByID( id )
 		if ply then
 			ULib.queueFunctionCall( hook.Call, ULib.HOOK_UCLAUTH, _, ply ) -- Inform the masses
