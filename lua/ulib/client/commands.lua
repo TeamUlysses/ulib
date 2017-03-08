@@ -12,5 +12,6 @@
 		argv - The table of arguments
 ]]
 function ULib.redirect( ply, command, argv )
-	RunConsoleCommand( "_u", command, unpack( argv ) )
+	local totalArgv = table.Add( ULib.explode( " ", command ), argv )
+	RunConsoleCommand( "_u", unpack( totalArgv ) )
 end

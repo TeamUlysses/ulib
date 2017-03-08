@@ -278,6 +278,72 @@ end
 
 
 --[[
+	Function: execFileULib
+
+	Just like <execFile>, except only for ULib-defined commands. It avoids the source engine
+	command queue, and has an additional option to only execute commands marked as "safe" (up to the
+	command author to properly define these).
+
+	Parameters:
+
+		f - The file, relative to the garrysmod folder.
+		safeMode - If set to true, does not run "unsafe" commands.
+		noMount - *(Optional)* If true, will not look in mounted directories.
+
+	Revisions:
+
+		v2.62 - Initial.
+]]
+function ULib.execFileULib( f, safeMode, noMount )
+	if not ULib.fileExists( f, noMount ) then
+		ULib.error( "Called execFileULib with invalid file! " .. f )
+		return
+	end
+
+	ULib.execStringULib( ULib.fileRead( f, noMount ), safeMode )
+end
+
+
+--[[
+	Function: execStringULib
+
+	Just like <execString>, except only for ULib-defined commands. It avoids the source engine
+	command queue, and has an additional option to only execute commands marked as "safe" (up to the
+	command author to properly define these).
+
+	Parameters:
+
+		f - The string.
+		safeMode - If set to true, does not run "unsafe" commands.
+
+	Revisions:
+
+		v2.62 - Initial.
+]]
+function ULib.execStringULib( f, safeMode )
+	local lines = string.Explode( "\n", f )
+	local srvPly = Entity( -1 ) -- Emulate the console callback object
+
+	for _, line in ipairs( lines ) do
+		line = string.Trim( line )
+		if line ~= "" then
+			local argv = ULib.splitArgs( line )
+			local commandName = table.remove( argv, 1 )
+			local cmdTable, commandName, argv = ULib.cmds.getCommandTableAndArgv( commandName, argv )
+
+			if not cmdTable then
+				Msg( "Error executing " .. tostring( commandName ) .. "\n" )
+			elseif cmdTable.__unsafe then
+				Msg( "Not executing unsafe command " .. commandName .. "\n" )
+			else
+				ULib.cmds.execute( cmdTable, srvPly, commandName, argv )
+			end
+		end
+	end
+end
+
+
+--[[
 	Function: serialize
 
 	Serializes a variable. It basically converts a variable into a runnable code string. It works correctly with inline tables.
