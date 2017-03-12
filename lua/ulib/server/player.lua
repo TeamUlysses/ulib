@@ -150,15 +150,16 @@ hook.Add( "CheckPassword", "ULibBanCheck", checkBan, HOOK_LOW )
 		ply - The player to kick.
 		reason - *(Optional)* The reason to give for kicking.
 		calling_ply - *(Optional)* The player doing the kicking.
+		is_ban - *(Optional)* Called from a ban, or just a kick.
 
 	Revisions:
 
 		v2.60 - Fixed a bug with the parameters if you didn't pass reason and calling_ply together.
 ]]
-function ULib.kick( ply, reason, calling_ply )
+function ULib.kick( ply, reason, calling_ply, is_ban )
 	local nick = calling_ply and calling_ply:IsValid() and
 		(string.format( "%s(%s)", calling_ply:Nick(), calling_ply:SteamID() ) or "Console")
-
+	local steamid = ply:SteamID()
 	if reason and nick then
 		ply:Kick( string.format( "Kicked by %s - %s", nick, reason ) )
 	elseif nick then
@@ -166,6 +167,7 @@ function ULib.kick( ply, reason, calling_ply )
 	else
 		ply:Kick( reason or "[ULX] Kicked from server" )
 	end
+	hook.Call( ULib.HOOK_USER_KICKED, _, steamid, reason or "[ULX] Kicked from server", calling_ply or "Console" )
 end
 
 
@@ -272,7 +274,7 @@ function ULib.addBan( steamid, time, reason, name, admin )
 
 	local ply = player.GetBySteamID( steamid )
 	if ply then
-		ULib.kick( ply, longReason )
+		ULib.kick( ply, longReason, nil, true)
 	end
 
 	-- Remove all semicolons from the reason to prevent command injection
@@ -284,6 +286,7 @@ function ULib.addBan( steamid, time, reason, name, admin )
 	game.ConsoleCommand( "writeid\n" )
 
 	ULib.fileWrite( ULib.BANS_FILE, ULib.makeKeyValues( ULib.bans ) )
+	hook.Call( ULib.HOOK_USER_BANNED, _, steamid, t )
 end
 
 --[[
@@ -311,6 +314,8 @@ function ULib.unban( steamid, admin )
 	--ULib banlist
 	ULib.bans[ steamid ] = nil
 	ULib.fileWrite( ULib.BANS_FILE, ULib.makeKeyValues( ULib.bans ) )
+	hook.Call( ULib.HOOK_USER_UNBANNED, _, steamid, admin or "Console" )
+
 end
 
 local function doInvis()

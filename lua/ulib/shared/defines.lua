@@ -255,6 +255,216 @@ ULib.HOOK_GETUSERS_CUSTOM_KEYWORD = "ULibGetUsersCustomKeyword"
 ULib.HOOK_GETUSER_CUSTOM_KEYWORD = "ULibGetUserCustomKeyword"
 
 --[[
+	Hook: ULibPlayerKicked
+
+	Called during ULib.kick.
+	This alerts you to the player being kicked.
+
+	Parameters passed to callback:
+
+		steamid - SteamID of the kicked player.
+		reason - Kick reason. Can be nil.
+		caller - Whomever did the kick. Can be nil.
+
+	Revisions:
+
+		v2.61 - Initial
+]]
+ULib.HOOK_USER_KICKED = "ULibPlayerKicked"
+
+--[[
+	Hook: ULibPlayerBanned
+
+	Called during ULib.addBan.
+	This alerts you to the player being banned.
+
+	Parameters passed to callback:
+
+		steamid - SteamID of the banned player.
+		ban_data - The data about the ban, exactly like it would be stored in ULib.bans.
+
+	Revisions:
+
+		v2.61 - Initial
+]]
+ULib.HOOK_USER_BANNED = "ULibPlayerBanned"
+
+--[[
+	Hook: ULibPlayerUnBanned
+
+	Called during ULib.unban.
+	This alerts you to the player being banned.
+
+	Parameters passed to callback:
+
+		steamid - SteamID of the unbanned player.
+		admin - If passed, it will be the unbaning admin, else it will show as console..
+
+	Revisions:
+
+		v2.61 - Initial
+]]
+ULib.HOOK_USER_UNBANNED = "ULibPlayerUnBanned"
+
+--[[
+	Hook: ULibGroupCreated
+
+	Called during ULib.ucl.addGroup.
+	This alerts you to the group being created.
+
+	Parameters passed to callback:
+
+		group_name - Group Name
+		group_data - Group table as it is store in ULib.ucl.groups[ name ].
+
+	Revisions:
+
+		v2.61 - Initial
+]]
+ULib.HOOK_GROUP_CREATED = "ULibGroupCreated"
+
+--[[
+	Hook: ULibGroupRemoved
+
+	Called during ULib.ucl.removeGroup.
+	This alerts you to the group being removed.
+
+	Parameters passed to callback:
+
+		group_name - Group Name
+		group_data - Group table as it is store in ULib.ucl.groups[ name ].
+
+	Revisions:
+
+		v2.61 - Initial
+]]
+ULib.HOOK_GROUP_REMOVED = "ULibGroupRemoved"
+
+--[[
+	Hook: ULibGroupAccessChanged
+
+	Called during ULib.ucl.groupAllow.
+	This alerts you to the group access being changed.
+
+	Parameters passed to callback:
+
+		group_name - Group Name
+		access - Acess being changed
+		revoke - Are we adding(false) or revoking(true)
+
+	Revisions:
+
+		v2.61 - Initial
+]]
+ULib.HOOK_GROUP_ACCESS_CHANGE = "ULibGroupAccessChanged"
+
+--[[
+	Hook: ULibGroupRenamed
+
+	Called during ULib.ucl.renameGroup.
+	This alerts you to the group being renamed.
+
+	Parameters passed to callback:
+
+		old_name - Old Group Name
+		new_name - New Group Name
+
+	Revisions:
+
+		v2.61 - Initial
+]]
+ULib.HOOK_GROUP_RENAMED = "ULibGroupRenamed"
+
+--[[
+	Hook: ULibGroupInheritanceChanged
+
+	Called during ULib.ucl.setGroupInheritance.
+	This alerts you to the group Inheritance being changed.
+
+	Parameters passed to callback:
+
+		group_name - Group Name
+		new_inherit - New Inheritance
+		old_inherit - Old Inheritance
+
+	Revisions:
+
+		v2.61 - Initial
+]]
+ULib.HOOK_GROUP_INHERIT_CHANGE = "ULibGroupInheritanceChanged"
+
+--[[
+	Hook: ULibGroupCanTargetChanged
+
+	Called during ULib.ucl.setGroupCanTarget.
+	This alerts you to the group CanTarget being changed.
+
+	Parameters passed to callback:
+
+		group_name - Group Name
+		new_target - New CanTarget
+		old_target - Old CanTarget
+
+	Revisions:
+
+		v2.61 - Initial
+]]
+ULib.HOOK_GROUP_CANTARGET_CHANGE = "ULibGroupCanTargetChanged"
+
+--[[
+	Hook: ULibUserGroupChange
+
+	Called during ULib.ucl.addUser.
+	This alerts you to the user's group being changed.
+
+	Parameters passed to callback:
+
+		id - Steamid of the user.
+		allows - Allows Table
+		denies - Denies Table
+		new_group - New Group
+		old_group - Old Group
+	Revisions:
+
+		v2.61 - Initial
+]]
+ULib.HOOK_USER_GROUP_CHANGE = "ULibUserGroupChange"
+
+--[[
+	Hook: ULibUserAccessChange
+
+	Called during ULib.ucl.userAllow.
+	This alerts you to the user's acess being changed.
+
+	Parameters passed to callback:
+
+	id - Steamid of the user.
+	access - Acess being changed
+	revoke - Are we adding(false) or revoking(true)
+	deny - Are we denying(true) or allowing(false)
+	Revisions:
+
+		v2.61 - Initial
+]]
+ULib.HOOK_USER_ACCESS_CHANGE = "ULibUserAccessChange"
+
+--[[
+	Hook: ULibUserRemoved
+
+	Called during ULib.ucl.removeUser.
+	This alerts you to the user's group being removed.
+
+	Parameters passed to callback:
+
+	id - Steamid of the user.
+	user_info - Old User Info(group, allows, denys, etc) as stored in ULib.ucl.users[id] before the change
+	Revisions:
+
+		v2.61 - Initial
+]]
+ULib.HOOK_USER_REMOVED = "ULibUserRemoved"
+
+--[[
 	Section: UCL Helpers
 
 	These defines are server-only, to help with UCL.

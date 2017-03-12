@@ -336,6 +336,7 @@ function ucl.addGroup( name, allows, inherit_from, from_CAMI )
 	ucl.groups[ name ] = { allow=allows, inherit_from=inherit_from }
 	ucl.saveGroups()
 
+	hook.Call( ULib.HOOK_GROUP_CREATED, _, name, ucl.groups[ name ] )
 	hook.Call( ULib.HOOK_UCLCHANGED )
 
 	-- CAMI logic
@@ -414,6 +415,7 @@ function ucl.groupAllow( name, access, revoke )
 
 		ucl.saveGroups()
 
+		hook.Call( ULib.HOOK_GROUP_ACCESS_CHANGE, _, name, access, revoke or false )
 		hook.Call( ULib.HOOK_UCLCHANGED )
 	end
 
@@ -473,6 +475,7 @@ function ucl.renameGroup( orig, new )
 	ucl.saveUsers()
 	ucl.saveGroups()
 
+	hook.Call( ULib.HOOK_GROUP_RENAMED, _, orig, new )
 	hook.Call( ULib.HOOK_UCLCHANGED )
 
 	-- CAMI logic
@@ -536,6 +539,7 @@ function ucl.setGroupInheritance( group, inherit_from, from_CAMI )
 
 	ucl.saveGroups()
 
+	hook.Call( ULib.HOOK_GROUP_INHERIT_CHANGE, _, group, inherit_from, old_inherit )
 	hook.Call( ULib.HOOK_UCLCHANGED )
 
 	-- CAMI logic
@@ -566,8 +570,10 @@ function ucl.setGroupCanTarget( group, can_target )
 	if not ucl.groups[ group ] then return error( "Group does not exist (" .. group .. ")", 2 ) end
 
 	if ucl.groups[ group ].can_target == can_target then return end -- Nothing to change
-
+	local old = ucl.groups[ group ].can_target
 	ucl.groups[ group ].can_target = can_target
+
+	hook.Call( ULib.HOOK_GROUP_CANTARGET_CHANGE, _, group, can_target, old )
 
 	ucl.saveGroups()
 
@@ -616,7 +622,7 @@ function ucl.removeGroup( name, from_CAMI )
 			end
 		end
 	end
-
+	local oldgroup = table.Copy( ucl.groups[ name ] )
 	ucl.groups[ name ] = nil
 	for _, groupInfo in pairs( ucl.groups ) do
 		if groupInfo.inherit_from == name then
@@ -627,6 +633,7 @@ function ucl.removeGroup( name, from_CAMI )
 	ucl.saveUsers()
 	ucl.saveGroups()
 
+	hook.Call( ULib.HOOK_GROUP_REMOVED, _, name, oldgroup )
 	hook.Call( ULib.HOOK_UCLCHANGED )
 
 	-- CAMI logic
@@ -733,12 +740,14 @@ function ucl.addUser( id, allows, denies, group, from_CAMI )
 			CAMI.SignalUserGroupChanged( ply, oldgroup, group or "user", CAMI.ULX_TOKEN )
 		end
 
+		hook.Call( ULib.HOOK_USER_GROUP_CHANGE, _, id, allows, denies, group, oldgroup )
 		ucl.probe( ply )
 	else -- Otherwise this gets called twice
 		if not from_CAMI then
 			CAMI.SignalSteamIDUserGroupChanged( id, oldgroup, group or "user", CAMI.ULX_TOKEN )
 		end
 		hook.Call( ULib.HOOK_UCLCHANGED )
+		hook.Call( ULib.HOOK_USER_GROUP_CHANGE, _, id, allows, denies, group, oldgroup )
 	end
 end
 
@@ -857,6 +866,7 @@ function ucl.userAllow( id, access, revoke, deny )
 
 		ucl.saveUsers()
 
+		hook.Call( ULib.HOOK_USER_ACCESS_CHANGE, _, id, access, revoke or false, deny or false )
 		hook.Call( ULib.HOOK_UCLCHANGED )
 	end
 
@@ -910,6 +920,7 @@ function ucl.removeUser( id, from_CAMI )
 
 	if changed then -- If the user is only added to the default garry file, then nothing changed
 		ucl.saveUsers()
+		hook.Call( ULib.HOOK_USER_REMOVED, _, id, userInfo )
 	end
 
 	local ply = ULib.getPlyByID( id )
