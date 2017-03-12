@@ -1071,8 +1071,9 @@ cmds.TranslateCommand = inheritsFrom( nil )
 			command is used?
 		no_space_in_say - *(Optional, defaults to false)* Is a space between
 			the chat command and arguments required?
+		unsafe - *(Optional, defaults to false)* Flag for ULib.execString, which disallows execution from untrusted config.
 ]]
-function cmds.TranslateCommand:instantiate( cmd, fn, say_cmd, hide_say, no_space_in_say )
+function cmds.TranslateCommand:instantiate( cmd, fn, say_cmd, hide_say, no_space_in_say, unsafe )
 	ULib.checkArg( 1, "ULib.cmds.TranslateCommand", "string", cmd, 5 )
 	if SERVER then
 		ULib.checkArg( 2, "ULib.cmds.TranslateCommand", "function", fn, 5 )
@@ -1082,13 +1083,14 @@ function cmds.TranslateCommand:instantiate( cmd, fn, say_cmd, hide_say, no_space
 	ULib.checkArg( 3, "ULib.cmds.TranslateCommand", {"nil", "string", "table"}, say_cmd, 5 )
 	ULib.checkArg( 4, "ULib.cmds.TranslateCommand", {"nil", "boolean"}, hide_say, 5 )
 	ULib.checkArg( 5, "ULib.cmds.TranslateCommand", {"nil", "boolean"}, no_space_in_say, 5 )
+	ULib.checkArg( 6, "ULib.cmds.TranslateCommand", {"nil", "boolean"}, unsafe, 5 )
 
 	self.args = {}
 	self.fn = fn
 	self.cmd = cmd -- We need this for usage print
 	translatedCmds[ cmd:lower() ] = self
 
-	cmds.addCommand( cmd, translateCmdCallback, translateAutocompleteCallback, cmd, say_cmd, hide_say, no_space_in_say )
+	cmds.addCommand( cmd, translateCmdCallback, translateAutocompleteCallback, cmd, say_cmd, hide_say, no_space_in_say, unsafe )
 end
 
 
@@ -1235,6 +1237,93 @@ local routedCmds = {}
 local sayCmds = {}
 local sayCommandCallback
 
+--[[
+	Function: cmds.getCommandTableAndArgv
+
+	Transforms a command and argument list as passed by the source engine into a ULib command table.
+
+	Parameters:
+
+		commandName - The *string* top-level command. IE, "ulx".
+		argv - The argument list, as a *list of strings*.
+		valveErrorCorrection - An *optional boolean* of whether to correct for source engine command line mangling.
+
+	Returns:
+
+		1 - The command table, as contained in ULib.cmds.routedCmds. If none found, returns nil.
+		2 - The final computed command name
+		3 - The argv table, stripped of ULX command portions.
+
+	Revisions:
+
+		v2.62 - Initial
+]]
+function cmds.getCommandTableAndArgv( commandName, argv, valveErrorCorrection )
+	if valveErrorCorrection then
+		local args = ""
+		for k, v in ipairs( argv ) do
+			args = string.format( '%s"%s" ', args, v )
+		end
+		args = string.Trim( args ) -- Remove that last space we added
+
+		args = args:gsub( "\" \":\" \"", ":" ) -- Valve error correction.
+		args = args:gsub( "\" \"'\" \"", "'" ) -- Valve error correction.
+		argv = ULib.splitArgs( args ) -- We're going to go ahead and reparse argv to fix the errors.
+	else
+		argv = table.Copy( argv )
+	end
+
+	-- Find the most specific command we have defined
+	local currTable = routedCmds[ commandName:lower() ]
+	if not currTable then return nil end
+
+	local nextWord = table.remove( argv, 1 )
+	while nextWord and currTable[ nextWord:lower() ] do
+		commandName = commandName .. " " .. nextWord
+		currTable = currTable[ nextWord:lower() ]
+
+		nextWord = table.remove( argv, 1 )
+	end
+	table.insert( argv, 1, nextWord ) -- Stick it in again, the last one was invalid
+	-- Done finding
+
+	return currTable, commandName, argv
+end
+
+
+--[[
+	Function: cmds.execute
+
+	Given a ULib command table and the information to pass to the command callback, execute the command.
+	Also routes server commands appropriately and executes ULib command hooks.
+
+	Parameters:
+
+		cmdTable - The command *table*, internal to ULib.
+		ply - The *player* calling the command.
+		commandName - The *string* of the command name.
+		argv - The argument list, as a *list of strings*.
+
+	Revisions:
+
+		v2.62 - Initial
+]]
+function cmds.execute( cmdTable, ply, commandName, argv )
+	if CLIENT and not cmdTable.__client_only then
+		ULib.redirect( ply, commandName, argv )
+		return
+	end
+
+	if not cmdTable.__fn then
+		return error( "Attempt to call undefined command: " .. commandName )
+	end
+
+	local return_value = hook.Call( ULib.HOOK_COMMAND_CALLED, _, ply, commandName, argv )
+	if return_value ~= false then
+		cmdTable.__fn( ply, commandName, argv )
+	end
+end
+
 local function routedCommandCallback( ply, commandName, argv )
 	local curtime = CurTime()
 	if not ply.ulib_threat_level or ply.ulib_threat_time <= curtime then
@@ -1258,43 +1347,8 @@ local function routedCommandCallback( ply, commandName, argv )
 	local orig_argv = argv
 	local orig_commandName = commandName
 
-	-- Valve error-correction
-	local args = ""
-	for k, v in ipairs( argv ) do
-		args = string.format( '%s"%s" ', args, v )
-	end
-	args = string.Trim( args ) -- Remove that last space we added
-
-	args = args:gsub( "\" \":\" \"", ":" ) -- Valve error correction.
-	args = args:gsub( "\" \"'\" \"", "'" ) -- Valve error correction.
-	argv = ULib.splitArgs( args ) -- We're going to go ahead and reparse argv to fix the errors.
-	-- End Valve error-correction
-
-	-- Find the most specific command we have defined
-	local currTable = routedCmds[ commandName:lower() ]
-	local nextWord = table.remove( argv, 1 )
-	while nextWord and currTable[ nextWord:lower() ] do
-		commandName = commandName .. " " .. nextWord
-		currTable = currTable[ nextWord:lower() ]
-
-		nextWord = table.remove( argv, 1 )
-	end
-	table.insert( argv, 1, nextWord ) -- Stick it in again, the last one was invalid
-	-- Done finding
-
-	if CLIENT and not currTable.__client_only then
-		ULib.redirect( ply, orig_commandName, orig_argv )
-		return
-	end
-
-	if not currTable.__fn then
-		return error( "Attempt to call undefined command: " .. commandName )
-	end
-
-	local return_value = hook.Call( ULib.HOOK_COMMAND_CALLED, _, ply, commandName, argv )
-	if return_value ~= false then
-		currTable.__fn( ply, commandName, argv )
-	end
+	currTable, commandName, argv = cmds.getCommandTableAndArgv( commandName, argv, true )
+	cmds.execute( currTable, ply, commandName, argv )
 end
 
 if SERVER then
@@ -1394,6 +1448,7 @@ end
 			command is used?
 		no_space_in_say - *(Optional, defaults to false)* Is a space between
 			the chat command and arguments required?
+		unsafe - Flag the command as unsafe to execute for <execStringULib>.
 
 	Example:
 
@@ -1415,9 +1470,10 @@ end
 
 	Revisions:
 
+		v2.63 - Added unsafe flag
 		v2.40 - Initial
 ]]
-function cmds.addCommand( cmd, fn, autocomplete, access_string, say_cmd, hide_say, no_space_in_say )
+function cmds.addCommand( cmd, fn, autocomplete, access_string, say_cmd, hide_say, no_space_in_say, unsafe )
 	ULib.checkArg( 1, "ULib.cmds.addCommand", "string", cmd )
 	if SERVER then
 		ULib.checkArg( 2, "ULib.cmds.addCommand", "function", fn )
@@ -1429,6 +1485,7 @@ function cmds.addCommand( cmd, fn, autocomplete, access_string, say_cmd, hide_sa
 	ULib.checkArg( 5, "ULib.cmds.addCommand", {"nil", "string", "table"}, say_cmd )
 	ULib.checkArg( 6, "ULib.cmds.addCommand", {"nil", "boolean"}, hide_say )
 	ULib.checkArg( 7, "ULib.cmds.addCommand", {"nil", "boolean"}, no_space_in_say )
+	ULib.checkArg( 8, "ULib.cmds.addCommand", {"nil", "boolean"}, unsafe )
 
 	local words = ULib.explode( "%s", cmd )
 	local currTable = routedCmds
@@ -1443,6 +1500,7 @@ function cmds.addCommand( cmd, fn, autocomplete, access_string, say_cmd, hide_sa
 	currTable.__fn = fn
 	currTable.__autocomplete = autocomplete
 	currTable.__access_string = access_string
+	currTable.__unsafe = unsafe
 
 	local dummy, dummy, prefix = cmd:find( "^(%S+)" )
 	concommand.Add( prefix, routedCommandCallback, autocompleteCallback )
@@ -1472,12 +1530,14 @@ end
 
 	Revisions:
 
+		v2.63 - Added unsafe flag
 		v2.40 - Initial
 ]]
-function cmds.addCommandClient( cmd, fn, autocomplete )
+function cmds.addCommandClient( cmd, fn, autocomplete, unsafe )
 	ULib.checkArg( 1, "ULib.cmds.addCommandClient", "string", cmd )
 	ULib.checkArg( 2, "ULib.cmds.addCommandClient", {"nil", "function"}, fn )
 	ULib.checkArg( 3, "ULib.cmds.addCommandClient", {"nil", "function"}, autocomplete )
+	ULib.checkArg( 4, "ULib.cmds.addCommandClient", {"nil", "boolean"}, unsafe )
 
 	local words = ULib.explode( "%s", cmd )
 	local currTable = routedCmds
@@ -1492,6 +1552,7 @@ function cmds.addCommandClient( cmd, fn, autocomplete )
 	currTable.__fn = fn
 	currTable.__autocomplete = autocomplete
 	currTable.__client_only = true
+	currTable.__unsafe = unsafe
 
 	local dummy, dummy, prefix = cmd:find( "^(%S+)" )
 	concommand.Add( prefix, routedCommandCallback, autocompleteCallback )
