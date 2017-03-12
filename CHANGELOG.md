@@ -2,6 +2,8 @@
 
 ## v2.62 - *(00/00/00)*
 * [ADD] Enhancements from and to CAMI.
+* [ADD] Exec* functions can now execute only ULib-defined functions which are not marked "unsafe" (thanks, FPtje).
+* [ADD] Hooks for users being kicked, banned, unbanned; groups being created, removed, changed, renamed; user access being changed, or removed (thanks, Andre).
 * [FIX] Registers ULib-created CAMI groups on client side properly now (thanks, Roboderpy).
 
 ## v2.61 - *(05/22/16)*

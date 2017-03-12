@@ -415,7 +415,7 @@ function ucl.groupAllow( name, access, revoke )
 
 		ucl.saveGroups()
 
-		hook.Call( ULib.HOOK_GROUP_ACCESS_CHANGE, _, name, access, revoke or false )
+		hook.Call( ULib.HOOK_GROUP_ACCESS_CHANGE, _, name, access, revoke )
 		hook.Call( ULib.HOOK_UCLCHANGED )
 	end
 
@@ -866,7 +866,7 @@ function ucl.userAllow( id, access, revoke, deny )
 
 		ucl.saveUsers()
 
-		hook.Call( ULib.HOOK_USER_ACCESS_CHANGE, _, id, access, revoke or false, deny or false )
+		hook.Call( ULib.HOOK_USER_ACCESS_CHANGE, _, id, access, revoke, deny )
 		hook.Call( ULib.HOOK_UCLCHANGED )
 	end
 

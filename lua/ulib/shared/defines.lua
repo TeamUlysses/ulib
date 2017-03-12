@@ -219,14 +219,14 @@ ULib.HOOK_PLAYER_NAME_CHANGED = "ULibPlayerNameChanged"
 	Hook: ULibGetUsersCustomKeyword
 
 	Called during ULib.getUsers when considering a target string for keywords.
-	This could be used to create a new, custom keyword for targetting users who
+	This could be used to create a new, custom keyword for targeting users who
 	have been connected for less than five minutes, for example.
 	Return nil or a table of player objects to add to the target list.
 
 	Parameters passed to callback:
 
 		target - A string chunk of a possibly larger target list to operate on.
-		ply - The player doing the targetting, not always specified (can be nil).
+		ply - The player doing the targeting, not always specified (can be nil).
 
 	Revisions:
 
@@ -238,7 +238,7 @@ ULib.HOOK_GETUSERS_CUSTOM_KEYWORD = "ULibGetUsersCustomKeyword"
 	Hook: ULibGetUserCustomKeyword
 
 	Called during ULib.getUser when considering a target string for keywords.
-	This could be used to create a new, custom keyword for always targetting a
+	This could be used to create a new, custom keyword for always targeting a
 	specific connected steamid, for example. Or, to target the shortest connected
 	player.
 	Return nil or a player object.
@@ -246,7 +246,7 @@ ULib.HOOK_GETUSERS_CUSTOM_KEYWORD = "ULibGetUsersCustomKeyword"
 	Parameters passed to callback:
 
 		target - A string target.
-		ply - The player doing the targetting, not always specified (can be nil).
+		ply - The player doing the targeting, not always specified (can be nil).
 
 	Revisions:
 
@@ -262,13 +262,13 @@ ULib.HOOK_GETUSER_CUSTOM_KEYWORD = "ULibGetUserCustomKeyword"
 
 	Parameters passed to callback:
 
-		steamid - SteamID of the kicked player.
-		reason - Kick reason. Can be nil.
-		caller - Whomever did the kick. Can be nil.
+		steamid - String of SteamID of the kicked player.
+		reason - String of kick reason or nil.
+		caller - Player object of whomever did the kick or nil.
 
 	Revisions:
 
-		v2.61 - Initial
+		v2.62 - Initial
 ]]
 ULib.HOOK_USER_KICKED = "ULibPlayerKicked"
 
@@ -280,12 +280,12 @@ ULib.HOOK_USER_KICKED = "ULibPlayerKicked"
 
 	Parameters passed to callback:
 
-		steamid - SteamID of the banned player.
-		ban_data - The data about the ban, exactly like it would be stored in ULib.bans.
+		steamid - String of SteamID of the banned player.
+		ban_data - The table data about the ban, exactly like it would be stored in ULib.bans.
 
 	Revisions:
 
-		v2.61 - Initial
+		v2.62 - Initial
 ]]
 ULib.HOOK_USER_BANNED = "ULibPlayerBanned"
 
@@ -297,12 +297,12 @@ ULib.HOOK_USER_BANNED = "ULibPlayerBanned"
 
 	Parameters passed to callback:
 
-		steamid - SteamID of the unbanned player.
-		admin - If passed, it will be the unbaning admin, else it will show as console..
+		steamid - String of SteamID for the unbanned player.
+		admin - The unbaning player object or nil.
 
 	Revisions:
 
-		v2.61 - Initial
+		v2.62 - Initial
 ]]
 ULib.HOOK_USER_UNBANNED = "ULibPlayerUnBanned"
 
@@ -314,12 +314,12 @@ ULib.HOOK_USER_UNBANNED = "ULibPlayerUnBanned"
 
 	Parameters passed to callback:
 
-		group_name - Group Name
-		group_data - Group table as it is store in ULib.ucl.groups[ name ].
+		group_name - String of Group Name
+		group_data - Group table as it is stored in ULib.ucl.groups[ name ].
 
 	Revisions:
 
-		v2.61 - Initial
+		v2.62 - Initial
 ]]
 ULib.HOOK_GROUP_CREATED = "ULibGroupCreated"
 
@@ -331,12 +331,12 @@ ULib.HOOK_GROUP_CREATED = "ULibGroupCreated"
 
 	Parameters passed to callback:
 
-		group_name - Group Name
-		group_data - Group table as it is store in ULib.ucl.groups[ name ].
+		group_name - String of Group Name
+		group_data - Group table as it is stored in ULib.ucl.groups[ name ].
 
 	Revisions:
 
-		v2.61 - Initial
+		v2.62 - Initial
 ]]
 ULib.HOOK_GROUP_REMOVED = "ULibGroupRemoved"
 
@@ -348,13 +348,13 @@ ULib.HOOK_GROUP_REMOVED = "ULibGroupRemoved"
 
 	Parameters passed to callback:
 
-		group_name - Group Name
-		access - Acess being changed
-		revoke - Are we adding(false) or revoking(true)
+		group_name - String of Group Name
+		access - String of access being changed
+		revoke - Boolean, Are we adding(false/nil) or revoking(true)
 
 	Revisions:
 
-		v2.61 - Initial
+		v2.62 - Initial
 ]]
 ULib.HOOK_GROUP_ACCESS_CHANGE = "ULibGroupAccessChanged"
 
@@ -366,12 +366,12 @@ ULib.HOOK_GROUP_ACCESS_CHANGE = "ULibGroupAccessChanged"
 
 	Parameters passed to callback:
 
-		old_name - Old Group Name
-		new_name - New Group Name
+		old_name - String of Old Group Name
+		new_name - String of New Group Name
 
 	Revisions:
 
-		v2.61 - Initial
+		v2.62 - Initial
 ]]
 ULib.HOOK_GROUP_RENAMED = "ULibGroupRenamed"
 
@@ -383,13 +383,13 @@ ULib.HOOK_GROUP_RENAMED = "ULibGroupRenamed"
 
 	Parameters passed to callback:
 
-		group_name - Group Name
-		new_inherit - New Inheritance
-		old_inherit - Old Inheritance
+		group_name - String of Group Name
+		new_inherit - String of New Inheritance
+		old_inherit - String of Old Inheritance
 
 	Revisions:
 
-		v2.61 - Initial
+		v2.62 - Initial
 ]]
 ULib.HOOK_GROUP_INHERIT_CHANGE = "ULibGroupInheritanceChanged"
 
@@ -401,13 +401,13 @@ ULib.HOOK_GROUP_INHERIT_CHANGE = "ULibGroupInheritanceChanged"
 
 	Parameters passed to callback:
 
-		group_name - Group Name
-		new_target - New CanTarget
-		old_target - Old CanTarget
+		group_name - String of Group Name
+		new_target - String of New CanTarget
+		old_target - String of Old CanTarget
 
 	Revisions:
 
-		v2.61 - Initial
+		v2.62 - Initial
 ]]
 ULib.HOOK_GROUP_CANTARGET_CHANGE = "ULibGroupCanTargetChanged"
 
@@ -419,14 +419,15 @@ ULib.HOOK_GROUP_CANTARGET_CHANGE = "ULibGroupCanTargetChanged"
 
 	Parameters passed to callback:
 
-		id - Steamid of the user.
+		id - String steamid of the user.
 		allows - Allows Table
 		denies - Denies Table
-		new_group - New Group
-		old_group - Old Group
+		new_group - String of New Group
+		old_group - String of Old Group
+
 	Revisions:
 
-		v2.61 - Initial
+		v2.62 - Initial
 ]]
 ULib.HOOK_USER_GROUP_CHANGE = "ULibUserGroupChange"
 
@@ -434,17 +435,18 @@ ULib.HOOK_USER_GROUP_CHANGE = "ULibUserGroupChange"
 	Hook: ULibUserAccessChange
 
 	Called during ULib.ucl.userAllow.
-	This alerts you to the user's acess being changed.
+	This alerts you to the user's access being changed.
 
 	Parameters passed to callback:
 
-	id - Steamid of the user.
-	access - Acess being changed
-	revoke - Are we adding(false) or revoking(true)
-	deny - Are we denying(true) or allowing(false)
+	id - The string steamid of the user.
+	access - The string of access being changed
+	revoke - Boolean, are we adding(false/nil) or revoking(true)
+	deny - Boolean, are we denying(true) or allowing(false/nil)
+
 	Revisions:
 
-		v2.61 - Initial
+		v2.62 - Initial
 ]]
 ULib.HOOK_USER_ACCESS_CHANGE = "ULibUserAccessChange"
 
@@ -456,11 +458,12 @@ ULib.HOOK_USER_ACCESS_CHANGE = "ULibUserAccessChange"
 
 	Parameters passed to callback:
 
-	id - Steamid of the user.
-	user_info - Old User Info(group, allows, denys, etc) as stored in ULib.ucl.users[id] before the change
+	id - The string steamid of the user.
+	user_info - Table of old user info (group, allows, denys, etc) as stored in ULib.ucl.users[id] before the change.
+
 	Revisions:
 
-		v2.61 - Initial
+		v2.62 - Initial
 ]]
 ULib.HOOK_USER_REMOVED = "ULibUserRemoved"
 
