@@ -68,15 +68,3 @@ ULib loads, and will send it to and load it on clients as well.
 Some important quirks developers should know about --
 * autocomplete - You have to define the autocomplete on the client, so if you pass a string for autocomplete to ULib.concommand,
 it will assume you mean a client function. There's also a delay in the sending of these to the client.
-
-## License
-
-This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 License.
-To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/ or send a letter to
-```
-Creative Commons
-543 Howard Street
-5th Floor
-San Francisco, California 94105
-USA
-```
