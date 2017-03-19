@@ -10,6 +10,7 @@
 		"ulib.build",
 		"README.md",
 		"CHANGELOG.md",
+		"LICENSE.md",
 		"lua/ulib/modules/what_is_this.txt"
 	],
 	"workshopid": 557962238
