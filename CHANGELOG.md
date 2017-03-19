@@ -1,6 +1,6 @@
 # ULib Changelog
 
-## v2.62 - *(00/00/00)*
+## v2.62 - *(03/19/17)*
 * [ADD] Enhancements from and to CAMI.
 * [ADD] Exec* functions can now execute only ULib-defined functions which are not marked "unsafe" (thanks, FPtje).
 * [ADD] Hooks for users being kicked, banned, unbanned; groups being created, removed, changed, renamed; user access being changed, or removed (thanks, Andre).
