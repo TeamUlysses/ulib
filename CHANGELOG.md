@@ -1,6 +1,7 @@
 # ULib Changelog
 
 ## v2.63 - *(00/00/00)*
+* [FIX] Server errors when loading massive ban lists.
 
 ## v2.62 - *(03/19/17)*
 * [ADD] Enhancements from and to CAMI.

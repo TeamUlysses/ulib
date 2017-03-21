@@ -441,11 +441,13 @@ function ULib.refreshBans()
 		end
 	end
 
+	local commandBuffer = ""
 	for k, v in pairs( ULib.bans ) do
 		if type( v ) == "table" and type( k ) == "string" then
 			local time = ( v.unban - os.time() ) / 60
 			if time > 0 then
-				game.ConsoleCommand( string.format( "banid %f %s\n", time, k ) )
+				--game.ConsoleCommand( string.format( "banid %f %s\n", time, k ) )
+				commandBuffer = string.format( "%sbanid %f %s\n", commandBuffer, time, k )
 			elseif math.floor( v.unban ) == 0 then -- We floor it because GM10 has floating point errors that might make it be 0.1e-20 or something dumb.
 				if not ban_set[ k ] then
 					ULib.bans[ k ] = nil
@@ -458,6 +460,7 @@ function ULib.refreshBans()
 			ULib.bans[ k ] = nil
 		end
 	end
+	ULib.execString( commandBuffer, "InitBans" )
 
 	-- We're queueing this because it will split the load out for VERY large ban files
 	ULib.queueFunctionCall( function() ULib.fileWrite( ULib.BANS_FILE, ULib.makeKeyValues( ULib.bans ) ) end )
