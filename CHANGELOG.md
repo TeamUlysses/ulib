@@ -1,6 +1,6 @@
 # ULib Changelog
 
-## v2.63 - *(00/00/00)*
+## v2.63 - *(03/21/17)*
 * [FIX] Server errors when loading massive ban lists.
 
 ## v2.62 - *(03/19/17)*
