@@ -496,7 +496,7 @@ function ULib.getSpawnInfo( player )
 	local weapons = player:GetWeapons()
 	local data = {}
 	for _, weapon in ipairs( weapons ) do
-		printname = weapon:GetClass()
+		local printname = weapon:GetClass()
 		data[ printname ] = {}
 		data[ printname ].clip1 = weapon:Clip1()
 		data[ printname ].clip2 = weapon:Clip2()
