@@ -1362,7 +1362,14 @@ if SERVER then
 
 	local function hookRoute( ply, command, argv )
 		if #argv > 0 then
-			concommand.Run( ply, table.remove( argv, 1 ), argv )
+			local CommandList, AutoCompleteList = concommand.GetTable()
+
+			local command = table.remove( argv, 1 )
+			local LowerCommand = string.lower( command )
+
+			if ( CommandList[ LowerCommand ] != nil ) then
+				CommandList[ LowerCommand ]( ply, command, argv )
+			end
 		end
 	end
 	concommand.Add( "_u", hookRoute )
