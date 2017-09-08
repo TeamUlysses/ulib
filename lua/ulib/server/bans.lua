@@ -87,11 +87,6 @@ function ULib.ban( ply, time, reason, admin )
 	end
 
 	ULib.addBan( ply:SteamID(), time, reason, ply:Name(), admin )
-
-	-- Load our currently banned users so we don't overwrite them
-	if ULib.fileExists( "cfg/banned_user.cfg" ) then
-		ULib.execFile( "cfg/banned_user.cfg" )
-	end
 end
 
 
@@ -101,6 +96,29 @@ end
 	An alias for <ban>.
 ]]
 ULib.kickban = ULib.ban
+
+
+local function escapeOrNull( str )
+	if not str then return "NULL"
+	else return sql.SQLStr(str) end
+end
+
+
+local function writeBan( bandata )
+	sql.Query(
+		"REPLACE INTO ulib_bans (steamid, time, unban, reason, name, admin, modified_admin, modified_time) " ..
+		string.format( "VALUES (%s, %i, %i, %s, %s, %s, %s, %s)",
+			util.SteamIDTo64( bandata.steamID ),
+			bandata.time or 0,
+			bandata.unban or 0,
+			escapeOrNull( bandata.reason ),
+			escapeOrNull( bandata.name ),
+			escapeOrNull( bandata.admin ),
+			escapeOrNull( bandata.modified_admin ),
+			escapeOrNull( bandata.modified_time )
+		)
+	)
+end
 
 
 --[[
@@ -132,6 +150,7 @@ function ULib.addBan( steamid, time, reason, name, admin )
 		end
 	end
 
+	-- Clean up passed data
 	local t = {}
 	local timeNow = os.time()
 	if ULib.bans[ steamid ] then
@@ -147,12 +166,10 @@ function ULib.addBan( steamid, time, reason, name, admin )
 	else
 		t.unban = 0
 	end
-	if reason then
-		t.reason = reason
-	end
-	if name then
-		t.name = name
-	end
+	t.reason = reason
+	t.name = name
+	t.steamID = steamid
+
 	ULib.bans[ steamid ] = t
 
 	local strTime = time ~= 0 and ULib.secondsToStringTime( time*60 )
@@ -174,12 +191,10 @@ function ULib.addBan( steamid, time, reason, name, admin )
 	-- Remove all semicolons from the reason to prevent command injection
 	shortReason = string.gsub(shortReason, ";", "")
 
-	-- This redundant kick code is to ensure they're kicked -- even if they're joining
+	-- This redundant kick is to ensure they're kicked -- even if they're joining
 	game.ConsoleCommand( string.format( "kickid %s %s\n", steamid, shortReason or "" ) )
-	game.ConsoleCommand( string.format( "banid %f %s kick\n", time, steamid ) )
-	game.ConsoleCommand( "writeid\n" )
 
-	ULib.fileWrite( ULib.BANS_FILE, ULib.makeKeyValues( ULib.bans ) )
+	writeBan( t )
 	hook.Call( ULib.HOOK_USER_BANNED, _, steamid, t )
 end
 
@@ -199,19 +214,57 @@ end
 		v2.10 - Initial
 ]]
 function ULib.unban( steamid, admin )
-
-	--Default banlist
-	if ULib.fileExists( "cfg/banned_user.cfg" ) then
-		ULib.execFile( "cfg/banned_user.cfg" )
-	end
-	ULib.queueFunctionCall( game.ConsoleCommand, "removeid " .. steamid .. ";writeid\n" ) -- Execute after done loading bans
-
 	--ULib banlist
 	ULib.bans[ steamid ] = nil
-	ULib.fileWrite( ULib.BANS_FILE, ULib.makeKeyValues( ULib.bans ) )
+	sql.Query( "DELETE FROM ulib_bans WHERE steamid=" .. util.SteamIDTo64( steamid ) )
 	hook.Call( ULib.HOOK_USER_UNBANNED, _, steamid, admin )
 
 end
+
+
+local function nilIfNull(data)
+	if data == "NULL" then return nil
+	else return data end
+end
+
+
+-- Init our bans table
+if not sql.TableExists( "ulib_bans" ) then
+	sql.Query( "CREATE TABLE IF NOT EXISTS ulib_bans ( " ..
+		"steamid INTEGER NOT NULL PRIMARY KEY, " ..
+		"time INTEGER NOT NULL, " ..
+		"unban INTEGER NOT NULL, " ..
+		"reason TEXT, " ..
+		"name TEXT, " ..
+		"admin TEXT, " ..
+		"modified_admin TEXT, " ..
+		"modified_time INTEGER " ..
+		");" )
+	sql.Query( "CREATE INDEX IDX_ULIB_BANS_TIME ON ulib_bans ( time DESC );" )
+	sql.Query( "CREATE INDEX IDX_ULIB_BANS_UNBAN ON ulib_bans ( unban DESC );" )
+end
+
+local LEGACY_BANS_FILE = "data/ulib/bans.txt"
+--[[
+	Function: getLegacyBans
+
+	Returns bans written by ULib versions prior to 2.7.
+]]
+function ULib.getLegacyBans()
+	if not ULib.fileExists( LEGACY_BANS_FILE ) then
+		return nil
+	end
+
+	local bans, err = ULib.parseKeyValues( ULib.fileRead( LEGACY_BANS_FILE ) )
+
+	if err then
+		return nil
+	else
+		return bans
+	end
+end
+
+local legacy_bans = ULib.getLegacyBans()
 
 
 --[[
@@ -220,64 +273,38 @@ end
 	Refreshes the ULib bans.
 ]]
 function ULib.refreshBans()
-	local err
-	if not ULib.fileExists( ULib.BANS_FILE ) then
-		ULib.bans = {}
-	else
-		ULib.bans, err = ULib.parseKeyValues( ULib.fileRead( ULib.BANS_FILE ) )
-	end
+	local results = sql.Query( "SELECT * FROM ulib_bans" )
 
-	if err then
-		Msg( "Bans file was not formatted correctly. Attempting to fix and backing up original\n" )
-		if err then
-			Msg( "Error while reading bans file was: " .. err .. "\n" )
+	ULib.bans = {}
+	if results then
+		for i=1, #results do
+			local r = results[i]
+
+			r.steamID = util.SteamIDFrom64( r.steamid )
+			r.steamid = nil
+			r.reason = nilIfNull( r.reason )
+			r.name = nilIfNull( r.name )
+			r.admin = nilIfNull( r.admin )
+			r.modified_admin = nilIfNull( r.modified_admin )
+			r.modified_time = nilIfNull( r.modified_time )
+			ULib.bans[ r.steamID ] = r
 		end
-		Msg( "Original file was backed up to " .. ULib.backupFile( ULib.BANS_FILE ) .. "\n" )
-		ULib.bans = {}
 	end
 
-	local default_bans = ""
-	if ULib.fileExists( "cfg/banned_user.cfg" ) then
-		ULib.execFile( "cfg/banned_user.cfg" )
-		ULib.queueFunctionCall( game.ConsoleCommand, "writeid\n" )
-		default_bans = ULib.fileRead( "cfg/banned_user.cfg" )
-	end
-
-	--default_bans = ULib.makePatternSafe( default_bans )
-	default_bans = string.gsub( default_bans, "banid %d+ ", "" )
-	default_bans = string.Explode( "\n", default_bans:gsub( "\r", "" ) )
-	local ban_set = {}
-	for _, v in pairs( default_bans ) do
-		if v ~= "" then
-			ban_set[ v ] = true
-			if not ULib.bans[ v ] then
-				ULib.bans[ v ] = { unban = 0 }
+	if legacy_bans then
+		sql.Begin()
+		for steamID, bandata in pairs( legacy_bans ) do
+			bandata.steamID = steamID -- Ensure this is set in the data
+			if not ULib.bans[ steamID ] then
+				writeBan( bandata )
+				ULib.bans[ steamID ] = bandata
 			end
 		end
-	end
+		sql.Commit()
 
-	local commandBuffer = ""
-	for k, v in pairs( ULib.bans ) do
-		if type( v ) == "table" and type( k ) == "string" then
-			local time = ( v.unban - os.time() ) / 60
-			if time > 0 then
-				--game.ConsoleCommand( string.format( "banid %f %s\n", time, k ) )
-				commandBuffer = string.format( "%sbanid %f %s\n", commandBuffer, time, k )
-			elseif math.floor( v.unban ) == 0 then -- We floor it because GM10 has floating point errors that might make it be 0.1e-20 or something dumb.
-				if not ban_set[ k ] then
-					ULib.bans[ k ] = nil
-				end
-			else
-				ULib.bans[ k ] = nil
-			end
-		else
-			Msg( "Warning: Bad ban data is being ignored, key = " .. tostring( k ) .. "\n" )
-			ULib.bans[ k ] = nil
-		end
+		Msg( "[ULib] Upgraded bans storage method, moving previous bans file to " .. ULib.backupFile( LEGACY_BANS_FILE ) .. "\n" )
+		ULib.fileDelete( LEGACY_BANS_FILE )
+		legacy_bans = nil
 	end
-	ULib.execString( commandBuffer, "InitBans" )
-
-	-- We're queueing this because it will split the load out for VERY large ban files
-	ULib.queueFunctionCall( function() ULib.fileWrite( ULib.BANS_FILE, ULib.makeKeyValues( ULib.bans ) ) end )
 end
 hook.Add( "Initialize", "ULibLoadBans", ULib.refreshBans, HOOK_MONITOR_HIGH )

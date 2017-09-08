@@ -1,6 +1,7 @@
 # ULib Changelog
 
-## v2.64 - *(00/00/00)*
+## v2.70 - *(00/00/00)*
+* [CHANGE] Moved bans to SQLite.
 * [FIX] Lua error with unspecified optional player arguments from server console (thanks, Timmy).
 
 ## v2.63 - *(03/21/17)*

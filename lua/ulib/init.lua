@@ -25,6 +25,8 @@ if not ULib then
 	include( "ulib/shared/player.lua" )
 	Msg( "//  server/player.lua        //\n" )
 	include( "ulib/server/player.lua" )
+	Msg( "//  server/bans.lua          //\n" )
+	include( "ulib/server/bans.lua" )
 	Msg( "//  shared/messages.lua      //\n" )
 	include( "ulib/shared/messages.lua" )
 	Msg( "//  shared/commands.lua      //\n" )
