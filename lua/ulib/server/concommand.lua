@@ -51,7 +51,11 @@ local function sayCmdCheck( ply, strText, bTeam )
 		if data.__cmd then
 			local return_value = hook.Call( ULib.HOOK_COMMAND_CALLED, _, ply, data.__cmd, argv )
 			if return_value == false then
-				return nil
+				if data.hide then
+					return ""
+				else
+					return nil
+				end
 			end
 		end
 
