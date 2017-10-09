@@ -214,6 +214,8 @@ end
 		v2.10 - Initial
 ]]
 function ULib.unban( steamid, admin )
+	game.ConsoleCommand( "removeid " .. steamid .. ";writeid\n" ) -- Remove from srcds in case it was stored there
+
 	--ULib banlist
 	ULib.bans[ steamid ] = nil
 	sql.Query( "DELETE FROM ulib_bans WHERE steamid=" .. util.SteamIDTo64( steamid ) )
