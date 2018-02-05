@@ -993,6 +993,7 @@ function ucl.registerAccess( access, groups, comment, category )
 		timer.Create( "ULibSaveGroups", 1, 1, function() -- 1 sec delay, 1 rep
 			ucl.saveGroups()
 			hook.Call( ULib.HOOK_UCLCHANGED )
+			hook.Call( ULib.HOOK_ACCESS_REGISTERED )
 		end )
 	end
 end
