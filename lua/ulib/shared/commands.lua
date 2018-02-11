@@ -1370,10 +1370,9 @@ if SERVER then
 
 	local function hookRoute( ply, command, argv )
 		if #argv > 0 then
-			local arg1 = table.remove( argv, 1 )
-			local commandTable, _ = concommand.GetTable()
-			if commandTable[arg1] ~= nil then
-				concommand.Run( ply, arg1, argv )
+			local commandName = table.remove( argv, 1 )
+			if routedCmds[ commandName:lower() ] then
+				routedCommandCallback( ply, commandName, argv )
 			end
 		end
 	end
