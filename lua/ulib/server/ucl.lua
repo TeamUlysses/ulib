@@ -990,7 +990,11 @@ function ucl.registerAccess( access, groups, comment, category )
 			table.insert( ucl.groups[ group ].allow, access )
 		end
 
-		timer.Create( "ULibSaveGroups", 1, 1, ucl.saveGroups ) -- 1 sec delay, 1 rep
+		timer.Create( "ULibSaveGroups", 1, 1, function() -- 1 sec delay, 1 rep
+			ucl.saveGroups()
+			hook.Call( ULib.HOOK_UCLCHANGED )
+			hook.Call( ULib.HOOK_ACCESS_REGISTERED )
+		end )
 	end
 end
 

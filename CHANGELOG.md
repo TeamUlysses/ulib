@@ -1,6 +1,7 @@
 # ULib Changelog
 
 ## v2.70 - *(00/00/00)*
+* [ADD] Hook when a new, previously unknown access is registered. UCLChanged is now called as well.
 * [CHANGE] Moved bans to SQLite.
 * [FIX] Lua error with unspecified optional player arguments from server console (thanks, Timmy).
 * [FIX] Overridden chat commands now respect the hidden-state (thanks, Timmy).

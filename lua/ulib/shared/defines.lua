@@ -88,6 +88,17 @@ ULib.HOOK_UCLAUTH = "UCLAuthed"
 ULib.HOOK_UCLCHANGED = "UCLChanged"
 
 --[[
+	Hook: UCLAccessRegistered
+
+	Called *on both server and client* when one or more unrecognized accesses are registered. No parameters are passed to callbacks.
+
+	Revisions:
+
+		v2.70 - Initial
+]]
+ULib.HOOK_ACCESS_REGISTERED = "UCLAccessRegistered"
+
+--[[
 	Hook: ULibReplicatedCvarChanged
 
 	Called *on both client and server* when a replicated cvar changes or is created.
