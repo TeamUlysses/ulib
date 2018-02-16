@@ -5,6 +5,7 @@
 * [CHANGE] Moved bans to SQLite.
 * [FIX] Lua error with unspecified optional player arguments from server console (thanks, Timmy).
 * [FIX] Overridden chat commands now respect the hidden-state (thanks, Timmy).
+* [FIX] _u now routes directly to intended functions instead of through concommands. No longer outputs error on server console when invalid parameters are passed from a client.
 
 ## v2.63 - *(03/21/17)*
 * [FIX] Server errors when loading massive ban lists.
