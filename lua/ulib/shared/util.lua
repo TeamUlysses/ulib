@@ -567,25 +567,18 @@ end
 --[[
 	Function: nameCheck
 
-	Checks all players' names at regular intervals to detect name changes. Calls ULibPlayerNameChanged if the name changed. *DO NOT CALL DIRECTLY*
+	Calls all ULibPlayerNameChanged hooks if a player changes their name.
 
 	Revisions:
 
 		2.20 - Initial
+		2.63 - GitHub issue #45 (Change HOOK_PLAYER_NAME_CHANGED to be generated off game event)
 ]]
-function ULib.nameCheck()
-	local players = player.GetAll()
-	for _, ply in ipairs( players ) do
-		if not ply.ULibLastKnownName then ply.ULibLastKnownName = ply:Nick() end
-
-		if ply.ULibLastKnownName ~= ply:Nick() then
-			hook.Call( ULib.HOOK_PLAYER_NAME_CHANGED, nil, ply, ply.ULibLastKnownName, ply:Nick() )
-			ply.ULibLastKnownName = ply:Nick()
-		end
-	end
+function ULib.nameCheck( data )
+	hook.Call( ULib.HOOK_PLAYER_NAME_CHANGED, nil, Player(data.userid), data.oldname, data.newname )
 end
-timer.Create( "ULibNameCheck", 1, 0, ULib.nameCheck )
-
+gameevent.Listen( "player_changename" )
+hook.Add( "player_changename", "ULibNameCheck", ULib.nameCheck )
 
 --[[
 	Function: getPlyByUID
