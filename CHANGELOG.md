@@ -3,6 +3,8 @@
 ## v2.70 - *(00/00/00)*
 * [ADD] Hook when a new, previously unknown access is registered. UCLChanged is now called as well.
 * [CHANGE] Moved bans to SQLite.
+* [CHANGE] Listen server hosts can no longer be banned (thanks, lewez).
+* [CHANGE] Use game hooks instead of timer for player name change detection (thanks, lewez).
 * [FIX] Lua error with unspecified optional player arguments from server console (thanks, Timmy).
 * [FIX] Overridden chat commands now respect the hidden-state (thanks, Timmy).
 * [FIX] _u now routes directly to intended functions instead of through concommands. No longer outputs error on server console when invalid parameters are passed from a client.
