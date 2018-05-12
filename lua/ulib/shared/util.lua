@@ -572,7 +572,6 @@ end
 	Revisions:
 
 		2.20 - Initial
-		2.63 - GitHub issue #45 (Change HOOK_PLAYER_NAME_CHANGED to be generated off game event)
 ]]
 function ULib.nameCheck( data )
 	hook.Call( ULib.HOOK_PLAYER_NAME_CHANGED, nil, Player(data.userid), data.oldname, data.newname )
