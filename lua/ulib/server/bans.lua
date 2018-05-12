@@ -80,10 +80,15 @@ hook.Add( "CheckPassword", "ULibBanCheck", checkBan, HOOK_LOW )
 	Revisions:
 
 		v2.10 - Added support for custom ban list
+		v2.63 - GitHub issue #40 (Make sure one cannot ban oneself as a listen server host or in single player)
 ]]
 function ULib.ban( ply, time, reason, admin )
 	if not time or type( time ) ~= "number" then
 		time = 0
+	end
+
+	if ply:IsListenServerHost() then
+		return
 	end
 
 	ULib.addBan( ply:SteamID(), time, reason, ply:Name(), admin )
