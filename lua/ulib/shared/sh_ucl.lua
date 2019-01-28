@@ -208,7 +208,7 @@ local origIsAdmin = meta.IsAdmin
 	Function: Player:IsAdmin
 
 	Overwrite garry's IsAdmin function to check for membership in admin group. This is so if group "serverowner"
-	inherits from superadmin, this function will still return true when checking on a member belonging to the
+	inherits from admin, this function will still return true when checking on a member belonging to the
 	"serverowner" group.
 
 	Returns:
@@ -232,7 +232,7 @@ local origIsSuperAdmin = meta.IsSuperAdmin
 --[[
 	Function: Player:IsSuperAdmin
 
-	Overwrite garry's IsSuperAdmin function to check for membership in admin group. This is so if group "serverowner"
+	Overwrite garry's IsSuperAdmin function to check for membership in superadmin group. This is so if group "serverowner"
 	inherits from superadmin, this function will still return true when checking on a member belonging to the
 	"serverowner" group.
 
