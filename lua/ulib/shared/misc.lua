@@ -325,7 +325,7 @@ function ULib.parseKeyValues( str, convert )
 	end
 
 	if convert and table.Count( current_table ) == 1 and
-		type( current_table.Out ) == "table" then -- If we caught a stupid garry-wrapper
+		istable( current_table.Out ) then -- If we caught a stupid garry-wrapper
 
 		current_table = current_table.Out
 	end
@@ -373,8 +373,13 @@ end
 		v2.10 - Initial (but tastefully stolen from a GM9 version)
 		v2.40 - Increased performance for insanely high table counts.
 ]]
+
+
+--function ULib.checkArg( argnum, fnName, expected, data, throwLevel )
 function ULib.makeKeyValues( t, tab, completed )
-	ULib.checkArg( 1, "ULib.makeKeyValues", "table", t )
+	if not istable(t) then
+		ULib.throwBadArg( 1, "ULib.makeKeyValues", "table", t, 4 )
+	end
 
 	tab = tab or ""
 	completed = completed or {}
@@ -385,13 +390,13 @@ function ULib.makeKeyValues( t, tab, completed )
 
 	for k, v in pairs( t ) do
 		str = str .. tab
-		if type( k ) ~= "number" then
-			str = string.format( "%s%q\t", str, tostring( k ) )
+		if not isnumber(k) then
+			str = string.format( "%s%q\t", str, k)
 		end
 
-		if type( v ) == "table" then
+		if istable( v ) then
 			str = string.format( "%s\n%s{\n%s%s}\n", str, tab, ULib.makeKeyValues( v, tab .. "\t", completed ), tab )
-		elseif type( v ) == "string" then
+		elseif isstring(v) then
 			str = string.format( "%s%q\n", str, v )
 		else
 			str = str .. tostring( v ) .. "\n"
@@ -421,7 +426,7 @@ end
 		v2.40 - Added ability to convert nils and bools.
 ]]
 function ULib.toBool( x )
-	if type( x ) == "boolean" then return x end
+	if isbool(x) then return x end
 	if x == nil then return false end
 
 	if tonumber( x ) ~= nil then
@@ -446,7 +451,7 @@ local function navigateUpTo(currentPointer, tableCrumbs)
 	for i=1, #tableCrumbs-1 do
 		local nextTableName = tableCrumbs[i]
 		currentPointer = currentPointer[ nextTableName ]
-		if type(currentPointer) ~= "table" then return false end -- Not found
+		if not istable(currentPointer) then return false end -- Not found
 	end
 	return true, currentPointer
 end
@@ -609,7 +614,7 @@ end
 ]]
 function ULib.checkArg( argnum, fnName, expected, data, throwLevel )
 	throwLevel = throwLevel or 4
-	if type( expected ) == "string" then
+	if isstring(expected) then
 		if type( data ) == expected then
 			return
 		else
@@ -729,7 +734,7 @@ end
 		v2.60 - Renamed function from "stringTimeToSeconds" to "stringTimeToMinutes", because I am dumb
 ]]
 function ULib.stringTimeToMinutes( str )
-	if str == nil or type( str ) == "number" then
+	if str == nil or isnumber(str) then
 		return str
 	end
 
@@ -1004,14 +1009,14 @@ function root_class:isa( target_class )
 end
 
 function isClass( obj )
-	return type( obj ) == "table" and type( obj.isa ) == "function" and obj:isa( root_class )
+	return istable(obj) and isfunction( obj.isa ) and obj:isa( root_class )
 end
 
 
 -- This wonderful bit of following code will make sure that no rogue coder can screw us up by changing the value of '_'
 _ = nil -- Make sure we're starting out right.
 local meta = getmetatable( _G ) or {}
-if type( meta ) == "boolean" then return end -- Metatable is protected, so we aren't able to run this code without erroring.
+if isbool(meta) then return end -- Metatable is protected, so we aren't able to run this code without erroring.
 local old__newindex = meta.__newindex
 setmetatable( _G, meta )
 function meta.__newindex( t, k, v )

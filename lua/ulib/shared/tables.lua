@@ -13,7 +13,7 @@ local metatable_cache = setmetatable( {}, { __mode = "k" } )
 local function make_getter( real_table )
 	local function getter( dummy, key )
 		local ret = real_table[ key ]
-		if type( ret ) == "table" and not metatable_cache[ ret ] then
+		if istable( ret ) and not metatable_cache[ ret ] then
 			ret = ULib.makeReadOnly( ret )
 		end
 		return ret
@@ -31,10 +31,10 @@ local function make_pairs( real_table )
 		local function nexter() -- both args dummy
 			key, value = next( real_table, cur_key )
 			cur_key = key
-			if type( key ) == "table" and not metatable_cache[ key ] then
+			if istable( key ) and not metatable_cache[ key ] then
 				key = ULib.makeReadOnly( key )
 			end
-			if type( value ) == "table" and not metatable_cache[ value ] then
+			if istable( value ) and not metatable_cache[ value ] then
 				value = ULib.makeReadOnly( value )
 			end
 			return key, value

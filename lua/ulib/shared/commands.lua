@@ -639,7 +639,7 @@ function cmds.PlayersArg:parseAndValidate( ply, arg, cmdInfo, plyRestrictions )
 	local return_value, err_msg = hook.Call( ULib.HOOK_PLAYER_TARGETS, _, ply, cmdInfo.cmd, targets )
 	if return_value == false then
 		return nil, err_msg or "you cannot target this person or these persons"
-	elseif type( return_value ) == "table" then
+	elseif istable( return_value ) then
 		if #return_value == 0 then
 			return nil, err_msg or "you cannot target this person or these persons"
 		else
@@ -1517,7 +1517,7 @@ function cmds.addCommand( cmd, fn, autocomplete, access_string, say_cmd, hide_sa
 	concommand.Add( prefix, routedCommandCallback, autocompleteCallback )
 
 	if SERVER and say_cmd then
-		if type( say_cmd ) == "string" then say_cmd = { say_cmd } end
+		if isstring( say_cmd ) then say_cmd = { say_cmd } end
 
 		for i=1, #say_cmd do
 			local t = {}

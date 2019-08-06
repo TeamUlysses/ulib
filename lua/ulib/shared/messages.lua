@@ -104,7 +104,7 @@ local function tsayColorCallback( ply, ... )
 			umsg.Char( #chunk )
 			for i=1, #chunk do
 				local arg = chunk[ i ]
-				if type( arg ) == "string" then
+				if isstring( arg ) then
 					umsg.Bool( true )
 					umsg.String( arg )
 				else

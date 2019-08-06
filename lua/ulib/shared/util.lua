@@ -493,7 +493,7 @@ end
 		v2.40 - Initial (But dragged over from UPS).
 ]]
 function ULib.queueFunctionCall( fn, ... )
-	if type( fn ) ~= "function" then
+	if not isfunction( fn ) then
 		error( "queueFunctionCall received a bad function", 2 )
 		return
 	end
@@ -518,7 +518,7 @@ end
 ]]
 function ULib.namedQueueFunctionCall( queueName, fn, ... )
 	queueName = queueName or "defaultQueueName"
-	if type( fn ) ~= "function" then
+	if not isfunction( fn ) then
 		error( "queueFunctionCall received a bad function", 2 )
 		return
 	end

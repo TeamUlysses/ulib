@@ -152,18 +152,18 @@ local function reloadGroups()
 		-- Check to make sure it passes a basic validity test
 		ucl.groups[ ULib.ACCESS_ALL ].inherit_from = nil -- Ensure this is the case
 		for groupName, groupInfo in pairs( ucl.groups ) do
-			if type( groupName ) ~= "string" then
+			if not isstring( groupName ) then
 				needsBackup = true
 				ucl.groups[ groupName ] = nil
 			else
 
-				if type( groupInfo ) ~= "table" then
+				if not istable( groupInfo ) then
 					needsBackup = true
 					groupInfo = {}
 					ucl.groups[ groupName ] = groupInfo
 				end
 
-				if type( groupInfo.allow ) ~= "table" then
+				if not istable( groupInfo.allow ) then
 					needsBackup = true
 					groupInfo.allow = {}
 				end
@@ -190,7 +190,7 @@ local function reloadGroups()
 
 				-- Lower case'ify
 				for k, v in pairs( groupInfo.allow ) do
-					if type( k ) == "string" and k:lower() ~= k then
+					if isstring( k ) and k:lower() ~= k then
 						groupInfo.allow[ k:lower() ] = v
 						groupInfo.allow[ k ] = nil
 					else
@@ -232,33 +232,33 @@ local function reloadUsers()
 
 	else
 		for id, userInfo in pairs( ucl.users ) do
-			if type( id ) ~= "string" then
+			if not isstring( id ) then
 				needsBackup = true
 				ucl.users[ id ] = nil
 			else
 
-				if type( userInfo ) ~= "table" then
+				if not istable( userInfo ) then
 					needsBackup = true
 					userInfo = {}
 					ucl.users[ id ] = userInfo
 				end
 
-				if type( userInfo.allow ) ~= "table" then
+				if not istable( userInfo.allow ) then
 					needsBackup = true
 					userInfo.allow = {}
 				end
 
-				if type( userInfo.deny ) ~= "table" then
+				if not istable( userInfo.deny ) then
 					needsBackup = true
 					userInfo.deny = {}
 				end
 
-				if userInfo.group and type( userInfo.group ) ~= "string" then
+				if userInfo.group and not isstring( userInfo.group ) then
 					needsBackup = true
 					userInfo.group = nil
 				end
 
-				if userInfo.name and type( userInfo.name ) ~= "string" then
+				if userInfo.name and not isstring( userInfo.name ) then
 					needsBackup = true
 					userInfo.name = nil
 				end
@@ -267,7 +267,7 @@ local function reloadUsers()
 
 				-- Lower case'ify
 				for k, v in pairs( userInfo.allow ) do
-					if type( k ) == "string" and k:lower() ~= k then
+					if isstring( k ) and k:lower() ~= k then
 						userInfo.allow[ k:lower() ] = v
 						userInfo.allow[ k ] = nil
 					else
@@ -276,7 +276,7 @@ local function reloadUsers()
 				end
 
 				for k, v in ipairs( userInfo.deny ) do
-					if type( k ) == "string" and type( v ) == "string" then -- This isn't allowed here
+					if isstring( k ) and isstring( v ) then -- This isn't allowed here
 						table.insert( userInfo.deny, k )
 						userInfo.deny[ k ] = nil
 					else
@@ -370,7 +370,7 @@ function ucl.groupAllow( name, access, revoke )
 	ULib.checkArg( 2, "ULib.ucl.groupAllow", {"string","table"}, access )
 	ULib.checkArg( 3, "ULib.ucl.groupAllow", {"nil","boolean"}, revoke )
 
-	if type( access ) == "string" then access = { access } end
+	if isstring( access ) then access = { access } end
 	if not ucl.groups[ name ] then return error( "Group does not exist for changing access (" .. name .. ")", 2 ) end
 
 	local allow = ucl.groups[ name ].allow
@@ -379,7 +379,7 @@ function ucl.groupAllow( name, access, revoke )
 	for k, v in pairs( access ) do
 		local access = v:lower()
 		local accesstag
-		if type( k ) == "string" then
+		if isstring( k ) then
 			accesstag = v
 			access = k:lower()
 		end
@@ -783,7 +783,7 @@ function ucl.userAllow( id, access, revoke, deny )
 	ULib.checkArg( 4, "ULib.ucl.userAllow", {"nil","boolean"}, deny )
 
 	id = id:upper() -- In case of steamid, needs to be upper case
-	if type( access ) == "string" then access = { access } end
+	if isstring( access ) then access = { access } end
 
 	local uid = id
 	if not ucl.authed[ uid ] then -- Check to see if it's a steamid or IP
@@ -819,7 +819,7 @@ function ucl.userAllow( id, access, revoke, deny )
 	for k, v in pairs( access ) do
 		local access = v:lower()
 		local accesstag
-		if type( k ) == "string" then
+		if isstring( k ) then
 			access = k:lower()
 			if not revoke and not deny then -- Not valid to have accessTags unless this is the case
 				accesstag = v
@@ -967,7 +967,7 @@ function ucl.registerAccess( access, groups, comment, category )
 	access = access:lower()
 	comment = comment or ""
 	if groups == nil then groups = {} end
-	if type( groups ) == "string" then
+	if isstring( groups ) then
 		groups = { groups }
 	end
 
