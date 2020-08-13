@@ -373,6 +373,25 @@ end
 		v2.10 - Initial (but tastefully stolen from a GM9 version)
 		v2.40 - Increased performance for insanely high table counts.
 ]]
+function ULib.jsonEncode( t, compress )
+    local data = util.TableToJSON( t )
+    if compress then
+        data = util.Compress( data )
+    end
+    return data
+end
+
+function ULib.jsonDecode( data, compressed )
+    if not data then return end
+    if compressed then
+        data = util.Decompress( data ) or ""
+        if data == "" then
+           return
+        end
+    end
+    return util.JSONToTable( data )
+end
+
 function ULib.makeKeyValues( t, tab, completed )
 	ULib.checkArg( 1, "ULib.makeKeyValues", "table", t )
 

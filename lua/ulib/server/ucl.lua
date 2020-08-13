@@ -115,7 +115,7 @@ function ucl.saveUsers()
 		table.sort( userInfo.deny )
 	end
 
-	ULib.fileWrite( ULib.UCL_USERS, ULib.makeKeyValues( ucl.users ) )
+	ULib.fileWrite( ULib.UCL_USERS, ULib.jsonEncode( ucl.users, true ) )
 end
 
 local function reloadGroups()
@@ -221,8 +221,15 @@ local function reloadUsers()
 	end
 
 	local needsBackup = false
-	local err
-	ucl.users, err = ULib.parseKeyValues( ULib.removeCommentHeader( ULib.fileRead( path, true ) or "", "/" ) )
+
+    local err
+    local userData = ULib.fileRead( path, true ) or ""
+
+    ucl.users = ULib.jsonDecode( userData, true )
+
+    if not ucl.users then
+	    ucl.users, err = ULib.parseKeyValues( ULib.removeCommentHeader( userData, "/" ) )
+    end
 
 	-- Check to make sure it passes a basic validity test
 	if not ucl.users then
