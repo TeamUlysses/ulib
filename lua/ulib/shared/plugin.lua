@@ -165,8 +165,7 @@ local function httpCheck( body, len, headers, httpCode )
 		return
 	end
 
-	timer.Remove( "ULibPluginUpdateChecker" )
-	hook.Remove( "Initialize", "ULibPluginUpdateChecker" )
+	hook.Remove( "PlayerConnect", "ULibPluginUpdateChecker" )
 
 	-- Okay, the HTTP library is functional and we can reach out. Let's check for updates.
 	for name, plugin in pairs (ULib.plugins) do
@@ -178,8 +177,7 @@ end
 
 local function httpErr()
 	-- Assume major problem and give up
-	timer.Remove( "ULibPluginUpdateChecker" )
-	hook.Remove( "Initialize", "ULibPluginUpdateChecker" )
+	hook.Remove( "PlayerConnect", "ULibPluginUpdateChecker" )
 end
 
 local function downloadForUlibUpdateCheck()
@@ -187,6 +185,5 @@ local function downloadForUlibUpdateCheck()
 end
 
 if ULib.AUTOMATIC_UPDATE_CHECKS then
-	hook.Add( "Initialize", "ULibPluginUpdateChecker", downloadForUlibUpdateCheck )
-	timer.Create( "ULibPluginUpdateChecker", 9, 10, downloadForUlibUpdateCheck )
+	hook.Add( "PlayerConnect", "ULibPluginUpdateChecker", downloadForUlibUpdateCheck )
 end
