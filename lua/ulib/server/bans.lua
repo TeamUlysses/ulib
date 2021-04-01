@@ -192,9 +192,6 @@ function ULib.addBan( steamid, time, reason, name, admin )
 		ULib.kick( ply, longReason, nil, true)
 	end
 
-	-- Remove all semicolons from the reason to prevent command injection
-	shortReason = string.gsub(shortReason, ";", "")
-
 	-- This redundant kick is to ensure they're kicked -- even if they're joining
 	RunConsoleCommand("kickid", steamid, shortReason or "")
 
