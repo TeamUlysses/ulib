@@ -21,41 +21,6 @@ ULib.DEFAULT_TSAY_COLOR = Color( 151, 211, 255 ) -- Found by using MS Paint
 
 
 --[[
-	Section: Umsg Helpers
-
-	These are ids for the ULib umsg functions, so the client knows what they're getting.
-]]
-ULib.TYPE_ANGLE = 1
-ULib.TYPE_BOOLEAN = 2
-ULib.TYPE_CHAR = 3
-ULib.TYPE_ENTITY = 4
-ULib.TYPE_FLOAT = 5
-ULib.TYPE_LONG = 6
-ULib.TYPE_SHORT = 7
-ULib.TYPE_STRING = 8
-ULib.TYPE_VECTOR = 9
--- These following aren't actually datatypes, we handle them ourselves
-ULib.TYPE_TABLE_BEGIN = 10
-ULib.TYPE_TABLE_END = 11
-ULib.TYPE_NIL = 12
-
-ULib.RPC_UMSG_NAME = "URPC"
-
-ULib.TYPE_SIZE = {
-	[ULib.TYPE_ANGLE] = 12, -- 3 floats
-	[ULib.TYPE_BOOLEAN] = 1,
-	[ULib.TYPE_CHAR] = 1,
-	[ULib.TYPE_ENTITY] = 4, -- Found through trial and error
-	[ULib.TYPE_FLOAT] = 4,
-	[ULib.TYPE_LONG] = 4,
-	[ULib.TYPE_SHORT] = 2,
-	[ULib.TYPE_VECTOR] = 12, -- 3 floats
-	[ULib.TYPE_NIL] = 0, -- Not technically a type but we handle it anyways
-}
-
-ULib.MAX_UMSG_BYTES = 255
-
---[[
 	Section: Hooks
 
 	These are the hooks that ULib has created that other modders are free to make use of.
@@ -499,4 +464,9 @@ end
 ]]
 if SERVER then
 	util.AddNetworkString( "URPC" )
+	util.AddNetworkString( "tsayc" )
+	util.AddNetworkString( "ulib_repWriteCvar" )
+	util.AddNetworkString( "ulib_repChangeCvar" )
+	
+	
 end
