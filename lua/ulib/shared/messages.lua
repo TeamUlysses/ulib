@@ -99,45 +99,54 @@ local function tsayColorCallback( ply, ... )
 
 	for chunk_num=1, #chunks do
 		local chunk = chunks[ chunk_num ]
-		umsg.Start( "tsayc", ply )
-			umsg.Bool( chunk_num == #chunks )
-			umsg.Char( #chunk )
+		
+		net.Start("tsayc")
+			net.WriteBool(chunk_num == #chunks)
+			net.WriteInt( #chunk, 8 )
 			for i=1, #chunk do
 				local arg = chunk[ i ]
 				if type( arg ) == "string" then
-					umsg.Bool( true )
-					umsg.String( arg )
+					net.WriteBool( true )
+					net.WriteString( arg )
 				else
-					umsg.Bool( false )
-					umsg.Char( arg.r - 128 )
-					umsg.Char( arg.g - 128 )
-					umsg.Char( arg.b - 128 )
+					net.WriteBool( false )
+					net.WriteColor( arg )
 				end
 			end
-		umsg.End()
+		
+		
+		if IsValid(ply) then
+			net.Send(ply)
+		else
+			net.Broadcast()
+		end
+
 	end
 end
 
 if CLIENT then
-local accumulator = {}
 
-local function tsayColorHook( um )
-	local last = um:ReadBool()
-	local argn = um:ReadChar()
-	for i=1, argn do
-		if um:ReadBool() then
-			table.insert( accumulator, um:ReadString() )
-		else
-			table.insert( accumulator, Color( um:ReadChar() + 128, um:ReadChar() + 128, um:ReadChar() + 128) )
+	local accumulator = {}
+
+	net.Receive( "tsayc", function( len )
+
+		local last = net.ReadBool()
+		local argn = net.ReadInt(8)
+		for i=1, argn do
+			if net.ReadBool() then
+				table.insert( accumulator, net.ReadString() )
+			else
+				table.insert( accumulator, net.ReadColor() )
+			end
 		end
-	end
+		
+		if last then
+			chat.AddText( unpack( accumulator ) )
+			accumulator = {}
+		end
 
-	if last then
-		chat.AddText( unpack( accumulator ) )
-		accumulator = {}
-	end
-end
-usermessage.Hook( "tsayc", tsayColorHook )
+	end )
+
 end
 
 
