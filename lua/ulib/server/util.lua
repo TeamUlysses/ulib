@@ -36,75 +36,6 @@ function ULib.clientRPC( plys, fn, ... )
 	end
 end
 
-
---[[
-	Function: umsgSend
-
-	Makes sending umsgs a blast. You don't have to bother knowing what type you're sending, just use ULib.umsgRcv() on the client.
-	Note that while you can send tables with this function, you're limited by the max umsg size. If you're sending a large amount of data,
-	consider using <clientRPC()> instead.
-
-	Parameters:
-
-		v - The value to send.
-		queue - *(For use by <clientRPC()> ONLY)* A boolean of whether the messages should be queued with RPC or not.
-]]
-function ULib.umsgSend( v, queue )
-	local tv = type( v )
-	local function call( fn, ... )
-		if queue then
-			queueRPC( fn, ... )
-		else
-			fn( ... )
-		end
-	end
-
-	if tv == "string" then
-		call( umsg.Char, ULib.TYPE_STRING )
-		call( umsg.String, v )
-	elseif tv == "number" then
-		if math.fmod( v, 1 ) ~= 0 then -- It's a float
-			call( umsg.Char, ULib.TYPE_FLOAT )
-			call( umsg.Float, v )
-		else
-			if v <= 127 and v >= -127 then
-				call( umsg.Char, ULib.TYPE_CHAR )
-				call( umsg.Char, v )
-			elseif v < 32767 and v > -32768 then
-				call( umsg.Char, ULib.TYPE_SHORT )
-				call( umsg.Short, v )
-			else
-				call( umsg.Char, ULib.TYPE_LONG )
-				call( umsg.Long, v )
-			end
-		end
-	elseif tv == "boolean" then
-		call( umsg.Char, ULib.TYPE_BOOLEAN )
-		call( umsg.Bool, v )
-	elseif tv == "Entity" or tv == "Player" then
-		call( umsg.Char, ULib.TYPE_ENTITY )
-		call( umsg.Entity, v )
-	elseif tv == "Vector" then
-		call( umsg.Char, ULib.TYPE_VECTOR )
-		call( umsg.Vector, v )
-	elseif tv == "Angle" then
-		call( umsg.Char, ULib.TYPE_ANGLE )
-		call( umsg.Angle, v )
-	elseif tv == "table" then
-		call( umsg.Char, ULib.TYPE_TABLE_BEGIN )
-		for key, value in pairs( v ) do
-			ULib.umsgSend( key, queue )
-			ULib.umsgSend( value, queue )
-		end
-		call( umsg.Char, ULib.TYPE_TABLE_END )
-	elseif tv == "nil" then
-		call( umsg.Char, ULib.TYPE_NIL )
-	else
-		ULib.error( "Unknown type passed to umsgSend -- " .. tv )
-	end
-end
-
-
 --[[
 	Function: play3DSound
 
@@ -192,13 +123,14 @@ function ULib.replicatedWritableCvar( sv_cvar, cl_cvar, default_value, save, not
 	end
 
 	local cvar_obj = GetConVar( sv_cvar ) or CreateConVar( sv_cvar, default_value, flags )
-
-	umsg.Start( "ulib_repWriteCvar" ) -- Send to everyone connected
-		umsg.String( sv_cvar )
-		umsg.String( cl_cvar )
-		umsg.String( default_value )
-		umsg.String( cvar_obj:GetString() )
-	umsg.End()
+	
+	
+	net.Start("ulib_repWriteCvar")
+		net.WriteString( sv_cvar )
+		net.WriteString( cl_cvar )
+		net.WriteString( default_value )
+		net.WriteString( cvar_obj:GetString() )
+	net.Broadcast()
 
 	repcvars[ sv_cvar ] = { access=access, default=default_value, cl_cvar=cl_cvar, cvar_obj=cvar_obj }
 	cvars.AddChangeCallback( sv_cvar, repCvarServerChanged )
@@ -210,12 +142,14 @@ end
 
 local function repCvarOnJoin( ply )
 	for sv_cvar, v in pairs( repcvars ) do
-		umsg.Start( "ulib_repWriteCvar", ply )
-			umsg.String( sv_cvar )
-			umsg.String( v.cl_cvar )
-			umsg.String( v.default )
-			umsg.String( v.cvar_obj:GetString() )
-		umsg.End()
+	
+		net.Start("ulib_repWriteCvar")
+			net.WriteString( sv_cvar )
+			net.WriteString( v.cl_cvar )
+			net.WriteString( v.default )
+			net.WriteString( v.cvar_obj:GetString() )
+		net.Send( ply )
+		
 	end
 end
 hook.Add( ULib.HOOK_LOCALPLAYERREADY, "ULibSendCvars", repCvarOnJoin )
@@ -237,12 +171,12 @@ local function clientChangeCvar( ply, command, argv )
 	local access = repcvars[ sv_cvar ].access
 	if not ply:query( access ) then
 		ULib.tsayError( ply, "You do not have access to this cvar (" .. sv_cvar .. "), " .. ply:Nick() .. "." )
-		umsg.Start( "ulib_repChangeCvar", ply )
-			umsg.Entity( ply )
-			umsg.String( repcvars[ sv_cvar ].cl_cvar )
-			umsg.String( oldvalue )
-			umsg.String( oldvalue ) -- No change
-		umsg.End()
+		net.Start( "ulib_repChangeCvar" )
+			net.WriteEntity( ply )
+			net.WriteString( repcvars[ sv_cvar ].cl_cvar )
+			net.WriteString( oldvalue )
+			net.WriteString( oldvalue ) -- No change
+		net.Send( ply )
 		return
 	end
 
@@ -258,13 +192,13 @@ repCvarServerChanged = function( sv_cvar, oldvalue, newvalue )
 	if not repcvars[ sv_cvar ] then -- Bad value or we need to ignore it
 		return
 	end
-
-	umsg.Start( "ulib_repChangeCvar" ) -- Tell clients to reset to new value
-		umsg.Entity( repcvars[ sv_cvar ].ignore or Entity( 0 ) )
-		umsg.String( repcvars[ sv_cvar ].cl_cvar )
-		umsg.String( oldvalue )
-		umsg.String( newvalue )
-	umsg.End()
+	
+	net.Start( "ulib_repChangeCvar" ) -- Tell clients to reset to new value
+		net.WriteEntity( repcvars[ sv_cvar ].ignore or Entity( 0 ) )
+		net.WriteString( repcvars[ sv_cvar ].cl_cvar )
+		net.WriteString( oldvalue )
+		net.WriteString( newvalue )
+	net.Broadcast()
 
 	if repcvars[ sv_cvar ].ignore then
 		repcvars[ sv_cvar ].ignore = nil
