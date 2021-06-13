@@ -300,7 +300,7 @@ local function reloadUsers()
 
 	local needsBackup = false
 	local err
-	ucl.users, err = ULib.parseKeyValues( ULib.removeCommentHeader( ULib.fileRead( path, true ) or "", "/" ) )
+	ucl.users, err = ULib.parseKeyValues( ULib.removeCommentHeader( ULib.fileRead( path, noMount ) or "", "/" ) )
 
 	-- Check to make sure it passes a basic validity test
 	if not ucl.users then
