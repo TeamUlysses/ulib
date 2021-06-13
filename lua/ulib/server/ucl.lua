@@ -145,7 +145,7 @@ function ucl.saveUser(steamid, userInfo)
 		REPLACE INTO ulib_users
 			(steamid, name, usergroup, allow, deny)
 		VALUES
-			("%s", "%s", "%s", "%s", "%s");
+			('%s', '%s', '%s', '%s', '%s');
 	]], escape(steamid), escape(userInfo.name), escape(userInfo.group), escape(allow), escape(deny)))
 end
 
