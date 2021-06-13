@@ -162,6 +162,10 @@ function ucl.deleteUser( steamid )
 	]], escape( steamid )))
 end
 
+function ucl.deleteUsers()
+	sql.Query([[DELETE FROM ulib_users;]])
+end
+
 local function reloadGroups()
 	-- Try to read from the safest locations first
 	local noMount = true
