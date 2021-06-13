@@ -153,6 +153,15 @@ function ucl.saveUser( steamid, userInfo )
 	]], escape( steamid ), escape( userInfo.name or "" ), escape( userInfo.group ), escape( allow ), escape( deny )))
 end
 
+function ucl.deleteUser( steamid )
+	sql.Query(string.format([[
+		DELETE FROM
+			ulib_users
+		WHERE
+			steamid = '%s'
+	]], escape( steamid )))
+end
+
 local function reloadGroups()
 	-- Try to read from the safest locations first
 	local noMount = true
