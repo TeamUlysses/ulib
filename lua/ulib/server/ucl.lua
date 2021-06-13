@@ -113,8 +113,6 @@ function ucl.saveUsers()
 	for steamid, userInfo in pairs( ucl.users ) do
 		ucl.saveUser(steamid, userInfo)
 	end
-
-	ULib.fileWrite( ULib.UCL_USERS, ULib.makeKeyValues( ucl.users ) )
 end
 
 local isFirstTimeDBSetup = false
