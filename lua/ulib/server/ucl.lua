@@ -117,6 +117,7 @@ function ucl.saveUsers()
 	ULib.fileWrite( ULib.UCL_USERS, ULib.makeKeyValues( ucl.users ) )
 end
 
+local isFirstTimeDBSetup = false
 function ucl.generateUserDB()
 	if not sql.TableExists("ulib_users") then
 		sql.Query([[
@@ -128,6 +129,7 @@ function ucl.generateUserDB()
 				deny TEXT
 			);
 		]])
+		isFirstTimeDBSetup = true
 	end
 end
 ucl.generateUserDB()
@@ -281,11 +283,14 @@ end
 
 local function reloadUsers()
 	-- Start by trying to read from the DB.
-	ucl.users = loadUsersFromDB()
-	if ucl.users then
-		-- We've loaded the users, so we don't need to do anything with the legacy file.
-		return
+	if not isFirstTimeDBSetup then
+		ucl.users = loadUsersFromDB()
+		if ucl.users then
+			-- We've loaded the users, so we don't need to do anything with the legacy file.
+			return
+		end
 	end
+	isFirstTimeDBSetup = false
 
 	-- Try to read from the safest locations first
 	local noMount = true
