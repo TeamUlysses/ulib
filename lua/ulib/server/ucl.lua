@@ -110,12 +110,43 @@ function ucl.saveGroups()
 end
 
 function ucl.saveUsers()
-	for _, userInfo in pairs( ucl.users ) do
-		table.sort( userInfo.allow )
-		table.sort( userInfo.deny )
+	for steamid, userInfo in pairs( ucl.users ) do
+		ucl.saveUser(steamid, userInfo)
 	end
 
 	ULib.fileWrite( ULib.UCL_USERS, ULib.makeKeyValues( ucl.users ) )
+end
+
+function ucl.generateUserDB()
+	if not sql.TableExists("ulib_users") then
+		sql.Query([[
+			CREATE TABLE IF NOT EXISTS ulib_users (
+				steamid TEXT NOT NULL PRIMARY KEY,
+				name TEXT,
+				group TEXT NOT NULL DEFAULT "user",
+				allow TEXT,
+				deny TEXT
+			);
+		]])
+	end
+end
+ucl.generateUserDB()
+
+local function escape(str)
+	return sql.SQLStr(str, true)
+end
+
+function ucl.saveUser(steamid, userInfo)
+	table.sort(userInfo.allow)
+	table.sort(userInfo.deny)
+	local allow, deny = ULib.makeKeyValues(userInfo.allow), ULib.makeKeyValues(userInfo.deny)
+
+	sql.Query(string.format([[
+		REPLACE INTO ulib_users
+			(steamid, name, group, allow, deny)
+		VALUES
+			("%s", "%s", "%s", "%s", "%s");
+	]], escape(steamid), escape(userInfo.name), escape(userInfo.group), escape(allow), escape(deny)))
 end
 
 local function reloadGroups()
