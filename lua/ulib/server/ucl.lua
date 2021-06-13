@@ -938,7 +938,26 @@ function ucl.userAllow( id, access, revoke, deny )
 			ULib.queueFunctionCall( hook.Call, ULib.HOOK_UCLAUTH, _, ply ) -- Inform the masses
 		end
 
-		ucl.saveUsers()
+		local saveId
+		if ucl.users[ id ] then
+			saveId = id
+		else
+			local data = ucl.authed[ uid ]
+			for checkId, check in pairs( ucl.users ) do
+				if check == data then
+					saveId = checkId
+					break
+				end
+			end
+		end
+
+		if saveId then
+			ucl.saveUser( id, ucl.users[ id ] )
+		else
+			Msg( "There was an error while changing user access.\n" )
+			Msg( "The user ID could not be found, so the user could not be saved\n" )
+		end
+
 
 		hook.Call( ULib.HOOK_USER_ACCESS_CHANGE, _, id, access, revoke, deny )
 		hook.Call( ULib.HOOK_UCLCHANGED )
@@ -982,18 +1001,18 @@ function ucl.removeUser( id, from_CAMI )
 
 		for _, index in ipairs( checkIndexes ) do
 			if ucl.users[ index ] then
-				changed = true
+				changed = index
 				ucl.users[ index ] = nil
 				break -- Only match the first one
 			end
 		end
 	else
-		changed = true
+		changed = id
 		ucl.users[ id ] = nil
 	end
 
 	if changed then -- If the user is only added to the default garry file, then nothing changed
-		ucl.saveUsers()
+		ucl.deleteUser( changed )
 		hook.Call( ULib.HOOK_USER_REMOVED, _, id, userInfo )
 	end
 
@@ -1105,7 +1124,9 @@ function ucl.probe( ply )
 
 			-- Update their name
 			ucl.authed[ uid ].name = ply:Nick()
-			ucl.saveUsers()
+
+			local sid = ply:SteamID()
+			ucl.saveUser( sid )
 
 			match = true
 			break
