@@ -284,32 +284,38 @@ local function loadUsersFromDB()
 end
 
 local function reloadUsers()
+	local runningFromDB = false
+	local needsBackup = false
+	local err
+
 	-- Start by trying to read from the DB.
 	if not isFirstTimeDBSetup then
 		ucl.users = loadUsersFromDB()
 		if ucl.users then
-			-- We've loaded the users, so we don't need to do anything with the legacy file.
-			return
+			runningFromDB = true
 		end
 	end
 
 	-- Next, read from the users file.
-	local noMount = true
-	local path = ULib.UCL_USERS
-	if not ULib.fileExists( path, noMount ) then
-		ULib.fileWrite( path, "" )
-	end
+	if not runningFromDB then
+		local noMount = true
+		local path = ULib.UCL_USERS
 
-	local needsBackup = false
-	local err
-	ucl.users, err = ULib.parseKeyValues( ULib.removeCommentHeader( ULib.fileRead( path, noMount ) or "", "/" ) )
+		if not ULib.fileExists( path, noMount ) then
+			ULib.fileWrite( path, "" )
+		end
+
+		ucl.users, err = ULib.parseKeyValues( ULib.removeCommentHeader( ULib.fileRead( path, noMount ) or "", "/" ) )
+	end
 
 	-- Check to make sure it passes a basic validity test
 	if not ucl.users then
 		needsBackup = true
 		-- Totally messed up! Clear it.
 		ucl.users = {}
-
+		if runningFromDB then
+			ucl.deleteUsers()
+		end
 	else
 		for id, userInfo in pairs( ucl.users ) do
 			if type( id ) ~= "string" then
@@ -368,15 +374,18 @@ local function reloadUsers()
 	end
 
 	if needsBackup then
-		Msg( "Users file was not formatted correctly. Attempting to fix and backing up original\n" )
-		if err then
-			Msg( "Error while reading users file was: " .. err .. "\n" )
+		if runningFromDB then
+			Msg( "There was bad data returned from the database. Attempting to fix, though some data may be lost.\n" )
+			ucl.deleteUsers()
+		else
+			Msg( "Users file was not formatted correctly. Attempting to fix and backing up original\n" )
+			if err then
+				Msg( "Error while reading users file was: " .. err .. "\n" )
+			end
+			Msg( "Original file was backed up to " .. ULib.backupFile( ULib.UCL_USERS ) .. "\n" )
 		end
-		Msg( "Original file was backed up to " .. ULib.backupFile( ULib.UCL_USERS ) .. "\n" )
 		ucl.saveUsers()
-	end
-
-	if isFirstTimeDBSetup then
+	elseif isFirstTimeDBSetup then
 		isFirstTimeDBSetup = false
 		Msg( "Migrating users file to users database.\n" )
 		ucl.saveUsers()
