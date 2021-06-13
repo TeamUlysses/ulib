@@ -118,7 +118,7 @@ function ucl.saveUsers()
 end
 
 local isFirstTimeDBSetup = false
-function ucl.generateUserDB()
+local function generateUserDB()
 	if not sql.TableExists("ulib_users") then
 		sql.Query([[
 			CREATE TABLE IF NOT EXISTS ulib_users (
@@ -132,7 +132,7 @@ function ucl.generateUserDB()
 		isFirstTimeDBSetup = true
 	end
 end
-ucl.generateUserDB()
+generateUserDB()
 
 local function escape(str)
 	return sql.SQLStr(str, true)
