@@ -223,7 +223,7 @@ function meta:IsAdmin()
 	if ucl.groups[ ULib.ACCESS_ADMIN ] then
 		return self:CheckGroup( ULib.ACCESS_ADMIN )
 	else -- Group doesn't exist, fall back on garry's method
-		origIsAdmin( self )
+		return origIsAdmin( self )
 	end
 end
 
@@ -248,7 +248,7 @@ function meta:IsSuperAdmin()
 	if ucl.groups[ ULib.ACCESS_SUPERADMIN ] then
 		return self:CheckGroup( ULib.ACCESS_SUPERADMIN )
 	else -- Group doesn't exist, fall back on garry's method
-		origIsSuperAdmin( self )
+		return origIsSuperAdmin( self )
 	end
 end
 
