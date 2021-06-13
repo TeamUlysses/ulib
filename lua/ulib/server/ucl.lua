@@ -145,7 +145,7 @@ function ucl.saveUser( steamid, userInfo )
 
 	table.sort( userInfo.allow )
 	table.sort( userInfo.deny )
-	local allow, deny = ULib.makeKeyValues( userInfo.allow ), ULib.makeKeyValues( userInfo.deny )
+	local allow, deny = util.TableToJSON( userInfo.allow ), util.TableToJSON( userInfo.deny )
 
 	sql.Query(string.format([[
 		REPLACE INTO ulib_users
@@ -275,7 +275,7 @@ local function loadUsersFromDB()
 
 	local out = {}
 	for _, row in ipairs(users) do
-		out[row.steamid] = {name = row.name, group = row.usergroup, allow = ULib.parseKeyValues(row.allow) or {}, deny = ULib.parseKeyValues(row.deny) or {}}
+		out[row.steamid] = {name = row.name, group = row.usergroup, allow = util.JSONToTable(row.allow) or {}, deny = util.JSONToTable(row.deny) or {}}
 	end
 
 	return out
