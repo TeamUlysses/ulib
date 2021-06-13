@@ -793,7 +793,7 @@ function ucl.addUser( id, allows, denies, group, from_CAMI )
 	if ucl.users[ id ] and ucl.users[ id ].group then oldgroup = ucl.users[ id ].group end
 	ucl.users[ id ] = { allow=allows, deny=denies, group=group, name=name }
 
-	ucl.saveUsers()
+	ucl.saveUser( id, ucl.users[ id ] )
 
 	local ply = ULib.getPlyByID( id )
 	if ply then
