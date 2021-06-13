@@ -290,7 +290,6 @@ local function reloadUsers()
 			return
 		end
 	end
-	isFirstTimeDBSetup = false
 
 	-- Try to read from the safest locations first
 	local noMount = true
@@ -372,6 +371,12 @@ local function reloadUsers()
 			Msg( "Error while reading users file was: " .. err .. "\n" )
 		end
 		Msg( "Original file was backed up to " .. ULib.backupFile( ULib.UCL_USERS ) .. "\n" )
+		ucl.saveUsers()
+	end
+
+	if isFirstTimeDBSetup then
+		isFirstTimeDBSetup = false
+		Msg( "Migrating users file to users database.\n" )
 		ucl.saveUsers()
 	end
 end
