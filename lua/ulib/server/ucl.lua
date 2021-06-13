@@ -122,8 +122,8 @@ function ucl.generateUserDB()
 		sql.Query([[
 			CREATE TABLE IF NOT EXISTS ulib_users (
 				steamid TEXT NOT NULL PRIMARY KEY,
-				name TEXT,
-				group TEXT NOT NULL DEFAULT "user",
+				name TEXT NULL,
+				usergroup TEXT NOT NULL DEFAULT "user",
 				allow TEXT,
 				deny TEXT
 			);
@@ -143,7 +143,7 @@ function ucl.saveUser(steamid, userInfo)
 
 	sql.Query(string.format([[
 		REPLACE INTO ulib_users
-			(steamid, name, group, allow, deny)
+			(steamid, name, usergroup, allow, deny)
 		VALUES
 			("%s", "%s", "%s", "%s", "%s");
 	]], escape(steamid), escape(userInfo.name), escape(userInfo.group), escape(allow), escape(deny)))
