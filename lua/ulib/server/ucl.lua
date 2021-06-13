@@ -136,17 +136,21 @@ local function escape(str)
 	return sql.SQLStr(str, true)
 end
 
-function ucl.saveUser(steamid, userInfo)
-	table.sort(userInfo.allow)
-	table.sort(userInfo.deny)
-	local allow, deny = ULib.makeKeyValues(userInfo.allow), ULib.makeKeyValues(userInfo.deny)
+function ucl.saveUser( steamid, userInfo )
+	if not userInfo then
+		userInfo = ucl.users[ steamid ]
+	end
+
+	table.sort( userInfo.allow )
+	table.sort( userInfo.deny )
+	local allow, deny = ULib.makeKeyValues( userInfo.allow ), ULib.makeKeyValues( userInfo.deny )
 
 	sql.Query(string.format([[
 		REPLACE INTO ulib_users
 			(steamid, name, usergroup, allow, deny)
 		VALUES
 			('%s', '%s', '%s', '%s', '%s');
-	]], escape(steamid), escape(userInfo.name), escape(userInfo.group), escape(allow), escape(deny)))
+	]], escape( steamid ), escape( userInfo.name or "" ), escape( userInfo.group ), escape( allow ), escape( deny )))
 end
 
 local function reloadGroups()
