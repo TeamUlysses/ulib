@@ -784,7 +784,7 @@ function ucl.addUser( id, allows, denies, group, from_CAMI )
 	if denies == ULib.DEFAULT_GRANT_ACCESS.deny then denies = table.Copy( denies ) end -- Otherwise we'd be changing all guest access
 	if group and not ucl.groups[ group ] then return error( "Group does not exist for adding user to (" .. group .. ")", 2 ) end
 
-	-- Lower case'ify
+	-- This doesn't do anything?
 	for k, v in ipairs( allows ) do allows[ k ] = v end
 	for k, v in ipairs( denies ) do denies[ k ] = v end
 
