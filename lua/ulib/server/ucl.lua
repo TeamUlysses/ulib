@@ -291,7 +291,7 @@ local function reloadUsers()
 		end
 	end
 
-	-- Try to read from the safest locations first
+	-- Next, read from the users file.
 	local noMount = true
 	local path = ULib.UCL_USERS
 	if not ULib.fileExists( path, noMount ) then
