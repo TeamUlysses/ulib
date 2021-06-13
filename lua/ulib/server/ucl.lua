@@ -243,7 +243,37 @@ local function reloadGroups()
 end
 reloadGroups()
 
+local function loadUsersFromDB()
+	-- No cap, the sqlite errors should always be reset when making a new query.
+	sql.m_strError = nil
+	local users = sql.Query( "SELECT * FROM ulib_users;" )
+	if not users then
+		local err = sql.LastError()
+		if err then
+			Msg( "The users database failed to load.\n" )
+			Msg( "Error while querying database was: " .. err .. "\n" )
+			return false
+		else
+			return {}
+		end
+	end
+
+	local out = {}
+	for _, row in ipairs(users) do
+		out[row.steamid] = {name = row.name, group = row.usergroup, allow = ULib.parseKeyValues(row.allow) or {}, deny = ULib.parseKeyValues(row.deny) or {}}
+	end
+
+	return out
+end
+
 local function reloadUsers()
+	-- Start by trying to read from the DB.
+	ucl.users = loadUsersFromDB()
+	if ucl.users then
+		-- We've loaded the users, so we don't need to do anything with the legacy file.
+		return
+	end
+
 	-- Try to read from the safest locations first
 	local noMount = true
 	local path = ULib.UCL_USERS
