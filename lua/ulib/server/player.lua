@@ -210,10 +210,13 @@ end
 function ULib.getSpawnInfo( ply )
 	local t = {}
 	ply.ULibSpawnInfo = t
+
 	t.health = ply:Health()
 	t.armor = ply:Armor()
-	if ply:GetActiveWeapon():IsValid() then
-		t.curweapon = ply:GetActiveWeapon():GetClass()
+
+	local wep = ply:GetActiveWeapon()
+	if IsValid( wep ) then
+		t.curweapon = wep:GetClass()
 	end
 
 	local weapons = ply:GetWeapons()
