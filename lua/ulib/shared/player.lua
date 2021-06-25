@@ -224,7 +224,7 @@ function ULib.getUsers( target, enable_keywords, ply )
 							-- This can't be ipairs, as it's indexed by ID, starts at 0 and may not be sequential.
 							for teamId, teamData in pairs( teams ) do
 								if teamData.Name == teamNameOrId then
-									for _, ply in ipairs( team.GetPlayers( teamId )) do
+									for _, ply in ipairs( team.GetPlayers( teamId ) ) do
 										table.insert( tmpTargets, ply )
 									end
 
