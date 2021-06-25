@@ -208,8 +208,6 @@ end
 		Updates player object to store health and armor. Has no effect unless ULib.Spawn is used later.
 ]]
 function ULib.getSpawnInfo( player )
-	local result = {}
-
 	local t = {}
 	player.ULibSpawnInfo = t
 	t.health = player:Health()
