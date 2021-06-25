@@ -136,10 +136,14 @@ end
 	Parameters:
 
 		target - A string of what you'd like to target. Accepts a comma separated list.
-		enable_keywords - *(Optional, defaults to false)* If true, the keywords "*" for all players, "^" for self,
-			"@" for picker (person in front of you), "#<group>" for those inside a specific group,
-			"%<group>" for users inside a group (counting inheritance), and "$<id>" for users matching a
-			particular ID will be activated.
+		enable_keywords - *(Optional, defaults to false)* If true, various keywords will be enabled:
+			"*" for all players,
+			"^" for self,
+			"@" for picker (person in front of you),
+			"#<group>" for those inside a specific group,
+			"%<group>" for users inside a group (counting inheritance),
+			"$<id>" for users matching a particular ID, and
+			"@<team>" for users inside a given team
 			Any of these can be negated with "!" before it. IE, "!^" targets everyone but yourself.
 		ply - *(Optional)* Player needing getUsers, this is necessary for some of the keywords.
 
@@ -152,6 +156,7 @@ end
 		v2.40 - Rewrite, added more keywords, removed immunity.
 		v2.50 - Added "#" and '$' keywords, removed special exception for "%user" (replaced by "#user").
 		v2.60 - Returns false if target is an empty string.
+		vx.xx - Added "@<team>" keyword extension.
 ]]
 function ULib.getUsers( target, enable_keywords, ply )
 	if target == "" then
