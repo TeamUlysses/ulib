@@ -207,24 +207,24 @@ end
 
 		Updates player object to store health and armor. Has no effect unless ULib.Spawn is used later.
 ]]
-function ULib.getSpawnInfo( player )
+function ULib.getSpawnInfo( ply )
 	local t = {}
-	player.ULibSpawnInfo = t
-	t.health = player:Health()
-	t.armor = player:Armor()
-	if player:GetActiveWeapon():IsValid() then
-		t.curweapon = player:GetActiveWeapon():GetClass()
+	ply.ULibSpawnInfo = t
+	t.health = ply:Health()
+	t.armor = ply:Armor()
+	if ply:GetActiveWeapon():IsValid() then
+		t.curweapon = ply:GetActiveWeapon():GetClass()
 	end
 
-	local weapons = player:GetWeapons()
+	local weapons = ply:GetWeapons()
 	local data = {}
 	for _, weapon in ipairs( weapons ) do
 		printname = weapon:GetClass()
 		data[ printname ] = {}
 		data[ printname ].clip1 = weapon:Clip1()
 		data[ printname ].clip2 = weapon:Clip2()
-		data[ printname ].ammo1 = player:GetAmmoCount( weapon:GetPrimaryAmmoType() )
-		data[ printname ].ammo2 = player:GetAmmoCount( weapon:GetSecondaryAmmoType() )
+		data[ printname ].ammo1 = ply:GetAmmoCount( weapon:GetPrimaryAmmoType() )
+		data[ printname ].ammo2 = ply:GetAmmoCount( weapon:GetSecondaryAmmoType() )
 	end
 	t.data = data
 end
