@@ -202,11 +202,35 @@ function ULib.getUsers( target, enable_keywords, ply )
 							return false, "You cannot target yourself from console!"
 						end
 					end
-				elseif piece == "@" then
-					if IsValid( ply ) then
-						local player = ULib.getPicker( ply )
-						if player then
-							table.insert( tmpTargets, player )
+				elseif piece:sub( 1, 1 ) == "@" then
+					if #peice == 1 then
+						if IsValid( ply ) then
+							local player = ULib.getPicker( ply )
+							if player then
+								table.insert( tmpTargets, player )
+							end
+						end
+					else
+						local teamNameOrId = peice:sub( 2 )
+						local teamId = tonumber( teamNameOrId )
+
+						if teamId then
+							for _, ply in ipairs( team.GetPlayers( teamId ) ) do
+								table.insert( tmpTargets, ply )
+							end
+						else
+							local teams = team.GetAllTeams()
+
+							-- This can't be ipairs, as it's indexed by ID, starts at 0 and may not be sequential.
+							for teamId, teamData in pairs( teams ) do
+								if teamData.name == teamNameOrId then
+									for _, ply in ipairs( team.GetPlayers( teamId )) do
+										table.insert( tmpTargets, ply )
+									end
+
+									break
+								end
+							end
 						end
 					end
 				elseif piece:sub( 1, 1 ) == "#" and ULib.ucl.groups[ piece:sub( 2 ) ] then
