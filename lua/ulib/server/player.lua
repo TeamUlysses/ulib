@@ -239,13 +239,18 @@ local function doWeapons( player, t )
 	player:StripAmmo()
 	player:StripWeapons()
 
-	for printname, data in pairs( t.data ) do
-		player:Give( printname )
-		local weapon = player:GetWeapon( printname )
-		weapon:SetClip1( data.clip1 )
-		weapon:SetClip2( data.clip2 )
-		player:SetAmmo( data.ammo1, weapon:GetPrimaryAmmoType() )
-		player:SetAmmo( data.ammo2, weapon:GetSecondaryAmmoType() )
+	for class, data in pairs( t.data ) do
+		local weapon = player:Give( class )
+		if not IsValid( weapon ) then
+			weapon = player:GetWeapon( class )
+		end
+
+		if IsValid( weapon ) then
+			weapon:SetClip1( data.clip1 )
+			weapon:SetClip2( data.clip2 )
+			player:SetAmmo( data.ammo1, weapon:GetPrimaryAmmoType() )
+			player:SetAmmo( data.ammo2, weapon:GetSecondaryAmmoType() )
+		end
 	end
 
 	if t.curweapon then
