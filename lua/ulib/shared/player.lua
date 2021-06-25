@@ -203,7 +203,7 @@ function ULib.getUsers( target, enable_keywords, ply )
 						end
 					end
 				elseif piece:sub( 1, 1 ) == "@" then
-					if #peice == 1 then
+					if #piece == 1 then
 						if IsValid( ply ) then
 							local player = ULib.getPicker( ply )
 							if player then
@@ -211,7 +211,7 @@ function ULib.getUsers( target, enable_keywords, ply )
 							end
 						end
 					else
-						local teamNameOrId = peice:sub( 2 )
+						local teamNameOrId = piece:sub( 2 )
 						local teamId = tonumber( teamNameOrId )
 
 						if teamId then
