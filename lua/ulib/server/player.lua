@@ -219,15 +219,15 @@ function ULib.getSpawnInfo( ply )
 		t.curweapon = wep:GetClass()
 	end
 
-	local weapons = ply:GetWeapons()
 	local data = {}
+	local weapons = ply:GetWeapons()
 	for _, weapon in ipairs( weapons ) do
-		printname = weapon:GetClass()
-		data[ printname ] = {}
-		data[ printname ].clip1 = weapon:Clip1()
-		data[ printname ].clip2 = weapon:Clip2()
-		data[ printname ].ammo1 = ply:GetAmmoCount( weapon:GetPrimaryAmmoType() )
-		data[ printname ].ammo2 = ply:GetAmmoCount( weapon:GetSecondaryAmmoType() )
+		local class = weapon:GetClass()
+		data[ class ] = {}
+		data[ class ].clip1 = weapon:Clip1()
+		data[ class ].clip2 = weapon:Clip2()
+		data[ class ].ammo1 = ply:GetAmmoCount( weapon:GetPrimaryAmmoType() )
+		data[ class ].ammo2 = ply:GetAmmoCount( weapon:GetSecondaryAmmoType() )
 	end
 	t.data = data
 end
