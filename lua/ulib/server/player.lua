@@ -246,8 +246,14 @@ local function doWeapons( player, t )
 		end
 
 		if IsValid( weapon ) then
-			weapon:SetClip1( data.clip1 )
-			weapon:SetClip2( data.clip2 )
+			if weapon.SetClip1 then
+				weapon:SetClip1( data.clip1 )
+			end
+
+			if weapon.SetClip2 then
+				weapon:SetClip2( data.clip2 )
+			end
+
 			player:SetAmmo( data.ammo1, weapon:GetPrimaryAmmoType() )
 			player:SetAmmo( data.ammo2, weapon:GetSecondaryAmmoType() )
 		end
