@@ -156,7 +156,7 @@ end
 		v2.40 - Rewrite, added more keywords, removed immunity.
 		v2.50 - Added "#" and '$' keywords, removed special exception for "%user" (replaced by "#user").
 		v2.60 - Returns false if target is an empty string.
-		vx.xx - Added "@<team>" keyword extension.
+		v2.70 - Added "@<team>" keyword extension.
 ]]
 function ULib.getUsers( target, enable_keywords, ply )
 	if target == "" then
