@@ -192,11 +192,8 @@ function ULib.addBan( steamid, time, reason, name, admin )
 		ULib.kick( ply, longReason, nil, true)
 	end
 
-	-- Remove all semicolons from the reason to prevent command injection
-	shortReason = string.gsub(shortReason, ";", "")
-
 	-- This redundant kick is to ensure they're kicked -- even if they're joining
-	game.ConsoleCommand( string.format( "kickid %s %s\n", steamid, shortReason or "" ) )
+	RunConsoleCommand("kickid", steamid, shortReason or "")
 
 	writeBan( t )
 	hook.Call( ULib.HOOK_USER_BANNED, _, steamid, t )
@@ -218,7 +215,8 @@ end
 		v2.10 - Initial
 ]]
 function ULib.unban( steamid, admin )
-	game.ConsoleCommand( "removeid " .. steamid .. ";writeid\n" ) -- Remove from srcds in case it was stored there
+	RunConsoleCommand("removeid", steamid) -- Remove from srcds in case it was stored there
+	RunConsoleCommand("writeid") -- Saving
 
 	--ULib banlist
 	ULib.bans[ steamid ] = nil
