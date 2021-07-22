@@ -25,6 +25,7 @@ ULib.sayCmds = ULib.sayCmds or {}
 	Revisions:
 
 		v2.10 - Made case-insensitive
+		v2.71 - Added ULibPostCommandCalled
 ]]
 local function sayCmdCheck( ply, strText, bTeam )
 	local match
@@ -68,7 +69,9 @@ local function sayCmdCheck( ply, strText, bTeam )
 		local fn = data.fn
 		local hide = data.hide
 
-		ULib.pcallError( fn, ply, match:Trim(), argv, args )
+		local err = ULib.pcallError( fn, ply, match:Trim(), argv, args )
+		hook.Call( ULib.HOOK_POST_COMMAND_CALLED, _, ply, data.__cmd, argv, hide, not err )
+
 		if hide then return "" end
 	end
 

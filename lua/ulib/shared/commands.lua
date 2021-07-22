@@ -1315,6 +1315,7 @@ end
 	Revisions:
 
 		v2.62 - Initial
+		v2.71 - Added ULibPostCommandCalled
 ]]
 function cmds.execute( cmdTable, ply, commandName, argv )
 	if CLIENT and not cmdTable.__client_only then
@@ -1329,6 +1330,7 @@ function cmds.execute( cmdTable, ply, commandName, argv )
 	local return_value = hook.Call( ULib.HOOK_COMMAND_CALLED, _, ply, commandName, argv )
 	if return_value ~= false then
 		cmdTable.__fn( ply, commandName, argv )
+		hook.Call( ULib.HOOK_POST_COMMAND_CALLED, _, ply, commandName, argv )
 	end
 end
 
