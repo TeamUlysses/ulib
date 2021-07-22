@@ -123,8 +123,8 @@ ULib.HOOK_COMMAND_CALLED = "ULibCommandCalled"
 
 	Parameters passed to callback:
 
-		ply - The player attempting to execute the command.
-		commandName - The command that's being executed.
+		ply - The player that executed the command.
+		commandName - The command that was executed.
 		args - The table of args for the command.
 		hide - If triggered from a chat command, a boolean indicating if the output of the command should be hidden.
 		success - If triggered from a chat command, a boolean indicating if the command ran successfully.
