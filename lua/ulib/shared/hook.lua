@@ -53,6 +53,8 @@ local BackwardsHooks = {} -- A table fully to garry's spec for aVoN
 function GetTable() return BackwardsHooks end
 function GetULibTable() return Hooks end
 
+-- Replaced with Srlions hook library. https://github.com/Srlion/Hook-Library
+
 
 local events = {}
 
