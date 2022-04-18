@@ -66,12 +66,8 @@ local function onGroupRemoved( camiGroup, originToken )
 end
 hook.Add( "CAMI.OnUsergroupUnregistered", "ULXCamiGroupRemoved", onGroupRemoved )
 
-local function onUsersGroupChanged( ply, oldGroup, newGroup, originToken )
-	if not ply or not ply:IsValid() then return end -- Seems like we get called after a player disconnects sometimes
+local function onSteamIDUserGroupChanged( id, oldGroup, newGroup, originToken )
 	if originToken == CAMI.ULX_TOKEN then return end
-
-	local id = ULib.ucl.getUserRegisteredID( ply )
-	if not id then id = ply:SteamID() end
 
 	if newGroup == ULib.ACCESS_ALL then
 		-- If they are becoming a regular user, and they had access, then remove them
@@ -87,7 +83,18 @@ local function onUsersGroupChanged( ply, oldGroup, newGroup, originToken )
 		ULib.ucl.addUser( id, nil, nil, newGroup, true )
 	end
 end
-hook.Add( "CAMI.PlayerUsergroupChanged", "ULXCamiUsersGroupChanged", onUsersGroupChanged )
+hook.Add( "CAMI.SteamIDUsergroupChanged", "ULXCamiSteamidUserGroupChanged", onSteamIDUserGroupChanged )
+
+local function onPlayerUserGroupChanged( ply, oldGroup, newGroup, originToken )
+	if not ply or not ply:IsValid() then return end -- Seems like we get called after a player disconnects sometimes
+	if originToken == CAMI.ULX_TOKEN then return end
+
+	local id = ULib.ucl.getUserRegisteredID( ply )
+	if not id then id = ply:SteamID() end
+
+	onSteamIDUserGroupChanged( id, oldGroup, newGroup, originToken )
+end
+hook.Add( "CAMI.PlayerUsergroupChanged", "ULXCamiPlayerUserGroupChanged", onPlayerUserGroupChanged )
 
 local function onPrivilegeRegistered( camiPriv )
 	local priv = camiPriv.Name:lower()
