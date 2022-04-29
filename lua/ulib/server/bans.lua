@@ -49,7 +49,7 @@ function ULib.getBanMessage( steamid, banData, templateMessage )
 	return templateMessage:gsub( "{{([%w_]+)}}", replacements )
 end
 
-local function checkBan( steamid64, ip, password, clpassword, name )
+local function checkBan( steamid64, ip, _, _, name )
 	local steamid = util.SteamIDFrom64( steamid64 )
 	local banData = ULib.bans[ steamid ]
 	if not banData then return end -- Not banned
@@ -109,7 +109,7 @@ end
 
 
 local function writeBan( bandata )
-	sql.Query(
+	local result = sql.Query(
 		"REPLACE INTO ulib_bans (steamid, time, unban, reason, name, admin, modified_admin, modified_time) " ..
 		string.format( "VALUES (%s, %i, %i, %s, %s, %s, %s, %s)",
 			util.SteamIDTo64( bandata.steamID ),
@@ -122,6 +122,12 @@ local function writeBan( bandata )
 			escapeOrNull( bandata.modified_time )
 		)
 	)
+
+	if result ~= false then return end
+
+	print( "Ban data that caused a fault:" )
+	PrintTable( bandata )
+	ErrorNoHaltWithStack( "An error occurred while writing a ULX ban!" )
 end
 
 
@@ -192,11 +198,8 @@ function ULib.addBan( steamid, time, reason, name, admin )
 		ULib.kick( ply, longReason, nil, true)
 	end
 
-	-- Remove all semicolons from the reason to prevent command injection
-	shortReason = string.gsub(shortReason, ";", "")
-
 	-- This redundant kick is to ensure they're kicked -- even if they're joining
-	game.ConsoleCommand( string.format( "kickid %s %s\n", steamid, shortReason or "" ) )
+	RunConsoleCommand( "kickid", steamid, shortReason or "" )
 
 	writeBan( t )
 	hook.Call( ULib.HOOK_USER_BANNED, _, steamid, t )
@@ -283,7 +286,7 @@ function ULib.refreshBans()
 
 	ULib.bans = {}
 	if results then
-		for i=1, #results do
+		for i = 1, #results do
 			local r = results[i]
 
 			r.steamID = util.SteamIDFrom64( r.steamid )
