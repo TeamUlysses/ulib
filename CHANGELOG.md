@@ -6,6 +6,7 @@
 * [ADD] Added a hook for PostCommandCalled (Thanks, brandonsturgeon)
 
 ## v2.71 - *(00/00/0000)*
+* [ADD] Added a sanity check to ULib.replicatedWritableCvar to address older addons after the net code rewrite. (Thanks, ZenBre4ker)
 * [FIX] Fixed some issues in player.lua with SetClip errors. (Thanks, JoshPiper)
 * [FIX] Cleaned up some code in player.lua to be more aligned with our docs. (Thanks, JoshPiper)
 * [FIX] Added returns to some fallback functions in sh_ucl.lua (Thanks, Deyvan)
