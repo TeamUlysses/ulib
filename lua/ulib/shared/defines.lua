@@ -7,7 +7,7 @@
 ULib = ULib or {}
 
 ULib.RELEASE = false -- Don't access these two directly, use ULib.pluginVersionStr("ULib")
-ULib.VERSION = 2.82
+ULib.VERSION = 2.72
 ULib.AUTOMATIC_UPDATE_CHECKS = true
 
 ULib.ACCESS_ALL = "user"
@@ -131,7 +131,7 @@ ULib.HOOK_COMMAND_CALLED = "ULibCommandCalled"
 
 	Revisions:
 
-		v2.82 - Initial
+		v2.72 - Initial
 ]]
 ULib.HOOK_POST_COMMAND_CALLED = "ULibPostCommandCalled"
 
