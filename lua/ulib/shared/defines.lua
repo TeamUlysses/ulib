@@ -7,7 +7,7 @@
 ULib = ULib or {}
 
 ULib.RELEASE = false -- Don't access these two directly, use ULib.pluginVersionStr("ULib")
-ULib.VERSION = 2.71
+ULib.VERSION = 2.72
 ULib.AUTOMATIC_UPDATE_CHECKS = true
 
 ULib.ACCESS_ALL = "user"
@@ -115,6 +115,25 @@ ULib.HOOK_LOCALPLAYERREADY = "ULibLocalPlayerReady"
 		v2.40 - Initial
 ]]
 ULib.HOOK_COMMAND_CALLED = "ULibCommandCalled"
+
+--[[
+	Hook: ULibPostCommandCalled
+
+	Called *on server* after a ULib command is run.
+
+	Parameters passed to callback:
+
+		ply - The player that executed the command.
+		commandName - The command that was executed.
+		args - The table of args for the command.
+		hide - If triggered from a chat command, a boolean indicating if the output of the command should be hidden.
+		success - If triggered from a chat command, a boolean indicating if the command ran successfully.
+
+	Revisions:
+
+		v2.72 - Initial
+]]
+ULib.HOOK_POST_COMMAND_CALLED = "ULibPostCommandCalled"
 
 --[[
 	Hook: ULibPlayerTarget
@@ -467,6 +486,4 @@ if SERVER then
 	util.AddNetworkString( "tsayc" )
 	util.AddNetworkString( "ulib_repWriteCvar" )
 	util.AddNetworkString( "ulib_repChangeCvar" )
-	
-	
 end
