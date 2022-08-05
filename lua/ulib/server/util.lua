@@ -113,6 +113,7 @@ local repCvarServerChanged
 function ULib.replicatedWritableCvar( sv_cvar, cl_cvar, default_value, save, notify, access )
 	sv_cvar = sv_cvar:lower()
 	cl_cvar = cl_cvar:lower()
+	default_value = tostring(default_value)
 
 	local flags = 0
 	if save then
