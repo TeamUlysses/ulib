@@ -2,14 +2,16 @@
 
 
 ## Experimental Features in Testing - *(00/00/0000)*
-* [CHANGE] Moved Users to SQLite. (Thanks, JoshPiper)
 * [ADD] Added a hook for PostCommandCalled (Thanks, brandonsturgeon)
+* [CHANGE] Moved Users to SQLite. (Thanks, JoshPiper)
 
 ## v2.71 - *(00/00/0000)*
 * [ADD] Added a sanity check to ULib.replicatedWritableCvar to address older addons after the net code rewrite. (Thanks, ZenBre4ker)
 * [FIX] Fixed some issues in player.lua with SetClip errors. (Thanks, JoshPiper)
 * [FIX] Cleaned up some code in player.lua to be more aligned with our docs. (Thanks, JoshPiper)
 * [FIX] Added returns to some fallback functions in sh_ucl.lua (Thanks, Deyvan)
+* [FIX] Ban reason string was returning two values due to a change in gsub returns. Localized the replacement gsub and return only the string value.
+* [CHANGE] Removed gsub from the SteamID replacement string in ban reasons.
 
 ## v2.70 - *(08/04/2022)*
 * [ADD] Hook when a new, previously unknown access is registered. UCLChanged is now called as well.
