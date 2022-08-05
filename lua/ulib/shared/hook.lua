@@ -130,6 +130,7 @@ function Call( name, gm, ... )
 						-- If the object has become invalid - remove it
 						--
 						HookTable[ i ][ k ] = nil
+						BackwardsHooks[ name ][ k ] = nil
 					end
 				end
 			end
