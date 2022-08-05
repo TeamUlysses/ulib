@@ -207,26 +207,27 @@ end
 
 		Updates player object to store health and armor. Has no effect unless ULib.Spawn is used later.
 ]]
-function ULib.getSpawnInfo( player )
-	local result = {}
-
+function ULib.getSpawnInfo( ply )
 	local t = {}
-	player.ULibSpawnInfo = t
-	t.health = player:Health()
-	t.armor = player:Armor()
-	if player:GetActiveWeapon():IsValid() then
-		t.curweapon = player:GetActiveWeapon():GetClass()
+	ply.ULibSpawnInfo = t
+
+	t.health = ply:Health()
+	t.armor = ply:Armor()
+
+	local wep = ply:GetActiveWeapon()
+	if IsValid( wep ) then
+		t.curweapon = wep:GetClass()
 	end
 
-	local weapons = player:GetWeapons()
 	local data = {}
+	local weapons = ply:GetWeapons()
 	for _, weapon in ipairs( weapons ) do
-		printname = weapon:GetClass()
-		data[ printname ] = {}
-		data[ printname ].clip1 = weapon:Clip1()
-		data[ printname ].clip2 = weapon:Clip2()
-		data[ printname ].ammo1 = player:GetAmmoCount( weapon:GetPrimaryAmmoType() )
-		data[ printname ].ammo2 = player:GetAmmoCount( weapon:GetSecondaryAmmoType() )
+		local class = weapon:GetClass()
+		data[ class ] = {}
+		data[ class ].clip1 = weapon:Clip1()
+		data[ class ].clip2 = weapon:Clip2()
+		data[ class ].ammo1 = ply:GetAmmoCount( weapon:GetPrimaryAmmoType() )
+		data[ class ].ammo2 = ply:GetAmmoCount( weapon:GetSecondaryAmmoType() )
 	end
 	t.data = data
 end
@@ -238,13 +239,24 @@ local function doWeapons( player, t )
 	player:StripAmmo()
 	player:StripWeapons()
 
-	for printname, data in pairs( t.data ) do
-		player:Give( printname )
-		local weapon = player:GetWeapon( printname )
-		weapon:SetClip1( data.clip1 )
-		weapon:SetClip2( data.clip2 )
-		player:SetAmmo( data.ammo1, weapon:GetPrimaryAmmoType() )
-		player:SetAmmo( data.ammo2, weapon:GetSecondaryAmmoType() )
+	for class, data in pairs( t.data ) do
+		local weapon = player:Give( class )
+		if not IsValid( weapon ) then
+			weapon = player:GetWeapon( class )
+		end
+
+		if IsValid( weapon ) then
+			if weapon.SetClip1 then
+				weapon:SetClip1( data.clip1 )
+			end
+
+			if weapon.SetClip2 then
+				weapon:SetClip2( data.clip2 )
+			end
+
+			player:SetAmmo( data.ammo1, weapon:GetPrimaryAmmoType() )
+			player:SetAmmo( data.ammo2, weapon:GetSecondaryAmmoType() )
+		end
 	end
 
 	if t.curweapon then
