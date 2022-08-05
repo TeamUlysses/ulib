@@ -3,6 +3,7 @@
 ## v2.71 - *(00/00/0000)*
 * [FIX] Fixed some issues in player.lua with SetClip errors. (Thanks, JoshPiper)
 * [FIX] Cleaned up some code in player.lua to be more aligned with our docs. (Thanks, JoshPiper)
+* [FIX] Added returns to some fallback functions in sh_ucl.lua (Thanks, Deyvan)
 
 ## v2.70 - *(08/04/2022)*
 * [ADD] Hook when a new, previously unknown access is registered. UCLChanged is now called as well.
