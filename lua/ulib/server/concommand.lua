@@ -25,7 +25,7 @@ ULib.sayCmds = ULib.sayCmds or {}
 	Revisions:
 
 		v2.10 - Made case-insensitive
-		v2.71 - Added ULibPostCommandCalled
+		v2.82 - Added ULibPostCommandCalled
 ]]
 local function sayCmdCheck( ply, strText, bTeam )
 	local match

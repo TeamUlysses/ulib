@@ -131,7 +131,7 @@ ULib.HOOK_COMMAND_CALLED = "ULibCommandCalled"
 
 	Revisions:
 
-		v2.81 - Initial
+		v2.82 - Initial
 ]]
 ULib.HOOK_POST_COMMAND_CALLED = "ULibPostCommandCalled"
 

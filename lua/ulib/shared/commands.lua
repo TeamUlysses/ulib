@@ -1315,7 +1315,7 @@ end
 	Revisions:
 
 		v2.62 - Initial
-		v2.71 - Added ULibPostCommandCalled
+		v2.82 - Added ULibPostCommandCalled
 ]]
 function cmds.execute( cmdTable, ply, commandName, argv )
 	if CLIENT and not cmdTable.__client_only then
