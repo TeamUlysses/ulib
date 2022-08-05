@@ -10,6 +10,7 @@
 * [FIX] Cleaned up some code in player.lua to be more aligned with our docs. (Thanks, JoshPiper)
 * [FIX] Added returns to some fallback functions in sh_ucl.lua (Thanks, Deyvan)
 * [FIX] Ban reason string was returning two values due to a change in gsub returns. Localized the replacement gsub and return only the string value.
+* [FIX] Removed legacy hooks when cleaned up, fixes potential memory leak issues.
 * [CHANGE] Removed gsub from the SteamID replacement string in ban reasons.
 
 ## v2.70 - *(08/04/2022)*
