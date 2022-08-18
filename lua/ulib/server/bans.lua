@@ -149,12 +149,15 @@ function ULib.addBan( steamid, time, reason, name, admin )
 	if reason == "" then reason = nil end
 
 	local admin_name
-	if admin then
-		admin_name = "(Console)"
-		if admin:IsValid() then
-			admin_name = string.format( "%s(%s)", admin:Name(), admin:SteamID() )
-		end
-	end
+    if admin then
+        if not IsValid(admin) then
+            admin_name = "(Console)"
+        elseif admin:IsPlayer() then
+            admin_name = string.format("%s(%s)", admin:Name(), admin:SteamID())
+        elseif isstring(admin) then
+            admin_name = admin
+        end
+    end
 
 	-- Clean up passed data
 	local t = {}
