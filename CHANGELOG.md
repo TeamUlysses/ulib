@@ -12,6 +12,7 @@
 * [FIX] Ban reason string was returning two values due to a change in gsub returns. Localized the replacement gsub and return only the string value.
 * [FIX] Removed legacy hooks when cleaned up, fixes potential memory leak issues.
 * [CHANGE] Removed gsub from the SteamID replacement string in ban reasons.
+* [CHANGE] Strings can now be passed to ULib.addBan for the admin parameter. This is useful for 3rd party integrations of ULib's ban. (Thanks, wrefgtzweve)
 
 ## v2.70 - *(08/04/2022)*
 * [ADD] Hook when a new, previously unknown access is registered. UCLChanged is now called as well.
