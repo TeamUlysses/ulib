@@ -117,25 +117,6 @@ ULib.HOOK_LOCALPLAYERREADY = "ULibLocalPlayerReady"
 ULib.HOOK_COMMAND_CALLED = "ULibCommandCalled"
 
 --[[
-	Hook: ULibPostCommandCalled
-
-	Called *on server* after a ULib command is run.
-
-	Parameters passed to callback:
-
-		ply - The player that executed the command.
-		commandName - The command that was executed.
-		args - The table of args for the command.
-		hide - If triggered from a chat command, a boolean indicating if the output of the command should be hidden.
-		success - If triggered from a chat command, a boolean indicating if the command ran successfully.
-
-	Revisions:
-
-		v2.72 - Initial
-]]
-ULib.HOOK_POST_COMMAND_CALLED = "ULibPostCommandCalled"
-
---[[
 	Hook: ULibPlayerTarget
 
 	Called whenever one player is about to target another player. Called *BEFORE* any other validation
@@ -186,10 +167,12 @@ ULib.HOOK_PLAYER_TARGETS = "ULibPlayerTargets" -- Exactly the same as the above 
 		ply - The player that executed the command.
 		commandName - The command that's being executed.
 		translated_args - A table of the translated arguments, as passed into the callback function itself.
+		callResult - The return value of the command function.
 
 	Revisions:
 
 		v2.40 - Initial
+		v2.72 - Add the callResult parameter
 ]]
 ULib.HOOK_POST_TRANSLATED_COMMAND = "ULibPostTranslatedCommand"
 

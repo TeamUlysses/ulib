@@ -948,8 +948,8 @@ local function translateCmdCallback( ply, commandName, argv )
 		end
 	end
 
-	cmd:call( isOpposite, unpack( args ) )
-	hook.Call( ULib.HOOK_POST_TRANSLATED_COMMAND, _, ply, commandName, args )
+	local callResult = cmd:call( isOpposite, unpack( args ) )
+	hook.Call( ULib.HOOK_POST_TRANSLATED_COMMAND, _, ply, commandName, args, callResult )
 end
 
 local function translateAutocompleteCallback( commandName, args )
@@ -1315,7 +1315,6 @@ end
 	Revisions:
 
 		v2.62 - Initial
-		v2.72 - Added ULibPostCommandCalled
 ]]
 function cmds.execute( cmdTable, ply, commandName, argv )
 	if CLIENT and not cmdTable.__client_only then
@@ -1330,7 +1329,6 @@ function cmds.execute( cmdTable, ply, commandName, argv )
 	local return_value = hook.Call( ULib.HOOK_COMMAND_CALLED, _, ply, commandName, argv )
 	if return_value ~= false then
 		cmdTable.__fn( ply, commandName, argv )
-		hook.Call( ULib.HOOK_POST_COMMAND_CALLED, _, ply, commandName, argv )
 	end
 end
 
