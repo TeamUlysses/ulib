@@ -20,6 +20,7 @@ local slapSounds = {
 	"physics/body/body_medium_impact_soft7.wav",
 }
 
+local invisiblePlayers = {}
 
 --[[
 	Function: slap
@@ -112,24 +113,21 @@ end
 
 
 local function doInvis()
-	local players = player.GetAll()
 	local remove = true
-	for _, player in ipairs( players ) do
-		local t = player:GetTable()
-		if t.invis then
-			remove = false
-			if player:Alive() and player:GetActiveWeapon():IsValid() then
-				if player:GetActiveWeapon() ~= t.invis.wep then
+	for player, t in pairs( invisiblePlayers ) do
+		if not IsValid(player) then invisiblePlayers[player] = nil continue end
+		remove = false
+		if player:Alive() and player:GetActiveWeapon():IsValid() then
+			if player:GetActiveWeapon() ~= t.wep then
 
-					if t.invis.wep and IsValid( t.invis.wep ) then		-- If changed weapon, set the old weapon to be visible.
-						t.invis.wep:SetRenderMode( RENDERMODE_NORMAL )
-						t.invis.wep:Fire( "alpha", 255, 0 )
-						t.invis.wep:SetMaterial( "" )
-					end
-
-					t.invis.wep = player:GetActiveWeapon()
-					ULib.invisible( player, true, t.invis.vis )
+				if t.wep and IsValid( t.wep ) then		-- If changed weapon, set the old weapon to be visible.
+					t.wep:SetRenderMode( RENDERMODE_NORMAL )
+					t.wep:Fire( "alpha", 255, 0 )
+					t.wep:SetMaterial( "" )
 				end
+
+				t.wep = player:GetActiveWeapon()
+				ULib.invisible( player, true, t.vis )
 			end
 		end
 	end
@@ -163,7 +161,7 @@ function ULib.invisible( ply, bool, visibility )
 		ply:SetMaterial( "models/effects/vol_light001" )
 		ply:SetRenderMode( RENDERMODE_TRANSALPHA )
 		ply:Fire( "alpha", visibility, 0 )
-		ply:GetTable().invis = { vis=visibility, wep=ply:GetActiveWeapon() }
+		invisiblePlayers[ply] = { vis=visibility, wep=ply:GetActiveWeapon() }
 
 		if IsValid( ply:GetActiveWeapon() ) then
 			ply:GetActiveWeapon():SetRenderMode( RENDERMODE_TRANSALPHA )
@@ -188,7 +186,7 @@ function ULib.invisible( ply, bool, visibility )
 			activeWeapon:Fire( "alpha", 255, 0 )
 			activeWeapon:SetMaterial( "" )
 		end
-		ply:GetTable().invis = nil
+		invisiblePlayers[ply] = nil
 	end
 end
 
