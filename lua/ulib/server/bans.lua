@@ -17,7 +17,6 @@ ULib.BanMessage = [[
 function ULib.getBanMessage( steamid, banData, templateMessage )
 	banData = banData or ULib.bans[ steamid ]
 	if not banData then return end
-  print( templateMessage )
 	templateMessage = templateMessage or ULib.BanMessage
 
 	local replacements = {
