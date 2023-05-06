@@ -204,7 +204,7 @@ function ULib.addBan( steamid, time, reason, name, admin )
 	end
 
 	-- This redundant kick is to ensure they're kicked -- even if they're joining
-	RunConsoleCommand( "kickid", steamid, shortReason or "" )
+	game.KickID( steamid, shortReason or "" )
 
 	writeBan( t )
 	hook.Call( ULib.HOOK_USER_BANNED, _, steamid, t )
