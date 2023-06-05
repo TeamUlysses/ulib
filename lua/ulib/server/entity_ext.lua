@@ -1,8 +1,5 @@
 local meta = FindMetaTable( "Entity" )
-
--- Return if there's nothing to add on to
 if not meta then return end
-
 
 -- Are you a STOOL author who's angry that your tool isn't on this list?
 -- Just add this to your code:
@@ -40,7 +37,7 @@ ULib.delWhitelist = -- White list for objects that can't be deleted
 	"statue",
 	"weld_ez",
 	"axis",
-	
+
 	-- Properties
 	"gravity",
 	"collision",
@@ -60,12 +57,26 @@ ULib.moveWhitelist = -- White list for objects that can't be moved
 	"eyeposer",
 	"faceposer",
 	"remover",
-	
+
 	-- Properties
 	--"remover", -- Already above
 	"persist",
 }
 
+-- Performance enhancement
+local delWhitelist = {}
+for _, v in ipairs( ULib.delWhitelist ) do
+	delWhitelist[v] = true
+end
+
+local moveWhitelist = {}
+for _, v in ipairs( ULib.moveWhitelist ) do
+	moveWhitelist[v] = true
+end
+
+local getTable = meta.GetTable
+
+-- Extended Entity meta and hooks
 function meta:DisallowMoving( bool )
 	self.NoMoving = bool
 end
@@ -107,61 +118,49 @@ local function tool( ply, tr, toolmode, second )
 		end
 	end
 
-	if tr.Entity.NoMoving then
-		if not table.HasValue( ULib.moveWhitelist, toolmode ) then
-			return false
-		end
+	local trTable = getTable( tr.Entity )
+	if trTable.NoMoving and not moveWhitelist[toolmode] then
+		return false
 	end
 
-	if tr.Entity.NoDeleting then
-		if not table.HasValue( ULib.delWhitelist, toolmode ) then
-			return false
-		end
+	if trTable.NoDeleting and not delWhitelist[toolmode] then
+		return false
 	end
 end
 hook.Add( "CanTool", "ULibEntToolCheck", tool, HOOK_HIGH )
 
-local function property( ply, propertymode, ent )
-	if ent.NoMoving then
-		if not table.HasValue( ULib.moveWhitelist, toolmode ) then
-			return false
-		end
+local function property( _, _, ent )
+	local entTable = getTable( ent )
+	if entTable.NoMoving and not moveWhitelist[toolmode] then
+		return false
 	end
-	
-	if ent.NoDeleting then
-		if not table.HasValue( ULib.delWhitelist, toolmode ) then
-			return false
-		end
+
+	if entTable.NoDeleting and not delWhitelist[toolmode] then
+		return false
 	end
 end
 hook.Add( "CanProperty", "ULibEntPropertyCheck", property, HOOK_HIGH )
 
-local function physgun( ply, ent )
-	if ent.NoMoving then return false end
+local function physgun( _, ent )
+	if getTable( ent ).NoMoving then return false end
 end
 hook.Add( "PhysgunPickup", "ULibEntPhysCheck", physgun, HOOK_HIGH )
 hook.Add( "CanPlayerUnfreeze", "ULibEntUnfreezeCheck", physgun, HOOK_HIGH )
 
-local function physgunReload( weapon, ply )
+local function physgunReload( _, ply )
 	local trace = util.GetPlayerTrace( ply )
 	local tr = util.TraceLine( trace )
 
 	local ent = tr.Entity
 	if not ent or not ent:IsValid() or ent:IsWorld() then return end -- Invalid or not interested
-	if ent.NoMoving then return false end
+	if getTable( ent ).NoMoving then return false end
 end
 hook.Add( "OnPhysgunReload", "ULibEntPhysReloadCheck", physgunReload, HOOK_HIGH )
 
-local function damageCheck( ent )
-	if ent.NoDeleting then
-		-- return false
-	end
-end
-hook.Add( "EntityTakeDamage", "ULibEntDamagedCheck", damageCheck, HOOK_MONITOR_HIGH )
-
 -- This is just in case we have some horribly programmed addon that goes rampant in deleting things
 local function removedCheck( ent )
-	if ent.NoDeleting and not ent.NoReplication then
+	local entTable = getTable( ent )
+	if entTable.NoDeleting and not entTable.NoReplication then
 		local class = ent:GetClass()
 		local pos = ent:GetPos()
 		local ang = ent:GetAngles()
