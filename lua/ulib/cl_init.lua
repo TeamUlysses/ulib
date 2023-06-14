@@ -3,7 +3,6 @@ ULib = ULib or {} -- Init table
 include( "ulib/shared/defines.lua" )
 include( "ulib/shared/misc.lua" )
 include( "ulib/shared/util.lua" )
-include( "ulib/shared/hook.lua" )
 include( "ulib/shared/tables.lua" )
 include( "ulib/client/commands.lua" )
 include( "ulib/shared/messages.lua" )

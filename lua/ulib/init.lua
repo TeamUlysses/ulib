@@ -17,8 +17,6 @@ if not ULib then
 	include( "ulib/shared/misc.lua" )
 	Msg( "//  shared/util.lua          //\n" )
 	include( "ulib/shared/util.lua" )
-	Msg( "//  shared/hook.lua          //\n" )
-	include( "ulib/shared/hook.lua" )
 	Msg( "//  shared/table.lua         //\n" )
 	include( "ulib/shared/tables.lua" )
 	Msg( "//  shared/player.lua        //\n" )
