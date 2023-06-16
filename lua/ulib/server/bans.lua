@@ -225,14 +225,31 @@ end
 
 		v2.10 - Initial
 ]]
+local allowedCharsStr = "STEAM_:1234567890"
+local allowedCharsIndex = string.Explode( "", allowedCharsStr )
+local allowedChars = {}
+
+for _, char in ipairs( allowedCharsIndex ) do
+	allowedChars[char] = true
+end
+
 function ULib.unban( steamid, admin )
-	game.ConsoleCommand( "removeid " .. steamid .. ";writeid\n" ) -- Remove from srcds in case it was stored there
+	for i = 1, #steamid do
+		if not allowedChars[steamid[i]] then
+			ULib.tsayError( admin, "Invalid steamid." )
+			return
+		end
+	end
+
+	local safe = util.SteamIDFrom64( util.SteamIDTo64( steamid ) )
+
+	game.ConsoleCommand( "removeid " .. safe .. "\n" )
+	RunConsoleCommand( "writeid" ) -- Saving
 
 	--ULib banlist
-	ULib.bans[ steamid ] = nil
+	ULib.bans[steamid] = nil
 	sql.Query( "DELETE FROM ulib_bans WHERE steamid=" .. util.SteamIDTo64( steamid ) )
 	hook.Call( ULib.HOOK_USER_UNBANNED, _, steamid, admin )
-
 end
 
 
