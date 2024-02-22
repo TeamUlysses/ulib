@@ -97,6 +97,7 @@ if not ULib then
 	end
 
 	local function clReady( ply )
+		if ply.ulib_ready then return end
 		ply.ulib_ready = true
 		hook.Call( ULib.HOOK_LOCALPLAYERREADY, _, ply )
 	end
