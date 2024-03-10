@@ -112,8 +112,9 @@ end
 
 
 local function doInvis()
+	local players = player.GetAll()
 	local remove = true
-	for _, player in player.Iterator() do
+	for _, player in ipairs( players ) do
 		local t = player:GetTable()
 		if t.invis then
 			remove = false
