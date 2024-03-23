@@ -1,12 +1,12 @@
 # ULib
 
-ULib is a developer library for GMod 13 (http://garrysmod.com/).
+ULib is a developer library for GMod 13 (https://gmod.facepunch.com/).
 
 ULib provides such features as universal physics, user access lists, and much, much more!
 
-Visit our homepage at http://ulyssesmod.net/.
+Visit our homepage at https://ulyssesmod.net/.
 
-You can talk to us on our forums at http://forums.ulyssesmod.net/.
+You can talk to us on our forums at https://forums.ulyssesmod.net/.
 
 ## Requirements
 ULib requires a working copy of the latest garrysmod, and that's it!
@@ -14,7 +14,7 @@ ULib requires a working copy of the latest garrysmod, and that's it!
 ## Installation
 
 ### Workshop
-ULib's workshop ID is `557962238`. You can subscribe to ULib via Workshop [here](http://steamcommunity.com/sharedfiles/filedetails/?id=557962238).
+ULib's workshop ID is `557962238`. You can subscribe to ULib via Workshop [here](https://steamcommunity.com/sharedfiles/filedetails/?id=557962238).
 
 ### Classic
 To install ULib, simply extract the files from the downloaded archive to your garrysmod/addons folder.
@@ -53,9 +53,9 @@ See the [CHANGELOG](CHANGELOG.md) file for information regarding changes between
 ## Developers
 
 To all developers, I sincerely hope you enjoy what ULib has to offer!
-If you have any suggestions, comments, or complaints, please tell us at http://forums.ulyssesmod.net/.
+If you have any suggestions, comments, or complaints, please tell us at https://forums.ulyssesmod.net/.
 
-If you want an overview of what's in ULib, please visit the documentation at http://ulyssesmod.net/docs/.
+If you want an overview of what's in ULib, please visit the documentation at https://ulyssesmod.net/docs/.
 If you find any bugs, you can report them at https://github.com/TeamUlysses/ulib/issues.
 
 All ULib's functions are kept in the table "ULib" to prevent conflicts.

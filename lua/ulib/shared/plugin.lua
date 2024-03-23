@@ -79,7 +79,7 @@ ULib.registerPlugin{
 	Version       = string.format( "%.2f", ULib.VERSION ),
 	IsRelease     = ULib.RELEASE,
 	Author        = "Team Ulysses",
-	URL           = "http://ulyssesmod.net",
+	URL           = "https://ulyssesmod.net",
 	WorkshopID    = 557962238,
 	--WorkshopMounted = true,
 	BuildNumLocal = tonumber(ULib.fileRead( "ulib.build" )),
