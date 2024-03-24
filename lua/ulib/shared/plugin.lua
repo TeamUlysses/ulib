@@ -161,7 +161,7 @@ function ULib.updateCheck( name, url )
 end
 
 local function httpCheck( body, len, headers, httpCode )
-	if httpCode ~= 200 then
+	if httpCode >= 200 and httpCode <= 299 then
 		return
 	end
 
@@ -181,7 +181,7 @@ local function httpErr()
 end
 
 local function downloadForUlibUpdateCheck()
-	http.Fetch( "http://google.com", httpCheck, httpErr )
+	http.Fetch( "http://connectivity-check.ubuntu.com/", httpCheck, httpErr )
 end
 
 if ULib.AUTOMATIC_UPDATE_CHECKS then
