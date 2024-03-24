@@ -1,10 +1,10 @@
 # ULib Changelog
 
-## Experimental Features in Testing - *(00/00/0000)*
+## Experimental Features in Testing - *(00/00/00)*
 * [ADD] Added a hook for PostCommandCalled (Thanks, brandonsturgeon)
 * [CHANGE] Moved Users to SQLite. (Thanks, JoshPiper)
 
-## v2.71 - *(00/00/0000)*
+## v2.71 - *(03/24/24)*
 * [ADD] Added a sanity check to ULib.replicatedWritableCvar to address older addons after the net code rewrite. (Thanks, ZenBre4ker)
 * [FIX] Fixed some issues in player.lua with SetClip errors. (Thanks, JoshPiper)
 * [FIX] Cleaned up some code in player.lua to be more aligned with our docs. (Thanks, JoshPiper)
@@ -15,7 +15,7 @@
 * [CHANGE] Removed gsub from the SteamID replacement string in ban reasons.
 * [CHANGE] Strings can now be passed to ULib.addBan for the admin parameter. This is useful for 3rd party integrations of ULib's ban. (Thanks, wrefgtzweve)
 
-## v2.70 - *(08/04/2022)*
+## v2.70 - *(08/04/22)*
 * [ADD] Hook when a new, previously unknown access is registered. UCLChanged is now called as well.
 * [CHANGE] Moved bans to SQLite.
 * [CHANGE] Listen server hosts can no longer be banned (thanks, lewez).
