@@ -6,7 +6,7 @@
 
 ULib = ULib or {}
 
-ULib.RELEASE = false -- Don't access these two directly, use ULib.pluginVersionStr("ULib")
+ULib.RELEASE = true -- Don't access these two directly, use ULib.pluginVersionStr("ULib")
 ULib.VERSION = 2.71
 ULib.AUTOMATIC_UPDATE_CHECKS = true
 
@@ -467,6 +467,4 @@ if SERVER then
 	util.AddNetworkString( "tsayc" )
 	util.AddNetworkString( "ulib_repWriteCvar" )
 	util.AddNetworkString( "ulib_repChangeCvar" )
-	
-	
 end
