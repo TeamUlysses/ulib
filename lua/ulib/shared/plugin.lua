@@ -181,7 +181,7 @@ local function httpErr()
 end
 
 local function downloadForUlibUpdateCheck()
-	http.Fetch( "http://google.com", httpCheck, httpErr )
+	http.Fetch( "http://www.msftncsi.com/ncsi.txt", httpCheck, httpErr )
 end
 
 if ULib.AUTOMATIC_UPDATE_CHECKS then
