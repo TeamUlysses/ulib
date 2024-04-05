@@ -161,7 +161,7 @@ function ULib.updateCheck( name, url )
 end
 
 local function httpCheck( body, len, headers, httpCode )
-	if httpCode >= 200 and httpCode <= 299 then
+	if httpCode < 200 or httpCode > 299 then
 		return
 	end
 
