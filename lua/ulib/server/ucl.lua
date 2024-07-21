@@ -336,6 +336,7 @@ function ucl.addGroup( name, allows, inherit_from, from_CAMI )
 	ucl.groups[ name ] = { allow=allows, inherit_from=inherit_from }
 	ucl.saveGroups()
 
+	ULib.clientRPC( _, "ULib.ucl.updateClientUCLGroup", name, ucl.groups[ name ] )
 	hook.Call( ULib.HOOK_GROUP_CREATED, _, name, ucl.groups[ name ] )
 	hook.Call( ULib.HOOK_UCLCHANGED )
 
@@ -415,6 +416,7 @@ function ucl.groupAllow( name, access, revoke )
 
 		ucl.saveGroups()
 
+		ULib.clientRPC( _, "ULib.ucl.updateClientUCLGroup", name, ucl.groups[ name ] )
 		hook.Call( ULib.HOOK_GROUP_ACCESS_CHANGE, _, name, access, revoke )
 		hook.Call( ULib.HOOK_UCLCHANGED )
 	end
@@ -475,6 +477,8 @@ function ucl.renameGroup( orig, new )
 	ucl.saveUsers()
 	ucl.saveGroups()
 
+	ULib.clientRPC( _, "ULib.ucl.updateClientUCLGroup", new, ucl.groups[ new ] )
+	ULib.clientRPC( _, "ULib.ucl.updateClientUCLGroup", orig, _ )
 	hook.Call( ULib.HOOK_GROUP_RENAMED, _, orig, new )
 	hook.Call( ULib.HOOK_UCLCHANGED )
 
@@ -539,6 +543,7 @@ function ucl.setGroupInheritance( group, inherit_from, from_CAMI )
 
 	ucl.saveGroups()
 
+	ULib.clientRPC( _, "ULib.ucl.updateClientUCLGroup", group, ucl.groups[ group ] )
 	hook.Call( ULib.HOOK_GROUP_INHERIT_CHANGE, _, group, inherit_from, old_inherit )
 	hook.Call( ULib.HOOK_UCLCHANGED )
 
@@ -577,6 +582,7 @@ function ucl.setGroupCanTarget( group, can_target )
 
 	ucl.saveGroups()
 
+	ULib.clientRPC( _, "ULib.ucl.updateClientUCLGroup", group, ucl.groups[ group ] )
 	hook.Call( ULib.HOOK_UCLCHANGED )
 end
 
@@ -624,15 +630,17 @@ function ucl.removeGroup( name, from_CAMI )
 	end
 	local oldgroup = table.Copy( ucl.groups[ name ] )
 	ucl.groups[ name ] = nil
-	for _, groupInfo in pairs( ucl.groups ) do
+	for groupName, groupInfo in pairs( ucl.groups ) do
 		if groupInfo.inherit_from == name then
 			groupInfo.inherit_from = inherits_from
+			ULib.clientRPC( _, "ULib.ucl.updateClientUCLGroup", groupName, groupInfo )
 		end
 	end
 
 	ucl.saveUsers()
 	ucl.saveGroups()
 
+	ULib.clientRPC( _, "ULib.ucl.updateClientUCLGroup", name, _ )
 	hook.Call( ULib.HOOK_GROUP_REMOVED, _, name, oldgroup )
 	hook.Call( ULib.HOOK_UCLCHANGED )
 
@@ -983,11 +991,12 @@ function ucl.registerAccess( access, groups, comment, category )
 			if table.HasValue( groupInfo.allow, access ) then return end -- Found, don't add again
 		end
 
-		for _, group in ipairs( groups ) do
+		for name, group in ipairs( groups ) do
 			-- Create group if it doesn't exist
 			if not ucl.groups[ group ] then ucl.addGroup( group ) end
 
 			table.insert( ucl.groups[ group ].allow, access )
+			ULib.clientRPC( _, "ULib.ucl.updateClientUCLGroup", name, ucl.groups[ name ] )
 		end
 
 		timer.Create( "ULibSaveGroups", 1, 1, function() -- 1 sec delay, 1 rep
@@ -1046,6 +1055,7 @@ function ucl.probe( ply )
 		end
 	end
 
+	ULib.clientRPC( _, "ULib.ucl.updateClientUCLPlayer", uid, ucl.authed[ uid ] )
 	hook.Call( ULib.HOOK_UCLCHANGED )
 	hook.Call( ULib.HOOK_UCLAUTH, _, ply )
 end
@@ -1075,27 +1085,23 @@ end
 hook.Add( ULib.HOOK_UCLAUTH, "ULibSendAuthToClients", sendAuthToClients, HOOK_MONITOR_LOW )
 
 local function sendUCLDataToClient( ply )
-	ULib.clientRPC( ply, "ULib.ucl.initClientUCL", ucl.authed, ucl.groups ) -- Send all UCL data (minus offline users) to all loaded users
-	ULib.clientRPC( ply, "hook.Call", ULib.HOOK_UCLCHANGED ) -- Call hook on client
-	ULib.clientRPC( ply, "authPlayerIfReady", ply, ply:UserID() ) -- Call on client
+	timer.Simple(0, function()
+		ULib.clientRPC( ply, "ULib.ucl.initClientUCL", ucl.authed, ucl.groups ) -- Send all UCL data (minus offline users) to the current user
+		ULib.clientRPC( ply, "authPlayerIfReady", ply, ply:UserID() ) -- Call on client
+	end)
 end
-hook.Add( ULib.HOOK_LOCALPLAYERREADY, "ULibSendUCLDataToClient", sendUCLDataToClient, HOOK_MONITOR_HIGH )
+hook.Add( "PlayerInitialSpawn", "ULibSendUCLDataToClient", sendUCLDataToClient, HOOK_MONITOR_HIGH )
 
 local function playerDisconnected( ply )
 	-- We want to perform these actions after everything else has processed through, but we need high priority hook to ensure we don't get sniped.
 	local uid = ply:UniqueID()
 	ULib.queueFunctionCall( function()
 		ucl.authed[ uid ] = nil
+		ULib.clientRPC( _, "ULib.ucl.updateClientUCLPlayer", uid, _ )
 		hook.Call( ULib.HOOK_UCLCHANGED )
 	end )
 end
 hook.Add( "PlayerDisconnected", "ULibUCLDisconnect", playerDisconnected, HOOK_MONITOR_HIGH )
-
-local function UCLChanged()
-	ULib.clientRPC( _, "ULib.ucl.initClientUCL", ucl.authed, ucl.groups ) -- Send all UCL data (minus offline users) to all loaded users
-	ULib.clientRPC( _, "hook.Call", ULib.HOOK_UCLCHANGED ) -- Call hook on client
-end
-hook.Add( ULib.HOOK_UCLCHANGED, "ULibSendUCLToClients", UCLChanged )
 
 --[[
 -- The following is useful for debugging since Garry changes client bootstrapping so frequently
@@ -1127,16 +1133,19 @@ function meta:SetUserGroup( group, dontCall )
 	local oldGroup = self:GetUserGroup()
 	oldSetUserGroup( self, group )
 
-	if ucl.authed[ self:UniqueID() ] then
-		if ucl.authed[ self:UniqueID() ] == ULib.DEFAULT_GRANT_ACCESS then
-			ucl.authed[ self:UniqueID() ] = table.Copy( ULib.DEFAULT_GRANT_ACCESS )
+	local uid = self:UniqueID()
+
+	if ucl.authed[ uid ] then
+		if ucl.authed[ uid ] == ULib.DEFAULT_GRANT_ACCESS then
+			ucl.authed[ uid ] = table.Copy( ULib.DEFAULT_GRANT_ACCESS )
 		end
-		ucl.authed[ self:UniqueID() ].group = group
+		ucl.authed[ uid ].group = group
 	else
 		self.tmp_group = group
 	end
 
 	if not dontCall and self:GetUserGroup() ~= oldGroup then -- Changed! Inform the masses of the change
+		ULib.clientRPC( _, "ULib.ucl.updateClientUCLPlayer", uid, ucl.authed[ uid ] )
 		hook.Call( ULib.HOOK_UCLCHANGED )
 		hook.Call( ULib.HOOK_UCLAUTH, _, self )
 	end

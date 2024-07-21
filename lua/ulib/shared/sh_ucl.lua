@@ -177,12 +177,25 @@ if CLIENT then
 	function ucl.initClientUCL( authed, groups )
 		ucl.authed = authed
 		ucl.groups = groups
+
 		for name, data in pairs( groups ) do
 			if not ULib.findInTable( {"superadmin", "admin", "user"}, name ) then
 				inherit_from = data.inherit_from or "user"
-				CAMI.RegisterUsergroup( {Name=name, Inherits=inherit_from}, CAMI.ULX_TOKEN )
+				CAMI.RegisterUsergroup( {Name = name, Inherits = inherit_from}, CAMI.ULX_TOKEN )
 			end
 		end
+
+		hook.Call( ULib.HOOK_UCLCHANGED )
+	end
+
+	function ucl.updateClientUCLPlayer( id, data )
+		ucl.authed[ id ] = data
+		hook.Call( ULib.HOOK_UCLCHANGED )
+	end
+
+	function ucl.updateClientUCLGroup( name, data )
+		ucl.groups[ name ] = data
+		hook.Call( ULib.HOOK_UCLCHANGED )
 	end
 end
 
