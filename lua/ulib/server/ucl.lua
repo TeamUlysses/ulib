@@ -653,7 +653,7 @@ end
 --[[
 	Function: ucl.getUserRegisteredID
 
-	Returns the SteamID, IP, or UniqueID of a player if they're registered under any of those IDs under ucl.users. Checks in order. Returns nil if not registered.
+	Returns the SteamID, SteamID64, IP, or UniqueID of a player if they're registered under any of those IDs under ucl.users. Checks in order. Returns nil if not registered.
 
 	Parameters:
 
@@ -666,9 +666,10 @@ end
 
 function ucl.getUserRegisteredID( ply )
 	local id = ply:SteamID()
+	local id64 = ply:SteamID64()
 	local uid = ply:UniqueID()
 	local ip = ULib.splitPort( ply:IPAddress() )
-	local checkIndexes = { id, ip, uid }
+	local checkIndexes = { id, id64, ip, uid }
 	for _, index in ipairs( checkIndexes ) do
 		if ULib.ucl.users[ index ] then
 			return id
@@ -683,7 +684,7 @@ end
 
 	Parameters:
 
-		id - The SteamID, IP, or UniqueID of the user you wish to check.
+		id - The SteamID, SteamID64, IP, or UniqueID of the user you wish to check.
 ]]
 
 function ucl.getUserInfoFromID( id )
@@ -706,7 +707,7 @@ end
 
 	Parameters:
 
-		id - The SteamID, IP, or UniqueID of the user you wish to add.
+		id - The SteamID, SteamID64, IP, or UniqueID of the user you wish to add.
 		allows - *(Optional, defaults to empty table)* The list of access you wish to give this user.
 		denies - *(Optional, defaults to empty table)* The list of access you wish to explicitly deny this user.
 		group - *(Optional)* The string of the group this user should belong to. Must be a valid group.
@@ -767,7 +768,7 @@ end
 
 	Parameters:
 
-		id - The SteamID, IP, or UniqueID of the user to change. Must be a valid, existing ID, or an ID of a connected player.
+		id - The SteamID, SteamID64, IP, or UniqueID of the user to change. Must be a valid, existing ID, or an ID of a connected player.
 		access - The string of the access or a table of accesses to add or remove. Access tags can be specified in values in the table for allows.
 		revoke - *(Optional, defaults to false)* A boolean of whether the access tag should be added or removed
 			from the allow or deny list. If true, it's removed.
@@ -793,15 +794,15 @@ function ucl.userAllow( id, access, revoke, deny )
 	id = id:upper() -- In case of steamid, needs to be upper case
 	if type( access ) == "string" then access = { access } end
 
-	local uid = id
-	if not ucl.authed[ uid ] then -- Check to see if it's a steamid or IP
+	local id64 = id
+	if not ucl.authed[ id64 ] then -- Check to see if it's a steamid or IP
 		local ply = ULib.getPlyByID( id )
 		if ply and ply:IsValid() then
-			uid = ply:UniqueID()
+			id64 = ply:SteamID64()
 		end
 	end
 
-	local userInfo = ucl.users[ id ] or ucl.authed[ uid ] -- Check both tables
+	local userInfo = ucl.users[ id ] or ucl.authed[ id64 ] -- Check both tables
 	if not userInfo then return error( "User id does not exist for changing access (" .. id .. ")", 2 ) end
 
 	-- If they're connected but don't exist in the ULib user database, add them.
@@ -889,7 +890,7 @@ end
 
 	Parameters:
 
-		id - The SteamID, IP, or UniqueID of the user you wish to remove. Must be a valid, existing ID.
+		id - The SteamID, SteamID64, IP, or UniqueID of the user you wish to remove. Must be a valid, existing ID.
 			The unique id of a connected user is always valid.
 		from_CAMI - *(Optional)* An indicator for this information coming from CAMI.
 
@@ -912,7 +913,7 @@ function ucl.removeUser( id, from_CAMI )
 		if not ply then return error( "SANITY CHECK FAILED!" ) end -- Should never be invalid
 
 		local ip = ULib.splitPort( ply:IPAddress() )
-		local checkIndexes = { ply:UniqueID(), ip, ply:SteamID() }
+		local checkIndexes = { ply:SteamID64(), ply:UniqueID(), ip, ply:SteamID() }
 
 		for _, index in ipairs( checkIndexes ) do
 			if ucl.users[ index ] then
@@ -1024,22 +1025,22 @@ end
 ]]
 function ucl.probe( ply )
 	local ip = ULib.splitPort( ply:IPAddress() )
-	local uid = ply:UniqueID()
-	local checkIndexes = { uid, ip, ply:SteamID() }
+	local id64 = ply:SteamID64()
+	local checkIndexes = { id64, ply:UniqueID(), ip, ply:SteamID() }
 
 	local match = false
 	for _, index in ipairs( checkIndexes ) do
 		if ucl.users[ index ] then
-			ucl.authed[ uid ] = ucl.users[ index ] -- Setup an ALIAS
+			ucl.authed[ id64 ] = ucl.users[ index ] -- Setup an ALIAS
 
 			-- If they have a group, set it
-			local group = ucl.authed[ uid ].group
+			local group = ucl.authed[ id64 ].group
 			if group and group ~= "" then
 				ply:SetUserGroup( group, true )
 			end
 
 			-- Update their name
-			ucl.authed[ uid ].name = ply:Nick()
+			ucl.authed[ id64 ].name = ply:Nick()
 			ucl.saveUsers()
 
 			match = true
@@ -1048,14 +1049,14 @@ function ucl.probe( ply )
 	end
 
 	if not match then
-		ucl.authed[ ply:UniqueID() ] = ULib.DEFAULT_GRANT_ACCESS
+		ucl.authed[ id64 ] = ULib.DEFAULT_GRANT_ACCESS
 		if ply.tmp_group then
 			ply:SetUserGroup( ply.tmp_group, true ) -- Make sure they keep the group
 			ply.tmp_group = nil
 		end
 	end
 
-	ULib.clientRPC( _, "ULib.ucl.updateClientUCLPlayer", uid, ucl.authed[ uid ] )
+	ULib.clientRPC( _, "ULib.ucl.updateClientUCLPlayer", id64, ucl.authed[ id64 ] )
 	hook.Call( ULib.HOOK_UCLCHANGED )
 	hook.Call( ULib.HOOK_UCLAUTH, _, ply )
 end
@@ -1064,7 +1065,7 @@ end
 local function setupBot( ply )
 	if not ply or not ply:IsValid() then return end
 
-	if not ucl.authed[ ply:UniqueID() ] then
+	if not ucl.authed[ ply:SteamID64() ] then
 		ply:SetUserGroup( ULib.ACCESS_ALL, true ) -- Give it a group!
 		ucl.probe( ply )
 	end
@@ -1094,10 +1095,10 @@ hook.Add( "PlayerInitialSpawn", "ULibSendUCLDataToClient", sendUCLDataToClient, 
 
 local function playerDisconnected( ply )
 	-- We want to perform these actions after everything else has processed through, but we need high priority hook to ensure we don't get sniped.
-	local uid = ply:UniqueID()
+	local id64 = ply:SteamID64()
 	ULib.queueFunctionCall( function()
-		ucl.authed[ uid ] = nil
-		ULib.clientRPC( _, "ULib.ucl.updateClientUCLPlayer", uid, _ )
+		ucl.authed[ id64 ] = nil
+		ULib.clientRPC( _, "ULib.ucl.updateClientUCLPlayer", id64, _ )
 		hook.Call( ULib.HOOK_UCLCHANGED )
 	end )
 end
@@ -1117,7 +1118,7 @@ local playerAuth = hook.GetTable().PlayerInitialSpawn.PlayerAuthSpawn
 hook.Remove( "PlayerInitialSpawn", "PlayerAuthSpawn" ) -- Remove from original spot
 
 local function newPlayerAuth( ply, ... )
-	ucl.authed[ ply:UniqueID() ] = nil -- If the player ent is removed before disconnecting, we can have this hanging out there.
+	ucl.authed[ ply:SteamID64() ] = nil -- If the player ent is removed before disconnecting, we can have this hanging out there.
 	playerAuth( ply, ... ) -- Put here, slightly ahead of ucl.
 	ucl.probe( ply, ... )
 end
@@ -1133,19 +1134,19 @@ function meta:SetUserGroup( group, dontCall )
 	local oldGroup = self:GetUserGroup()
 	oldSetUserGroup( self, group )
 
-	local uid = self:UniqueID()
+	local id64 = self:SteamID64()
 
-	if ucl.authed[ uid ] then
-		if ucl.authed[ uid ] == ULib.DEFAULT_GRANT_ACCESS then
-			ucl.authed[ uid ] = table.Copy( ULib.DEFAULT_GRANT_ACCESS )
+	if ucl.authed[ id64 ] then
+		if ucl.authed[ id64 ] == ULib.DEFAULT_GRANT_ACCESS then
+			ucl.authed[ id64 ] = table.Copy( ULib.DEFAULT_GRANT_ACCESS )
 		end
-		ucl.authed[ uid ].group = group
+		ucl.authed[ id64 ].group = group
 	else
 		self.tmp_group = group
 	end
 
 	if not dontCall and self:GetUserGroup() ~= oldGroup then -- Changed! Inform the masses of the change
-		ULib.clientRPC( _, "ULib.ucl.updateClientUCLPlayer", uid, ucl.authed[ uid ] )
+		ULib.clientRPC( _, "ULib.ucl.updateClientUCLPlayer", id64, ucl.authed[ id64 ] )
 		hook.Call( ULib.HOOK_UCLCHANGED )
 		hook.Call( ULib.HOOK_UCLAUTH, _, self )
 	end

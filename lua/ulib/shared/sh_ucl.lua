@@ -15,7 +15,7 @@ local ucl = ULib.ucl -- Make it easier for us to refer to
 -- Setup!
 ucl.groups = ucl.groups or {} -- Stores allows, inheritance, and custom addon info keyed by group name
 ucl.users = ucl.users or {} -- Stores allows, denies, group, and last seen name keyed by user id (steamid, ip, whatever)
-ucl.authed = ucl.authed or {} -- alias to ucl.users subtable for player if they have an entry, otherwise a "guest" entry. Keyed by uniqueid.
+ucl.authed = ucl.authed or {} -- alias to ucl.users subtable for player if they have an entry, otherwise a "guest" entry. Keyed by SteamID64.
 -- End setup
 
 --[[
@@ -45,13 +45,10 @@ function ucl.query( ply, access, hide )
 
 	access = access:lower()
 
-	local unique_id = ply:UniqueID()
-	if CLIENT and game.SinglePlayer() then
-		unique_id = "1" -- Fix garry's bug
-	end
+	local id64 = ply:SteamID64()
 
-	if not ucl.authed[ unique_id ] then return error( "[ULIB] Unauthed player" ) end -- Sanity check
-	local playerInfo = ucl.authed[ unique_id ]
+	if not ucl.authed[ id64 ] then return error( "[ULIB] Unauthed player" ) end -- Sanity check
+	local playerInfo = ucl.authed[ id64 ]
 
 	-- First check the player's info
 	if table.HasValue( playerInfo.deny, access ) then return false end -- Deny overrides all else
@@ -282,12 +279,10 @@ end
 function meta:GetUserGroup()
 	if not self:IsValid() then return "" end -- Not a valid player
 
-	local uid = self:UniqueID()
-	if CLIENT and game.SinglePlayer() then
-		uid = "1" -- Fix garry's bug
-	end
-	if not ucl.authed[ uid ] then return "" end
-	return ucl.authed[ uid ].group or "user"
+	local id64 = self:SteamID64()
+
+	if not ucl.authed[ id64 ] then return "" end
+	return ucl.authed[ id64 ].group or "user"
 end
 
 
