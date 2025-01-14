@@ -16,6 +16,28 @@ local ucl = ULib.ucl -- Make it easier for us to refer to
 ucl.groups = ucl.groups or {} -- Stores allows, inheritance, and custom addon info keyed by group name
 ucl.users = ucl.users or {} -- Stores allows, denies, group, and last seen name keyed by user id (steamid, ip, whatever)
 ucl.authed = ucl.authed or {} -- alias to ucl.users subtable for player if they have an entry, otherwise a "guest" entry. Keyed by SteamID64.
+
+local authedMeta = {} -- Used to ensure backwards compatibility for keying ucl.authed by UniqueID
+
+function authedMeta:__index(key)
+	if isstring(key) and #key ~= 17 then -- SteamID64 should always have a length of 17; UniqueID should always have a length of 10
+		local ply = player.GetByUniqueID(key)
+		key = ply:SteamID64()
+	end
+
+	return rawget(self, key)
+end
+
+function authedMeta:__newindex(key, value)
+	if isstring(key) and #key ~= 17 then -- SteamID64 should always have a length of 17; UniqueID should always have a length of 10
+		local ply = player.GetByUniqueID(key)
+		key = ply:SteamID64()
+	end
+
+	rawset(self, key, value)
+end
+
+setmetatable(ucl.authed, authedMeta)
 -- End setup
 
 --[[
@@ -128,8 +150,8 @@ end
 		v2.40 - Initial
 ]]
 function ucl.getInheritanceTree()
-	local inherits = { [ULib.ACCESS_ALL]={} }
-	local find = { [ULib.ACCESS_ALL]=inherits[ULib.ACCESS_ALL] }
+	local inherits = { [ULib.ACCESS_ALL] = {} }
+	local find = { [ULib.ACCESS_ALL] = inherits[ULib.ACCESS_ALL] }
 	for group, _ in pairs( ucl.groups ) do
 		if group ~= ULib.ACCESS_ALL then
 			local inherits_from = ucl.groupInheritsFrom( group )
