@@ -21,7 +21,7 @@ local authedMeta = {} -- Used to ensure backwards compatibility for keying ucl.a
 
 function authedMeta:__index(key)
 	if isstring(key) and #key ~= 17 then -- SteamID64 should always have a length of 17; UniqueID should always have a length of 10
-		local ply = player.GetByUniqueID(key)
+		local ply = ULib.getPlyByID(key)
 		key = ply:SteamID64()
 	end
 
@@ -30,7 +30,7 @@ end
 
 function authedMeta:__newindex(key, value)
 	if isstring(key) and #key ~= 17 then -- SteamID64 should always have a length of 17; UniqueID should always have a length of 10
-		local ply = player.GetByUniqueID(key)
+		local ply = ULib.getPlyByID(key)
 		key = ply:SteamID64()
 	end
 
