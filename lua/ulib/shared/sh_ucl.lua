@@ -68,8 +68,11 @@ function ucl.query( ply, access, hide )
 	access = access:lower()
 
 	local id64 = ply:SteamID64()
-
-	if not ucl.authed[ id64 ] then return error( "[ULIB] Unauthed player" ) end -- Sanity check
+	
+	if not ucl.authed[ id64 ] then -- If we use the query in PlayerInitialSpawn before PlayerAuthed or it was not called or player is unauthed
+		ply:UniqueID() -- Oddly enough, it calls PlayerAuthed
+		if not ucl.authed[ id64 ] then return error( "[ULIB] Unauthed player" ) end -- Sanity check
+	end
 	local playerInfo = ucl.authed[ id64 ]
 
 	-- First check the player's info
