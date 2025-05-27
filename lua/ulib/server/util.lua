@@ -142,16 +142,38 @@ function ULib.replicatedWritableCvar( sv_cvar, cl_cvar, default_value, save, not
 end
 
 local function repCvarOnJoin( ply )
-	for sv_cvar, v in pairs( repcvars ) do
-	
-		net.Start("ulib_repWriteCvar")
-			net.WriteString( sv_cvar )
-			net.WriteString( v.cl_cvar )
-			net.WriteString( v.default )
-			net.WriteString( v.cvar_obj:GetString() )
-		net.Send( ply )
-		
+	local cvar_data = {}
+	-- Create a minimized version of this table to save data
+	for sv_cvar, info in pairs( repcvars ) do
+		cvar_data[ sv_cvar ] = { d=info.default, c=info.cl_cvar, v=info.cvar_obj:GetString() }
 	end
+
+	local cvars_json = util.TableToJSON( cvar_data )
+	local compressedcvars = util.Compress( cvars_json )
+	local compressedlen = #compressedcvars
+
+	local blocksize = 2560
+	local offset = 1
+	local idx = 1
+	while ( compressedlen > 0 ) do
+		local sendsize = compressedlen
+		if sendsize > blocksize then
+			sendsize = blocksize
+		end
+
+		net.Start( "ulib_repWriteCvarBatch_Part" )
+			net.WriteUInt( sendsize, 16 )
+			net.WriteUInt( idx, 16 )
+			net.WriteData( string.sub( compressedcvars, offset, offset + sendsize ) )
+		net.Send( ply )
+
+		offset = offset + sendsize
+		idx = idx + 1
+		compressedlen = compressedlen - sendsize
+	end
+
+	net.Start( "ulib_repWriteCvarBatch_Complete" )
+	net.Send( ply )
 end
 hook.Add( ULib.HOOK_LOCALPLAYERREADY, "ULibSendCvars", repCvarOnJoin )
 
