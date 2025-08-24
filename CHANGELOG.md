@@ -3,6 +3,7 @@
 ## Upcoming - *(00/00/00)*
 * [ADD] Added a hook for PostCommandCalled (Thanks, brandonsturgeon)
 * [CHANGE] Moved Users to SQLite. (Thanks, JoshPiper)
+* [CHANGE] Refactored how CVars are replicated in an attempt to not overflow the buffer on servers with a lot of CVars. (Thanks, Malivil)
 
 ## v2.71 - *(03/24/24)*
 * [ADD] Added a sanity check to ULib.replicatedWritableCvar to address older addons after the net code rewrite. (Thanks, ZenBre4ker)
