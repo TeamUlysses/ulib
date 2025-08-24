@@ -167,10 +167,12 @@ ULib.HOOK_PLAYER_TARGETS = "ULibPlayerTargets" -- Exactly the same as the above 
 		ply - The player that executed the command.
 		commandName - The command that's being executed.
 		translated_args - A table of the translated arguments, as passed into the callback function itself.
+		callResult - The return value of the command function.
 
 	Revisions:
 
 		v2.40 - Initial
+		v2.72 - Add the callResult parameter
 ]]
 ULib.HOOK_POST_TRANSLATED_COMMAND = "ULibPostTranslatedCommand"
 

@@ -1,9 +1,6 @@
 # ULib Changelog
 
 ## Upcoming - *(00/00/00)*
-* [ADD] Added a hook for PostCommandCalled (Thanks, brandonsturgeon)
-* [CHANGE] Moved Users to SQLite. (Thanks, JoshPiper)
-* [CHANGE] Refactored how CVars are replicated in an attempt to not overflow the buffer on servers with a lot of CVars. (Thanks, Malivil)
 
 ## v2.71 - *(03/24/24)*
 * [ADD] Added a sanity check to ULib.replicatedWritableCvar to address older addons after the net code rewrite. (Thanks, ZenBre4ker)
@@ -15,6 +12,9 @@
 * [FIX] Fix possible lag exploit with player ready code. (Thanks, WardenPotato)
 * [CHANGE] Removed gsub from the SteamID replacement string in ban reasons.
 * [CHANGE] Strings can now be passed to ULib.addBan for the admin parameter. This is useful for 3rd party integrations of ULib's ban. (Thanks, wrefgtzweve)
+* [ADD] Added a hook for PostCommandCalled (Thanks, brandonsturgeon)
+* [CHANGE] Moved Users to SQLite. (Thanks, JoshPiper)
+* [CHANGE] Refactored how CVars are replicated in an attempt to not overflow the buffer on servers with a lot of CVars. (Thanks, Malivil)
 
 ## v2.70 - *(08/04/22)*
 * [ADD] Hook when a new, previously unknown access is registered. UCLChanged is now called as well.

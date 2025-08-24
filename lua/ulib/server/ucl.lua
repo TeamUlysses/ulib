@@ -110,12 +110,60 @@ function ucl.saveGroups()
 end
 
 function ucl.saveUsers()
-	for _, userInfo in pairs( ucl.users ) do
-		table.sort( userInfo.allow )
-		table.sort( userInfo.deny )
+	for steamid, userInfo in pairs( ucl.users ) do
+		ucl.saveUser(steamid, userInfo)
+	end
+end
+
+local isFirstTimeDBSetup = false
+local function generateUserDB()
+	if not sql.TableExists("ulib_users") then
+		sql.Query([[
+			CREATE TABLE IF NOT EXISTS ulib_users (
+				steamid TEXT NOT NULL PRIMARY KEY,
+				name TEXT NULL,
+				usergroup TEXT NOT NULL DEFAULT "user",
+				allow TEXT,
+				deny TEXT
+			);
+		]])
+		isFirstTimeDBSetup = true
+	end
+end
+generateUserDB()
+
+local function escape(str)
+	return sql.SQLStr(str, true)
+end
+
+function ucl.saveUser( steamid, userInfo )
+	if not userInfo then
+		userInfo = ucl.users[ steamid ]
 	end
 
-	ULib.fileWrite( ULib.UCL_USERS, ULib.makeKeyValues( ucl.users ) )
+	table.sort( userInfo.allow )
+	table.sort( userInfo.deny )
+	local allow, deny = util.TableToJSON( userInfo.allow ), util.TableToJSON( userInfo.deny )
+
+	sql.Query(string.format([[
+		REPLACE INTO ulib_users
+			(steamid, name, usergroup, allow, deny)
+		VALUES
+			('%s', '%s', '%s', '%s', '%s');
+	]], escape( steamid ), escape( userInfo.name or "" ), escape( userInfo.group ), escape( allow ), escape( deny )))
+end
+
+function ucl.deleteUser( steamid )
+	sql.Query(string.format([[
+		DELETE FROM
+			ulib_users
+		WHERE
+			steamid = '%s'
+	]], escape( steamid )))
+end
+
+function ucl.deleteUsers()
+	sql.Query([[DELETE FROM ulib_users;]])
 end
 
 local function reloadGroups()
@@ -212,24 +260,62 @@ local function reloadGroups()
 end
 reloadGroups()
 
-local function reloadUsers()
-	-- Try to read from the safest locations first
-	local noMount = true
-	local path = ULib.UCL_USERS
-	if not ULib.fileExists( path, noMount ) then
-		ULib.fileWrite( path, "" )
+local function loadUsersFromDB()
+	-- No cap, the sqlite errors should always be reset when making a new query.
+	sql.m_strError = nil
+	local users = sql.Query( "SELECT * FROM ulib_users;" )
+	if not users then
+		local err = sql.LastError()
+		if err then
+			Msg( "The users database failed to load.\n" )
+			Msg( "Error while querying database was: " .. err .. "\n" )
+			return false
+		else
+			return {}
+		end
 	end
 
+	local out = {}
+	for _, row in ipairs(users) do
+		out[row.steamid] = {name = row.name, group = row.usergroup, allow = util.JSONToTable(row.allow) or {}, deny = util.JSONToTable(row.deny) or {}}
+	end
+
+	return out
+end
+
+local function reloadUsers()
+	local runningFromDB = false
 	local needsBackup = false
 	local err
-	ucl.users, err = ULib.parseKeyValues( ULib.removeCommentHeader( ULib.fileRead( path, true ) or "", "/" ) )
+
+	-- Start by trying to read from the DB.
+	if not isFirstTimeDBSetup then
+		ucl.users = loadUsersFromDB()
+		if ucl.users then
+			runningFromDB = true
+		end
+	end
+
+	-- Next, read from the users file.
+	if not runningFromDB then
+		local noMount = true
+		local path = ULib.UCL_USERS
+
+		if not ULib.fileExists( path, noMount ) then
+			ULib.fileWrite( path, "" )
+		end
+
+		ucl.users, err = ULib.parseKeyValues( ULib.removeCommentHeader( ULib.fileRead( path, noMount ) or "", "/" ) )
+	end
 
 	-- Check to make sure it passes a basic validity test
 	if not ucl.users then
 		needsBackup = true
 		-- Totally messed up! Clear it.
 		ucl.users = {}
-
+		if runningFromDB then
+			ucl.deleteUsers()
+		end
 	else
 		for id, userInfo in pairs( ucl.users ) do
 			if type( id ) ~= "string" then
@@ -288,11 +374,20 @@ local function reloadUsers()
 	end
 
 	if needsBackup then
-		Msg( "Users file was not formatted correctly. Attempting to fix and backing up original\n" )
-		if err then
-			Msg( "Error while reading users file was: " .. err .. "\n" )
+		if runningFromDB then
+			Msg( "There was bad data returned from the database. Attempting to fix, though some data may be lost.\n" )
+			ucl.deleteUsers()
+		else
+			Msg( "Users file was not formatted correctly. Attempting to fix and backing up original\n" )
+			if err then
+				Msg( "Error while reading users file was: " .. err .. "\n" )
+			end
+			Msg( "Original file was backed up to " .. ULib.backupFile( ULib.UCL_USERS ) .. "\n" )
 		end
-		Msg( "Original file was backed up to " .. ULib.backupFile( ULib.UCL_USERS ) .. "\n" )
+		ucl.saveUsers()
+	elseif isFirstTimeDBSetup then
+		isFirstTimeDBSetup = false
+		Msg( "Migrating users file to users database.\n" )
 		ucl.saveUsers()
 	end
 end
@@ -723,7 +818,7 @@ function ucl.addUser( id, allows, denies, group, from_CAMI )
 	if denies == ULib.DEFAULT_GRANT_ACCESS.deny then denies = table.Copy( denies ) end -- Otherwise we'd be changing all guest access
 	if group and not ucl.groups[ group ] then return error( "Group does not exist for adding user to (" .. group .. ")", 2 ) end
 
-	-- Lower case'ify
+	-- This doesn't do anything?
 	for k, v in ipairs( allows ) do allows[ k ] = v end
 	for k, v in ipairs( denies ) do denies[ k ] = v end
 
@@ -732,7 +827,7 @@ function ucl.addUser( id, allows, denies, group, from_CAMI )
 	if ucl.users[ id ] and ucl.users[ id ].group then oldgroup = ucl.users[ id ].group end
 	ucl.users[ id ] = { allow=allows, deny=denies, group=group, name=name }
 
-	ucl.saveUsers()
+	ucl.saveUser( id, ucl.users[ id ] )
 
 	local ply = ULib.getPlyByID( id )
 	if ply then
@@ -864,7 +959,26 @@ function ucl.userAllow( id, access, revoke, deny )
 			ULib.queueFunctionCall( hook.Call, ULib.HOOK_UCLAUTH, _, ply ) -- Inform the masses
 		end
 
-		ucl.saveUsers()
+		local saveId
+		if ucl.users[ id ] then
+			saveId = id
+		else
+			local data = ucl.authed[ uid ]
+			for checkId, check in pairs( ucl.users ) do
+				if check == data then
+					saveId = checkId
+					break
+				end
+			end
+		end
+
+		if saveId then
+			ucl.saveUser( id, ucl.users[ id ] )
+		else
+			Msg( "There was an error while changing user access.\n" )
+			Msg( "The user ID could not be found, so the user could not be saved\n" )
+		end
+
 
 		hook.Call( ULib.HOOK_USER_ACCESS_CHANGE, _, id, access, revoke, deny )
 		hook.Call( ULib.HOOK_UCLCHANGED )
@@ -908,18 +1022,18 @@ function ucl.removeUser( id, from_CAMI )
 
 		for _, index in ipairs( checkIndexes ) do
 			if ucl.users[ index ] then
-				changed = true
+				changed = index
 				ucl.users[ index ] = nil
 				break -- Only match the first one
 			end
 		end
 	else
-		changed = true
+		changed = id
 		ucl.users[ id ] = nil
 	end
 
 	if changed then -- If the user is only added to the default garry file, then nothing changed
-		ucl.saveUsers()
+		ucl.deleteUser( changed )
 		hook.Call( ULib.HOOK_USER_REMOVED, _, id, userInfo )
 	end
 
@@ -1031,7 +1145,9 @@ function ucl.probe( ply )
 
 			-- Update their name
 			ucl.authed[ uid ].name = ply:Nick()
-			ucl.saveUsers()
+
+			local sid = ply:SteamID()
+			ucl.saveUser( sid )
 
 			match = true
 			break

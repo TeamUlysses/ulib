@@ -948,8 +948,8 @@ local function translateCmdCallback( ply, commandName, argv )
 		end
 	end
 
-	cmd:call( isOpposite, unpack( args ) )
-	hook.Call( ULib.HOOK_POST_TRANSLATED_COMMAND, _, ply, commandName, args )
+	local callResult = cmd:call( isOpposite, unpack( args ) )
+	hook.Call( ULib.HOOK_POST_TRANSLATED_COMMAND, _, ply, commandName, args, callResult )
 end
 
 local function translateAutocompleteCallback( commandName, args )
