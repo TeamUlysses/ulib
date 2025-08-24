@@ -24,7 +24,7 @@ function ULib.getBanMessage( steamid, banData, templateMessage )
 		BAN_START = "(Unknown)",
 		REASON = "(None given)",
 		TIME_LEFT = "(Permaban)",
-		STEAMID = steamid:gsub("%D", ""),
+		STEAMID = steamid,
 		STEAMID64 = util.SteamIDTo64( steamid ),
 	}
 
@@ -45,8 +45,9 @@ function ULib.getBanMessage( steamid, banData, templateMessage )
 	if unban and unban > 0 then
 		replacements.TIME_LEFT = ULib.secondsToStringTime( unban - os.time() )
 	end
-
-	return templateMessage:gsub( "{{([%w_]+)}}", replacements )
+  
+  	local banMessage = templateMessage:gsub( "{{([%w_]+)}}", replacements )
+	return banMessage
 end
 
 local function checkBan( steamid64, ip, password, clpassword, name )
@@ -148,9 +149,12 @@ function ULib.addBan( steamid, time, reason, name, admin )
 
 	local admin_name
 	if admin then
-		admin_name = "(Console)"
-		if admin:IsValid() then
-			admin_name = string.format( "%s(%s)", admin:Name(), admin:SteamID() )
+		if isstring(admin) then
+			admin_name = admin
+		elseif not IsValid(admin) then
+			admin_name = "(Console)"
+		elseif admin:IsPlayer() then
+			admin_name = string.format("%s(%s)", admin:Name(), admin:SteamID())
 		end
 	end
 
@@ -193,7 +197,7 @@ function ULib.addBan( steamid, time, reason, name, admin )
 	end
 
 	-- This redundant kick is to ensure they're kicked -- even if they're joining
-	RunConsoleCommand("kickid", steamid, shortReason or "")
+	game.KickID( steamid, shortReason or "" )
 
 	writeBan( t )
 	hook.Call( ULib.HOOK_USER_BANNED, _, steamid, t )

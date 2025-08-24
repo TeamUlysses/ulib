@@ -82,8 +82,14 @@ end
 --
 -- Run a hook (this replaces Call)
 --
+local currentGM
+
 function Run( name, ... )
-	return Call( name, gmod and gmod.GetGamemode() or nil, ... )
+	if ( !currentGM ) then
+		currentGM = gmod and gmod.GetGamemode() or nil
+	end
+
+	return Call( name, currentGM, ... )
 end
 
 --
@@ -130,6 +136,7 @@ function Call( name, gm, ... )
 						-- If the object has become invalid - remove it
 						--
 						HookTable[ i ][ k ] = nil
+						BackwardsHooks[ name ][ k ] = nil
 					end
 				end
 			end

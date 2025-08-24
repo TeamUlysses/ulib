@@ -1352,9 +1352,8 @@ local function routedCommandCallback( ply, commandName, argv )
 	if not routedCmds[ commandName:lower() ] then
 		return error( "Base command \"" .. commandName .. "\" is not defined!" )
 	end
-	local orig_argv = argv
-	local orig_commandName = commandName
 
+	local currTable
 	currTable, commandName, argv = cmds.getCommandTableAndArgv( commandName, argv, true )
 	cmds.execute( currTable, ply, commandName, argv )
 end
