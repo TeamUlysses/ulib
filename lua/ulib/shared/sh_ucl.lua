@@ -15,7 +15,29 @@ local ucl = ULib.ucl -- Make it easier for us to refer to
 -- Setup!
 ucl.groups = ucl.groups or {} -- Stores allows, inheritance, and custom addon info keyed by group name
 ucl.users = ucl.users or {} -- Stores allows, denies, group, and last seen name keyed by user id (steamid, ip, whatever)
-ucl.authed = ucl.authed or {} -- alias to ucl.users subtable for player if they have an entry, otherwise a "guest" entry. Keyed by uniqueid.
+ucl.authed = ucl.authed or {} -- alias to ucl.users subtable for player if they have an entry, otherwise a "guest" entry. Keyed by SteamID64.
+
+local authedMeta = {} -- Used to ensure backwards compatibility for keying ucl.authed by UniqueID
+
+function authedMeta:__index(key)
+	if isstring(key) and #key ~= 17 then -- SteamID64 should always have a length of 17; UniqueID should always have a length of 10
+		local ply = ULib.getPlyByID(key)
+		key = ply:SteamID64()
+	end
+
+	return rawget(self, key)
+end
+
+function authedMeta:__newindex(key, value)
+	if isstring(key) and #key ~= 17 then -- SteamID64 should always have a length of 17; UniqueID should always have a length of 10
+		local ply = ULib.getPlyByID(key)
+		key = ply:SteamID64()
+	end
+
+	rawset(self, key, value)
+end
+
+setmetatable(ucl.authed, authedMeta)
 -- End setup
 
 --[[
@@ -45,13 +67,13 @@ function ucl.query( ply, access, hide )
 
 	access = access:lower()
 
-	local unique_id = ply:UniqueID()
-	if CLIENT and game.SinglePlayer() then
-		unique_id = "1" -- Fix garry's bug
+	local id64 = ply:SteamID64()
+	
+	if not ucl.authed[ id64 ] then -- If we use the query in PlayerInitialSpawn before PlayerAuthed or it was not called or player is unauthed
+		ply:UniqueID() -- Oddly enough, it calls PlayerAuthed
+		if not ucl.authed[ id64 ] then return error( "[ULIB] Unauthed player" ) end -- Sanity check
 	end
-
-	if not ucl.authed[ unique_id ] then return error( "[ULIB] Unauthed player" ) end -- Sanity check
-	local playerInfo = ucl.authed[ unique_id ]
+	local playerInfo = ucl.authed[ id64 ]
 
 	-- First check the player's info
 	if table.HasValue( playerInfo.deny, access ) then return false end -- Deny overrides all else
@@ -131,8 +153,8 @@ end
 		v2.40 - Initial
 ]]
 function ucl.getInheritanceTree()
-	local inherits = { [ULib.ACCESS_ALL]={} }
-	local find = { [ULib.ACCESS_ALL]=inherits[ULib.ACCESS_ALL] }
+	local inherits = { [ULib.ACCESS_ALL] = {} }
+	local find = { [ULib.ACCESS_ALL] = inherits[ULib.ACCESS_ALL] }
 	for group, _ in pairs( ucl.groups ) do
 		if group ~= ULib.ACCESS_ALL then
 			local inherits_from = ucl.groupInheritsFrom( group )
@@ -177,12 +199,25 @@ if CLIENT then
 	function ucl.initClientUCL( authed, groups )
 		ucl.authed = authed
 		ucl.groups = groups
+
 		for name, data in pairs( groups ) do
 			if not ULib.findInTable( {"superadmin", "admin", "user"}, name ) then
 				inherit_from = data.inherit_from or "user"
-				CAMI.RegisterUsergroup( {Name=name, Inherits=inherit_from}, CAMI.ULX_TOKEN )
+				CAMI.RegisterUsergroup( {Name = name, Inherits = inherit_from}, CAMI.ULX_TOKEN )
 			end
 		end
+
+		hook.Call( ULib.HOOK_UCLCHANGED )
+	end
+
+	function ucl.updateClientUCLPlayer( id, data )
+		ucl.authed[ id ] = data
+		hook.Call( ULib.HOOK_UCLCHANGED )
+	end
+
+	function ucl.updateClientUCLGroup( name, data )
+		ucl.groups[ name ] = data
+		hook.Call( ULib.HOOK_UCLCHANGED )
 	end
 end
 
@@ -269,12 +304,10 @@ end
 function meta:GetUserGroup()
 	if not self:IsValid() then return "" end -- Not a valid player
 
-	local uid = self:UniqueID()
-	if CLIENT and game.SinglePlayer() then
-		uid = "1" -- Fix garry's bug
-	end
-	if not ucl.authed[ uid ] then return "" end
-	return ucl.authed[ uid ].group or "user"
+	local id64 = self:SteamID64()
+
+	if not ucl.authed[ id64 ] then return "" end
+	return ucl.authed[ id64 ].group or "user"
 end
 
 

@@ -59,7 +59,7 @@ end
 
 
 local Player = FindMetaTable( "Player" )
-local checkIndexes = { Player.UniqueID, function( ply ) if CLIENT then return "" end local ip = ULib.splitPort( ply:IPAddress() ) return ip end, Player.SteamID, Player.UserID }
+local checkIndexes = { Player.SteamID64, Player.UniqueID, function( ply ) if CLIENT then return "" end local ip = ULib.splitPort( ply:IPAddress() ) return ip end, Player.SteamID, Player.UserID }
 --[[
 	Function: getPlyByID
 
@@ -67,7 +67,7 @@ local checkIndexes = { Player.UniqueID, function( ply ) if CLIENT then return ""
 
 	Parameters:
 
-		id - The ID to try to match against connected players. Can be a unique id, ip address, steam id, or user id.
+		id - The ID to try to match against connected players. Can be a SteamID64, UniqueID, IP address, SteamID, or UserID.
 
 	Returns:
 
