@@ -54,15 +54,7 @@ local function clCvarChanged( cl_cvar, oldvalue, newvalue )
 	RunConsoleCommand( "ulib_update_cvar", sv_cvar, newvalue )
 end
 
--- This is the counterpart to <replicatedWithWritableCvar>. See that function for more info. We also add callbacks from here.
-
-net.Receive( "ulib_repWriteCvar", function( len )
-
-	local sv_cvar = net.ReadString()
-	local cl_cvar = net.ReadString()
-	local default_value = net.ReadString()
-	local current_value = net.ReadString()
-
+local function repWriteCvar( sv_cvar, cl_cvar, default_value, current_value )
 	cvarinfo[ sv_cvar ] = GetConVar( cl_cvar ) or CreateClientConVar( cl_cvar, default_value, false, false ) -- Make sure it's created one way or another (second case is most common)
 	reversecvar[ cl_cvar ] = { sv_cvar=sv_cvar }
 
@@ -73,9 +65,43 @@ net.Receive( "ulib_repWriteCvar", function( len )
 			RunConsoleCommand( cl_cvar, current_value )
 		end
 	end )
-	
+
 	cvars.AddChangeCallback( cl_cvar, clCvarChanged )
-	
+end
+
+-- This is the counterpart to <replicatedWithWritableCvar>. See that function for more info. We also add callbacks from here.
+
+net.Receive( "ulib_repWriteCvar", function( len )
+	local sv_cvar = net.ReadString()
+	local cl_cvar = net.ReadString()
+	local default_value = net.ReadString()
+	local current_value = net.ReadString()
+
+	repWriteCvar( sv_cvar, cl_cvar, default_value, current_value )
+end )
+
+local compressedcvars = {}
+net.Receive( "ulib_repWriteCvarBatch_Part", function()
+	local len = net.ReadUInt( 16 )
+	local idx = net.ReadUInt( 16 )
+	compressedcvars[ idx ] = net.ReadData( len )
+end )
+
+net.Receive( "ulib_repWriteCvarBatch_Complete", function()
+	local cvar_count = table.Count( compressedcvars )
+	local compressedstring = ""
+	for idx = 1, cvar_count do
+		compressedstring = compressedstring .. compressedcvars[ idx ]
+	end
+
+	local cvars_json = util.Decompress( compressedstring )
+	local cvars = util.JSONToTable( cvars_json )
+
+	for sv_cvar, info in pairs( cvars ) do
+		repWriteCvar( sv_cvar, info.c, info.d, info.v )
+	end
+
+	compressedcvars = {}
 end )
 
 

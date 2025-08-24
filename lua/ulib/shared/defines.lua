@@ -466,5 +466,7 @@ if SERVER then
 	util.AddNetworkString( "URPC" )
 	util.AddNetworkString( "tsayc" )
 	util.AddNetworkString( "ulib_repWriteCvar" )
+	util.AddNetworkString( "ulib_repWriteCvarBatch_Part" )
+	util.AddNetworkString( "ulib_repWriteCvarBatch_Complete" )
 	util.AddNetworkString( "ulib_repChangeCvar" )
 end
