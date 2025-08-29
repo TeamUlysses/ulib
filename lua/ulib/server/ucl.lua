@@ -666,6 +666,55 @@ if SERVER then
 	end, nil, "Restore UCL users from a backup file (server console or listen server host only).")
 end
 
+-- === Drop UCL users database table (with confirmation) ===
+-- Usage: ucl_drop_users_db CONFIRM
+-- Effect: Drops the SQLite table `ulib_users`
+--         On next reload, it will be re-imported from users.txt
+-- Security: Only dedicated server console or listen-server host may run this
+
+if SERVER then
+	local function dropUsersTable()
+		MsgN("[ULib UCL] Dropping ulib_users table …")
+		local ok, err = pcall(function()
+			sql.Query("DROP TABLE IF EXISTS ulib_users;")
+		end)
+		if not ok then
+			MsgN("[ULib UCL] ERROR while dropping users table: " .. tostring(err))
+			return false
+		end
+		MsgN("[ULib UCL] ulib_users table dropped successfully.")
+		return true
+	end
+
+	concommand.Add("ucl_drop_users_db", function(ply, cmd, args, argStr)
+		-- Dedicated server console: ply == nil
+		-- Listen server host: valid ply and ply:IsListenServerHost()
+		if IsValid(ply) and not ply:IsListenServerHost() then
+			ply:PrintMessage(HUD_PRINTCONSOLE,
+				"[ULib UCL] This command can only be run by the SERVER CONSOLE or the LISTEN SERVER HOST.\n")
+			MsgN("[ULib UCL] Denied non-host player '" .. ply:Nick() .. "' from running " .. cmd)
+			return
+		end
+
+		-- Require explicit CONFIRM
+		if (args[1] or ""):upper() ~= "CONFIRM" then
+			MsgN("[ULib UCL] Refusing to drop table. You must run: ucl_drop_users_db CONFIRM")
+			if IsValid(ply) then
+				ply:PrintMessage(HUD_PRINTCONSOLE,
+					"[ULib UCL] Refusing to drop table. You must run: ucl_drop_users_db CONFIRM\n")
+			end
+			return
+		end
+
+		local ok = dropUsersTable()
+		if ok and IsValid(ply) then
+			ply:PrintMessage(HUD_PRINTCONSOLE,
+				"[ULib UCL] ulib_users table dropped. Restart or reload to re-import from legacy users.txt\n")
+		end
+	end, nil, "Drop the ulib_users table (requires CONFIRM).")
+end
+
+
 
 
 --[[
